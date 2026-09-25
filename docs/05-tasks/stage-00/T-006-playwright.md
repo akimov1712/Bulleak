@@ -1,7 +1,7 @@
 # T-006 · Playwright: smoke e2e desktop + mobile
 
 - **Этап:** 00 Среда разработки
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/01-rules/testing-policy.md
@@ -18,7 +18,7 @@
 - `e2e/smoke.spec.ts`
 
 ## Критерии приёмки
-- [ ] `npm run e2e` зелёный в обоих проектах
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] `npm run e2e` зелёный в обоих проектах
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test: add playwright smoke tests`
