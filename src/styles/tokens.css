@@ -26,6 +26,7 @@
   --xp-shade: #d98e00;
   --on-xp: #3d2800;
   --on-mod: #14172a;
+  --xp-text: #8f5a00;
   --info: #2563eb;
   --info-soft: #dbe8ff;
   --epic: #7c4dea;
@@ -89,6 +90,7 @@
   --xp: #ffc247;
   --xp-shade: #d99a1a;
   --on-xp: #2e1f00;
+  --xp-text: #ffc247;
   --info: #60a5fa;
   --info-soft: #172a4a;
   --epic: #a78bfa;
@@ -121,6 +123,7 @@
   --color-xp-shade: var(--xp-shade);
   --color-on-xp: var(--on-xp);
   --color-on-mod: var(--on-mod);
+  --color-xp-text: var(--xp-text);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --color-epic: var(--epic);
