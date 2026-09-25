@@ -1,7 +1,7 @@
 # T-107 · Роутинг и страницы-заглушки
 
 - **Этап:** 01 Каркас приложения и дизайн-система
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/routing.md
@@ -18,8 +18,8 @@
 - `src/pages/*.tsx`
 
 ## Критерии приёмки
-- [ ] Все URL из routing.md открываются
-- [ ] Неизвестный URL → 404
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Все URL из routing.md открываются
+- [x] Неизвестный URL → 404
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(app): add routing with page placeholders`

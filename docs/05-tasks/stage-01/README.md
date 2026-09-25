@@ -17,7 +17,7 @@
 | [T-104](T-104-ui-kit-forms-progress.md) | UI-кит 2: прогресс и формы | ☑ |
 | [T-105](T-105-ui-kit-overlays.md) | UI-кит 3: Modal/Sheet, Popover/Tooltip, Toast, Skeleton, EmptyState | ☑ |
 | [T-106](T-106-mascot.md) | Маскот «Бычок Буллик» | ☑ |
-| [T-107](T-107-routing.md) | Роутинг и страницы-заглушки | ☐ |
+| [T-107](T-107-routing.md) | Роутинг и страницы-заглушки | ☑ |
 | [T-108](T-108-app-shell.md) | AppShell: сайдбар, верхняя панель, нижняя навигация | ☐ |
 | [T-109](T-109-ui-showcase.md) | Витрина UI-кита (dev) | ☐ |
 | [T-110](T-110-about-page.md) | Страница «О курсе», дисклеймер, атрибуции | ☐ |
