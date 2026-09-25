@@ -68,3 +68,12 @@ export async function expectNoHorizontalScroll(page: Page) {
   );
   expect(overflow).toBe(false);
 }
+
+/** Close the level-up modal if it appeared (it overlays the page and blocks clicks). */
+export async function dismissLevelUp(page: Page) {
+  const dialog = page.getByRole('dialog', { name: 'Новый уровень!' });
+  if (await dialog.isVisible().catch(() => false)) {
+    await dialog.getByRole('button', { name: 'Продолжить' }).click();
+    await expect(dialog).toBeHidden();
+  }
+}

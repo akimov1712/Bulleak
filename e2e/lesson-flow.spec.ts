@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { quiz } from '../src/content/modules/m00/l01/quiz';
-import { expectNoHorizontalScroll, runLessonQuiz } from './helpers';
+import { dismissLevelUp, expectNoHorizontalScroll, runLessonQuiz } from './helpers';
 
 const LESSON_TITLE = 'Добро пожаловать: что такое трейдинг и чем он не является';
 
@@ -48,6 +48,7 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
     await page.goto('/#/lesson/m00-l01/quiz');
     await runLessonQuiz(page, quiz.questions, 7); // 7/8 = 87.5%
     await expect(page.getByRole('heading', { name: 'Тест сдан!' })).toBeVisible();
+    await dismissLevelUp(page);
     await page.getByRole('link', { name: 'Следующий урок' }).click();
     await expect(
       page.getByRole('heading', {

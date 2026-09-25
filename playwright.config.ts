@@ -15,6 +15,9 @@ export default defineConfig({
     baseURL: externalBaseUrl ?? `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
     locale: 'ru-RU',
+    // Endless decorative animations (bouncing map node) never become "stable" for clicks;
+    // reduced motion also exercises the app's motion setting.
+    reducedMotion: 'reduce',
   },
   projects: [
     {

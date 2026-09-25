@@ -1,7 +1,7 @@
 # T-311 · E2E: награды за урок
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -13,7 +13,7 @@
 - `e2e/gamification.spec.ts`
 
 ## Критерии приёмки
-- [ ] Зелёный на обоих проектах
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Зелёный на обоих проектах
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test(e2e): cover rewards after lesson completion`
