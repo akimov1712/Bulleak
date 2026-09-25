@@ -5,17 +5,19 @@ import type { QuizResult } from '@/types/quiz';
 import type { ExamKey, ProgressState } from '@/types/progress';
 import { createInitialProgress, PROGRESS_VERSION } from '@/lib/progress/initial';
 import { migrateProgress } from '@/lib/progress/migrate';
-import {
-  addLessonTime,
-  markLessonRead,
-  recordExam,
-  recordLessonQuiz,
-} from '@/lib/progress/actions';
+import { applyEvent } from '@/lib/progress/applyEvent';
+import type { ProgressEvent, Rewards } from '@/types/events';
+import { courseIndex } from '@/content/courseIndex';
+import { achievements } from '@/content/achievements';
+import { useSettings } from './settingsStore';
+import { useUi } from './uiStore';
 import { safeStorage } from './safeStorage';
 
 export const PROGRESS_STORAGE_KEY = 'tc-progress';
 
 interface ProgressActions {
+  /** Apply any progress event (XP, streak, achievements); returns the rewards. */
+  dispatch: (event: ProgressEvent) => Rewards;
   markRead: (id: LessonId) => void;
   addTime: (id: LessonId, seconds: number) => void;
   recordQuiz: (id: LessonId, result: QuizResult, durationSec?: number) => void;
@@ -41,20 +43,32 @@ export function selectProgressData(s: ProgressStore): ProgressState {
   return data as ProgressState;
 }
 
-/** Actions delegate to pure functions in lib/progress; the store only wires state and time. */
+/** All progress changes go through dispatch → lib/progress/applyEvent (pure); the store wires time and settings. */
 export const useProgress = create<ProgressStore>()(
   persist(
     (set, get) => {
       const apply = (fn: (state: ProgressState, now: number) => ProgressState) =>
         set(fn(selectProgressData(get()), Date.now()));
+      const dispatch = (event: ProgressEvent): Rewards => {
+        const { state, rewards } = applyEvent(selectProgressData(get()), event, {
+          now: Date.now(),
+          dailyGoalXp: useSettings.getState().dailyGoalXp,
+          course: courseIndex,
+          achievements,
+        });
+        set(state);
+        useUi.getState().pushRewards(rewards);
+        return rewards;
+      };
       return {
         ...createInitialProgress(Date.now()),
-        markRead: (id) => apply((s, now) => markLessonRead(s, id, now)),
-        addTime: (id, seconds) => apply((s, now) => addLessonTime(s, id, seconds, now)),
-        recordQuiz: (id, result, durationSec) =>
-          apply((s, now) => recordLessonQuiz(s, id, result, now, durationSec)),
+        dispatch,
+        markRead: (lessonId) => void dispatch({ type: 'lessonRead', lessonId }),
+        addTime: (lessonId, seconds) => void dispatch({ type: 'lessonTime', lessonId, seconds }),
+        recordQuiz: (lessonId, result, durationSec) =>
+          void dispatch({ type: 'quizCompleted', lessonId, result, durationSec }),
         recordExam: (key, result, durationSec) =>
-          apply((s, now) => recordExam(s, key, result, now, durationSec)),
+          void dispatch({ type: 'examCompleted', key, result, durationSec }),
         setName: (name) => apply((s) => ({ ...s, profile: { ...s.profile, name: name.trim() } })),
         replace: (next) => set(migrateProgress(next, PROGRESS_VERSION, Date.now())),
         reset: () => set(createInitialProgress(Date.now())),

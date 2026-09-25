@@ -4,6 +4,7 @@ import { PROGRESS_STORAGE_KEY, subscribeToOtherTabs, useProgress } from './progr
 import { createInitialProgress } from '@/lib/progress/initial';
 import { StorageBanner } from '@/app/layout/StorageBanner';
 import { __resetSafeStorage, safeStorage } from './safeStorage';
+import { useUi } from './uiStore';
 import { vi } from 'vitest';
 
 beforeEach(() => {
@@ -68,6 +69,25 @@ describe('progressStore', () => {
     });
     expect(useProgress.getState().xp).toBe(777);
     off();
+  });
+});
+
+describe('dispatch', () => {
+  it('applies the event pipeline and queues rewards for the UI', () => {
+    useUi.setState({ rewardsQueue: [] });
+    const rewards = useProgress.getState().dispatch({ type: 'lessonRead', lessonId: 'm00-l01' });
+    expect(rewards.xp).toBe(20);
+    expect(useProgress.getState().xp).toBe(20);
+    expect(useProgress.getState().achievements['first-step']).toBeTypeOf('number');
+    expect(useUi.getState().rewardsQueue).toHaveLength(1);
+    expect(useUi.getState().shiftRewards()?.newAchievements).toEqual(['first-step']);
+    expect(useUi.getState().rewardsQueue).toHaveLength(0);
+  });
+
+  it('does not queue empty rewards', () => {
+    useUi.setState({ rewardsQueue: [] });
+    useProgress.getState().addTime('m00-l01', 30);
+    expect(useUi.getState().rewardsQueue).toHaveLength(0);
   });
 });
 

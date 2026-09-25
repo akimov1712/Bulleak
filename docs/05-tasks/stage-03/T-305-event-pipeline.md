@@ -1,7 +1,7 @@
 # T-305 · Единый конвейер событий прогресса
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -16,7 +16,7 @@
 - `src/store/progressStore.ts`
 
 ## Критерии приёмки
-- [ ] Достижение с XP может вызвать level up — корректно в одном событии
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Достижение с XP может вызвать level up — корректно в одном событии
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(progress): add unified progress event pipeline`
