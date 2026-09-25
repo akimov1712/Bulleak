@@ -21,7 +21,7 @@
 | [T-208](T-208-lesson-page.md) | Страница урока | ☑ |
 | [T-209](T-209-lesson-timer-read.md) | Таймер активного времени и правило «урок прочитан» | ☑ |
 | [T-210](T-210-quiz-lib.md) | Логика тестов: подготовка и оценка | ☑ |
-| [T-211](T-211-quiz-flow.md) | Поток теста: старт → вопросы → результат | ☐ |
+| [T-211](T-211-quiz-flow.md) | Поток теста: старт → вопросы → результат | ☑ |
 | [T-212](T-212-questions-choice.md) | Вопросы: single, multi, truefalse | ☑ |
 | [T-213](T-213-questions-numeric-match-order.md) | Вопросы: numeric, match, order | ☑ |
 | [T-214](T-214-content-validation.md) | Автоматическая валидация контента | ☐ |

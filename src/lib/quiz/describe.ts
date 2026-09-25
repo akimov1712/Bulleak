@@ -1,4 +1,5 @@
 import type { Question } from '@/types/quiz';
+import type { PreparedQuestion } from './prepare';
 import { formatNumber, formatPrice } from '@/lib/format';
 
 /** Human-readable correct answer for feedback and the mistakes review. */
@@ -68,4 +69,9 @@ export function isAnswered(q: Question, value: unknown): boolean {
     case 'order':
       return Array.isArray(value) && value.length === q.items.length;
   }
+}
+
+/** Answer the learner starts with (order questions start from the shuffled list). */
+export function initialAnswer(q: PreparedQuestion): unknown {
+  return q.type === 'order' ? q.shuffled : undefined;
 }

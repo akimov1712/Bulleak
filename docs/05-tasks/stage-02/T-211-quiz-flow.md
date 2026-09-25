@@ -1,7 +1,7 @@
 # T-211 · Поток теста: старт → вопросы → результат
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/quiz-engine.md (Поток)
@@ -18,8 +18,8 @@
 - `src/features/quiz/QuizResult.tsx`
 
 ## Критерии приёмки
-- [ ] Результат записывается в progress (recordQuiz)
-- [ ] Перезагрузка посреди теста → тест начинается заново
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Результат записывается в progress (recordQuiz)
+- [x] Перезагрузка посреди теста → тест начинается заново
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(quiz): add quiz runner flow and result screen`
