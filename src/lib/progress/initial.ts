@@ -1,4 +1,10 @@
-import type { Counters, LessonProgress, ProgressState, Streak } from '@/types/progress';
+import type {
+  Counters,
+  DayActivity,
+  LessonProgress,
+  ProgressState,
+  Streak,
+} from '@/types/progress';
 
 export const PROGRESS_VERSION = 1;
 export const MAX_QUIZ_ATTEMPTS = 500;
@@ -12,6 +18,11 @@ export function emptyCounters(): Counters {
     calculatorsUsed: [],
     glossaryViewed: [],
     dailyGoalsMet: 0,
+    simCorrectSkips: 0,
+    backtestTrades: 0,
+    forwardTrades: 0,
+    planStreak: 0,
+    planWritten: false,
   };
 }
 
@@ -35,5 +46,18 @@ export function createInitialProgress(now: number): ProgressState {
     quizAttempts: [],
     counters: emptyCounters(),
     profile: { name: '', startedAt: now },
+  };
+}
+
+export function emptyDay(): DayActivity {
+  return {
+    xp: 0,
+    minutes: 0,
+    lessonsCompleted: 0,
+    quizzes: 0,
+    simTrades: 0,
+    simXp: 0,
+    journalXp: 0,
+    goalMet: false,
   };
 }

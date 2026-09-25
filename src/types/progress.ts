@@ -31,6 +31,12 @@ export interface DayActivity {
   lessonsCompleted: number;
   quizzes: number;
   simTrades: number;
+  /** XP from the simulator today (capped per day). */
+  simXp: number;
+  /** XP from journal entries today (capped per day). */
+  journalXp: number;
+  /** The daily XP goal was reached (bonus given once). */
+  goalMet: boolean;
 }
 
 export interface QuizAttempt {
@@ -58,6 +64,14 @@ export interface Counters {
   calculatorsUsed: string[];
   glossaryViewed: string[];
   dailyGoalsMet: number;
+  /** Correct "no trade" decisions in simulator scenarios. */
+  simCorrectSkips: number;
+  backtestTrades: number;
+  /** Closed demo/testnet journal trades (forward test). */
+  forwardTrades: number;
+  /** Consecutive closed journal trades that followed the plan. */
+  planStreak: number;
+  planWritten: boolean;
 }
 
 export interface Profile {

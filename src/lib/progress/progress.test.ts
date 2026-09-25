@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { QuizResult } from '@/types/quiz';
-import { createInitialProgress, MAX_QUIZ_ATTEMPTS, PROGRESS_VERSION } from './initial';
+import { createInitialProgress, emptyDay, MAX_QUIZ_ATTEMPTS, PROGRESS_VERSION } from './initial';
 import { migrateProgress } from './migrate';
 import { addLessonTime, markLessonRead, recordExam, recordLessonQuiz } from './actions';
 
@@ -182,13 +182,7 @@ describe('migrateProgress', () => {
     });
     expect(migrated.lessons['m00-l02']).toBeUndefined();
     expect(Object.keys(migrated.activity)).toEqual(['2026-09-25']);
-    expect(migrated.activity['2026-09-25']).toEqual({
-      xp: 10,
-      minutes: 0,
-      lessonsCompleted: 0,
-      quizzes: 0,
-      simTrades: 0,
-    });
+    expect(migrated.activity['2026-09-25']).toEqual({ ...emptyDay(), xp: 10 });
     expect(migrated.streak).toMatchObject({ current: 3, lastActiveDay: null });
     expect(migrated.counters.calculatorsUsed).toEqual(['position']);
     expect(migrated.counters.glossaryViewed).toEqual([]);

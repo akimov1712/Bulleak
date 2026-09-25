@@ -74,6 +74,9 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
           lessonsCompleted: num(v.lessonsCompleted),
           quizzes: num(v.quizzes),
           simTrades: num(v.simTrades),
+          simXp: num(v.simXp),
+          journalXp: num(v.journalXp),
+          goalMet: v.goalMet === true,
         }
       : null,
   );
@@ -101,6 +104,11 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
     calculatorsUsed: strArray(counterRaw.calculatorsUsed),
     glossaryViewed: strArray(counterRaw.glossaryViewed),
     dailyGoalsMet: num(counterRaw.dailyGoalsMet),
+    simCorrectSkips: num(counterRaw.simCorrectSkips),
+    backtestTrades: num(counterRaw.backtestTrades),
+    forwardTrades: num(counterRaw.forwardTrades),
+    planStreak: num(counterRaw.planStreak),
+    planWritten: counterRaw.planWritten === true,
   };
 
   // Every field is normalized: statistics later sum ratios and iterate tag pairs.

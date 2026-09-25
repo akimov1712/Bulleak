@@ -2,16 +2,12 @@ import type { LessonId } from '@/types/course';
 import type { QuizResult } from '@/types/quiz';
 import type { DayActivity, ExamKey, ProgressState, QuizAttempt } from '@/types/progress';
 import { toDateKey } from '@/lib/date';
-import { emptyLessonProgress, MAX_QUIZ_ATTEMPTS } from './initial';
+import { emptyDay, emptyLessonProgress, MAX_QUIZ_ATTEMPTS } from './initial';
 
 /**
  * Pure state transitions for learning progress (no XP/achievements — those are layered on
  * in stage 03 by lib/progress/applyEvent). Every function returns a new state object.
  */
-
-function emptyDay(): DayActivity {
-  return { xp: 0, minutes: 0, lessonsCompleted: 0, quizzes: 0, simTrades: 0 };
-}
 
 function updateDay(
   state: ProgressState,
