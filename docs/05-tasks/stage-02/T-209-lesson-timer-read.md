@@ -1,7 +1,7 @@
 # T-209 · Таймер активного времени и правило «урок прочитан»
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/lesson-player.md (Поведение)
@@ -16,7 +16,7 @@
 - `src/lib/progress/read.ts`
 
 ## Критерии приёмки
-- [ ] XP за чтение ровно один раз (пока без XP — флаг readAt; XP подключается на этапе 03)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] XP за чтение ровно один раз (пока без XP — флаг readAt; XP подключается на этапе 03)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(lesson): track active time and read state`

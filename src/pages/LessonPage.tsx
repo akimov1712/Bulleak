@@ -16,6 +16,7 @@ import { ReadingProgress } from '@/features/lesson/ReadingProgress';
 import { TableOfContents } from '@/features/lesson/TableOfContents';
 import { LockedLesson } from '@/features/lesson/LockedLesson';
 import { LessonFooter } from '@/features/lesson/LessonFooter';
+import { useLessonRead } from '@/features/lesson/useLessonRead';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
@@ -72,6 +73,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
   const [ready, setReady] = useState(false);
   const markReady = useCallback(() => setReady(true), []);
   useScrollRestore(`lesson:${lesson.id}`, ready);
+  useLessonRead(lesson, articleRef, ready);
 
   const module = courseIndex.getModule(lesson.moduleId);
   const status = lessonStatus(ctx, lesson.id);
