@@ -1,7 +1,7 @@
 # T-404 · Компонент CandleChart
 
 - **Этап:** 04 Графики и пилотный контент (модули 0–3)
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/content-pipeline.md (CandleChart)
@@ -19,8 +19,8 @@
 - `src/features/charts/annotations.ts`
 
 ## Критерии приёмки
-- [ ] Работает на 375px (жесты, без перехвата скролла страницы)
-- [ ] Нет утечек при размонтировании
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Работает на 375px (жесты, без перехвата скролла страницы)
+- [x] Нет утечек при размонтировании
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(charts): add candle chart with annotations and indicators`

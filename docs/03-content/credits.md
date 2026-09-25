@@ -9,4 +9,4 @@
 
 ## Данные и библиотеки
 - Исторические свечи: публичный API Bybit (`/v5/market/kline`).
-- Графики: TradingView Lightweight Charts™ (Apache-2.0) — ссылка на TradingView в футере/на странице «О курсе» (требование лицензии библиотеки).
+- Графики: TradingView Lightweight Charts™ v5 (Apache-2.0), Copyright (c) 2025 TradingView, Inc. Атрибуция по лицензии — логотип TradingView со ссылкой на каждом графике (`attributionLogo: true`) и ссылка на странице «О курсе».

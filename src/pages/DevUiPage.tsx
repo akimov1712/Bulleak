@@ -21,6 +21,7 @@ import { MOOD_LIST, MOODS } from '@/components/mascot/moods';
 import { toast } from '@/store/uiStore';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatUsd } from '@/lib/format';
+import { CandleChart, type ChartPick } from '@/features/charts/CandleChart';
 
 const SWATCHES = [
   'bg',
@@ -64,10 +65,44 @@ export function DevUiPage() {
   const [sound, setSound] = useState(false);
   const [modal, setModal] = useState<'center' | 'sheet' | null>(null);
   const [pill, setPill] = useState('risk');
+  const [pick, setPick] = useState<ChartPick | null>(null);
 
   return (
     <div className="flex flex-col gap-10">
       <PageHeader title="UI-кит" subtitle="Витрина компонентов (только в dev)" />
+
+      <Section title="Графики">
+        <CandleChart
+          dataset="BTCUSDT-240"
+          to="2026-09-25T12:00Z"
+          bars={120}
+          volume
+          indicators={[
+            { type: 'ema', period: 20 },
+            { type: 'ema', period: 50 },
+          ]}
+          annotations={[
+            { type: 'swings', n: 4 },
+            { type: 'hline', price: 80000, label: 'Уровень 80k', dashed: true },
+            { type: 'zone', top: 76500, bottom: 74900, label: 'Зона спроса', tone: 'bull' },
+            { type: 'vline', time: '2026-09-15T16:00Z', label: 'Событие' },
+          ]}
+          caption="BTC 4H: свинги HH/HL, уровень, зона, EMA 20/50"
+        />
+        <CandleChart
+          dataset="ETHUSDT-D"
+          bars={150}
+          interactive
+          height={280}
+          indicators={[{ type: 'bollinger' }, { type: 'rsi' }, { type: 'macd' }]}
+          onPick={setPick}
+          caption={
+            pick
+              ? `Клик: свеча #${pick.index}, цена ${pick.price.toFixed(2)}`
+              : 'ETH 1D: Bollinger, RSI, MACD. Кликни по графику'
+          }
+        />
+      </Section>
 
       <Section title="Цвета">
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
