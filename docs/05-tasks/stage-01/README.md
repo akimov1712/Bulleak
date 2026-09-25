@@ -11,7 +11,7 @@
 ## Задачи
 | ID | Задача | Статус |
 |---|---|---|
-| [T-101](T-101-utils.md) | Утилиты: format, date, seeded random | ☐ |
+| [T-101](T-101-utils.md) | Утилиты: format, date, seeded random | ☑ |
 | [T-102](T-102-settings-store-theme.md) | Стор настроек и переключение темы | ☐ |
 | [T-103](T-103-ui-kit-basic.md) | UI-кит 1: Button, IconButton, Card, Badge, Pill | ☐ |
 | [T-104](T-104-ui-kit-forms-progress.md) | UI-кит 2: прогресс и формы | ☐ |
