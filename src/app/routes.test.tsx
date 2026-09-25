@@ -15,7 +15,7 @@ describe('routes', () => {
     [paths.home(), 'Главная'],
     [paths.path(), 'Карта курса'],
     [paths.module('m03'), 'Модуль m03'],
-    [paths.lesson('m03-l02'), 'Урок m03-l02'],
+    [paths.lesson('m03-l02'), 'Таймфреймы'],
     [paths.lessonQuiz('m03-l02'), 'Тест урока m03-l02'],
     [paths.exam('m03'), 'Экзамен m03'],
     [paths.simulator(), 'Тренажёр'],

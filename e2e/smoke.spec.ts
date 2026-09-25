@@ -27,7 +27,7 @@ test('home opens without console errors', async ({ page }) => {
 
 const pages: [string, string][] = [
   ['#/path', 'Карта курса'],
-  ['#/lesson/m00-l01', 'Урок m00-l01'],
+  ['#/lesson/m00-l01', 'Добро пожаловать: что такое трейдинг и чем он не является'],
   ['#/simulator', 'Тренажёр'],
   ['#/tools', 'Инструменты'],
   ['#/journal', 'Журнал сделок'],
