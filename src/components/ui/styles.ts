@@ -71,3 +71,9 @@ export function cardClass({
     cardPaddings[padding],
   );
 }
+
+/** Text-like inputs (Input, NumberInput, Select). */
+export const inputClass =
+  'min-h-11 w-full rounded-xl border-2 border-border bg-surface px-3.5 text-base text-text ' +
+  'placeholder:text-text-muted/70 transition-colors hover:border-text-muted/40 ' +
+  'focus:border-info focus:outline-none aria-invalid:border-bear disabled:opacity-50';

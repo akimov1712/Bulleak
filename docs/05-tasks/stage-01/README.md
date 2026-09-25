@@ -14,7 +14,7 @@
 | [T-101](T-101-utils.md) | Утилиты: format, date, seeded random | ☑ |
 | [T-102](T-102-settings-store-theme.md) | Стор настроек и переключение темы | ☑ |
 | [T-103](T-103-ui-kit-basic.md) | UI-кит 1: Button, IconButton, Card, Badge, Pill | ☑ |
-| [T-104](T-104-ui-kit-forms-progress.md) | UI-кит 2: прогресс и формы | ☐ |
+| [T-104](T-104-ui-kit-forms-progress.md) | UI-кит 2: прогресс и формы | ☑ |
 | [T-105](T-105-ui-kit-overlays.md) | UI-кит 3: Modal/Sheet, Popover/Tooltip, Toast, Skeleton, EmptyState | ☐ |
 | [T-106](T-106-mascot.md) | Маскот «Бычок Буллик» | ☐ |
 | [T-107](T-107-routing.md) | Роутинг и страницы-заглушки | ☐ |
