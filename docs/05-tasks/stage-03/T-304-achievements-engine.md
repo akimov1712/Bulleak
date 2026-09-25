@@ -1,7 +1,7 @@
 # T-304 · Движок достижений
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/03-content/achievements-list.md
@@ -16,8 +16,8 @@
 - `src/lib/achievements.ts`
 
 ## Критерии приёмки
-- [ ] 40 достижений, id уникальны
-- [ ] Повторно не выдаются
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] 40 достижений, id уникальны
+- [x] Повторно не выдаются
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(gamification): add achievements engine`
