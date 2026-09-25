@@ -11,17 +11,24 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Трейдинг на Bybit с нуля</title>
     <script>
-      // Apply the saved theme before first paint to avoid a light/dark flash.
+      // Apply the saved theme and motion preference before first paint (mirrors
+      // useApplyTheme / useApplyMotion) to avoid a light/dark flash or unwanted animation.
       (function () {
-        var theme = 'system';
+        var state = {};
         try {
           var saved = JSON.parse(localStorage.getItem('tc-settings') || '{}');
-          if (saved && saved.state && saved.state.theme) theme = saved.state.theme;
+          if (saved && saved.state) state = saved.state;
         } catch (e) {}
+        var theme = state.theme || 'system';
         if (theme === 'system') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
+        var motion = state.reducedMotion || 'system';
+        var reduce =
+          motion === 'off' ||
+          (motion === 'system' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.motion = reduce ? 'reduce' : 'full';
       })();
     </script>
   </head>

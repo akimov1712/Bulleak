@@ -1,4 +1,5 @@
 import { forwardRef, type InputHTMLAttributes, type SelectHTMLAttributes } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { inputClass } from './styles';
 
@@ -31,23 +32,23 @@ export function Select<T extends string>({
   ...rest
 }: SelectProps<T>) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onValueChange(e.target.value as T)}
-      className={cn(inputClass, 'cursor-pointer appearance-none pr-9', className)}
-      style={{
-        backgroundImage:
-          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa3c0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'right 0.75rem center',
-      }}
-      {...rest}
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div className={cn('relative', className)}>
+      <select
+        value={value}
+        onChange={(e) => onValueChange(e.target.value as T)}
+        className={cn(inputClass, 'cursor-pointer appearance-none pr-10')}
+        {...rest}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-text-muted"
+      />
+    </div>
   );
 }

@@ -63,6 +63,14 @@ describe('NumberInput', () => {
     expect(onValue).toHaveBeenLastCalledWith(null);
   });
 
+  it('clears invalid text on blur so it matches the null value', async () => {
+    render(<ControlledNumber onValue={() => {}} />);
+    const input = screen.getByLabelText('Депозит');
+    await userEvent.type(input, 'abc');
+    await userEvent.tab();
+    expect(input).toHaveValue('');
+  });
+
   it('clamps to bounds on blur', async () => {
     const onValue = vi.fn();
     render(<ControlledNumber onValue={onValue} min={0} max={100} />);
@@ -83,14 +91,19 @@ describe('NumberInput', () => {
 describe('Field', () => {
   it('shows an error and marks it as alert', () => {
     render(
-      <Field label="Стоп" error="Стоп должен быть ниже входа">
+      <Field label="Стоп" hint="Ставь стоп за структурой" error="Стоп должен быть ниже входа">
         {({ id, describedBy, invalid }) => (
           <input id={id} aria-describedby={describedBy} aria-invalid={invalid} />
         )}
       </Field>,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Стоп должен быть ниже входа');
-    expect(screen.getByLabelText('Стоп')).toHaveAttribute('aria-invalid', 'true');
+    const input = screen.getByLabelText('Стоп');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    // every id in aria-describedby must exist
+    for (const id of (input.getAttribute('aria-describedby') ?? '').split(' ')) {
+      expect(document.getElementById(id)).not.toBeNull();
+    }
   });
 });
 

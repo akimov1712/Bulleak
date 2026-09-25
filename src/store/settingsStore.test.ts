@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
+import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { DEFAULT_SETTINGS, useSettings } from './settingsStore';
 import { useResolvedTheme } from '@/hooks/useTheme';
 
@@ -38,6 +39,19 @@ describe('settingsStore', () => {
     useSettings.getState().update({ freeMode: true });
     useSettings.getState().reset();
     expect(useSettings.getState().freeMode).toBe(false);
+  });
+});
+
+describe('useApplyMotion', () => {
+  it('writes data-motion from the user setting', () => {
+    const { rerender } = renderHook(() => useApplyMotion());
+    expect(document.documentElement.dataset.motion).toBe('full');
+    act(() => useSettings.getState().update({ reducedMotion: 'off' }));
+    rerender();
+    expect(document.documentElement.dataset.motion).toBe('reduce');
+    act(() => useSettings.getState().update({ reducedMotion: 'on' }));
+    rerender();
+    expect(document.documentElement.dataset.motion).toBe('full');
   });
 });
 

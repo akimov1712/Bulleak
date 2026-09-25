@@ -1,3 +1,5 @@
+import { decimalsForStep } from './format';
+
 /**
  * Parse user-typed numbers: accepts "," or "." as decimal separator, spaces/nbsp as
  * thousands separators, a leading "+" or "-"/"−". Returns null for empty or invalid input.
@@ -18,9 +20,13 @@ export function clamp(value: number, min?: number, max?: number): number {
   return v;
 }
 
-/** Round to the nearest multiple of `step` (floating-point safe for display steps). */
+/** Round to the nearest multiple of `step`, trimming float noise to the step's precision. */
 export function roundToStep(value: number, step: number): number {
   if (!(step > 0)) return value;
-  const decimals = Math.max(0, -Math.floor(Math.log10(step)) + 1);
-  return Number((Math.round(value / step) * step).toFixed(decimals));
+  return Number((Math.round(value / step) * step).toFixed(decimalsForStep(step)));
+}
+
+/** Plain decimal text without exponent or grouping: 1e-7 → "0.0000001". */
+export function toPlainString(value: number): string {
+  return value.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 20 });
 }

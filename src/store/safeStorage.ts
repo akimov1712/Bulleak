@@ -9,6 +9,8 @@ import type { StateStorage } from 'zustand/middleware';
 type Listener = (healthy: boolean) => void;
 
 const memory = new Map<string, string>();
+/** Keys whose latest value could not be written to localStorage. */
+const unsavedKeys = new Set<string>();
 const listeners = new Set<Listener>();
 let healthy = true;
 
@@ -37,6 +39,8 @@ function backend(): Storage | null {
 
 export const safeStorage: StateStorage = {
   getItem(name) {
+    // A key whose last write failed is newer in memory than in localStorage.
+    if (unsavedKeys.has(name)) return memory.get(name) ?? null;
     try {
       const store = backend();
       if (!store) throw new Error('localStorage unavailable');
@@ -52,13 +56,16 @@ export const safeStorage: StateStorage = {
       const store = backend();
       if (!store) throw new Error('localStorage unavailable');
       store.setItem(name, value);
+      unsavedKeys.delete(name);
       setHealthy(true);
     } catch {
+      unsavedKeys.add(name);
       setHealthy(false);
     }
   },
   removeItem(name) {
     memory.delete(name);
+    unsavedKeys.delete(name);
     try {
       backend()?.removeItem(name);
     } catch {
@@ -70,6 +77,7 @@ export const safeStorage: StateStorage = {
 /** Test helper: reset module state between tests. */
 export function __resetSafeStorage(): void {
   memory.clear();
+  unsavedKeys.clear();
   listeners.clear();
   healthy = true;
 }

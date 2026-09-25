@@ -22,6 +22,9 @@ const C = {
   horn: 'var(--mascot-horn)',
   hornShade: 'var(--mascot-horn-shade)',
   ink: 'var(--mascot-ink)',
+  eye: 'var(--mascot-eye)',
+  cheek: 'var(--mascot-cheek)',
+  mouth: 'var(--mascot-mouth)',
   cap: 'var(--mascot-cap)',
   capShade: 'var(--mascot-cap-shade)',
   line: 'var(--mascot-outline)',
@@ -33,9 +36,9 @@ const stroke = { stroke: C.line, strokeWidth: 4, strokeLinejoin: 'round' as cons
 function Face({ mood }: { mood: MascotMood }): ReactNode {
   const openEye = (cx: number, lookX = 0, lookY = 0, r = 11) => (
     <g>
-      <ellipse cx={cx} cy={84} rx={r} ry={r + 2} fill="#fff" {...stroke} strokeWidth={3} />
+      <ellipse cx={cx} cy={84} rx={r} ry={r + 2} fill={C.eye} {...stroke} strokeWidth={3} />
       <circle cx={cx + lookX} cy={85 + lookY} r={r * 0.55} fill={C.ink} />
-      <circle cx={cx + lookX + 2.5} cy={81 + lookY} r={r * 0.2} fill="#fff" />
+      <circle cx={cx + lookX + 2.5} cy={81 + lookY} r={r * 0.2} fill={C.eye} />
     </g>
   );
   const closedHappy = (cx: number) => (
@@ -101,7 +104,7 @@ function Face({ mood }: { mood: MascotMood }): ReactNode {
         <>
           {closedHappy(76)}
           {closedHappy(124)}
-          {mouth('M84 134 Q100 158 116 134 Z', '#8a2f2f')}
+          {mouth('M84 134 Q100 158 116 134 Z', C.mouth)}
           <g fill="var(--xp)" stroke={C.line} strokeWidth={2}>
             <path d="M28 40 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4z" />
             <path d="M170 34 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" />
@@ -148,7 +151,7 @@ function Face({ mood }: { mood: MascotMood }): ReactNode {
         <>
           {openEye(76, 0, 0, 13)}
           {openEye(124, 0, 0, 13)}
-          <ellipse cx={100} cy={142} rx={8} ry={10} fill="#8a2f2f" stroke={C.ink} strokeWidth={4} />
+          <ellipse cx={100} cy={142} rx={8} ry={10} fill={C.mouth} stroke={C.ink} strokeWidth={4} />
           <path d="M150 64 q-6 10 0 15 q6 -5 0 -15z" fill="var(--info)" />
         </>
       );
@@ -271,7 +274,7 @@ export function Mascot({ mood = 'happy', size = 120, className, title }: MascotP
         <path d="M50 70 Q54 30 100 28 Q146 30 150 70 Q100 56 50 70 Z" fill={C.cap} {...stroke} />
         <path d="M120 64 Q156 58 172 70 Q150 76 128 72 Z" fill={C.capShade} {...stroke} />
         <circle cx={100} cy={29} r={5} fill={C.capShade} {...stroke} strokeWidth={3} />
-        <g fill="#fff">
+        <g fill={C.eye}>
           <rect x={85} y={44} width={6} height={10} rx={1.5} />
           <rect x={87.5} y={40} width={1.5} height={18} />
           <rect x={97} y={40} width={6} height={12} rx={1.5} />
@@ -286,8 +289,8 @@ export function Mascot({ mood = 'happy', size = 120, className, title }: MascotP
         <ellipse cx={113} cy={124} rx={5} ry={7} fill={C.nostril} />
 
         {/* cheeks */}
-        <ellipse cx={56} cy={110} rx={9} ry={6} fill="#f08a8a" opacity={0.45} />
-        <ellipse cx={144} cy={110} rx={9} ry={6} fill="#f08a8a" opacity={0.45} />
+        <ellipse cx={56} cy={110} rx={9} ry={6} fill={C.cheek} opacity={0.45} />
+        <ellipse cx={144} cy={110} rx={9} ry={6} fill={C.cheek} opacity={0.45} />
 
         <Face mood={mood} />
       </g>

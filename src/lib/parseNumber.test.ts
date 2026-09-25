@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { clamp, parseNumber, roundToStep } from './parseNumber';
+import { clamp, parseNumber, roundToStep, toPlainString } from './parseNumber';
+
+describe('toPlainString', () => {
+  it('never uses exponent notation or grouping', () => {
+    expect(toPlainString(1e-7)).toBe('0.0000001');
+    expect(toPlainString(1234567.5)).toBe('1234567.5');
+    expect(toPlainString(-0.5)).toBe('-0.5');
+    expect(parseNumber(toPlainString(1e-7))).toBe(1e-7);
+  });
+});
 
 describe('parseNumber', () => {
   it.each([
@@ -42,6 +51,9 @@ describe('roundToStep', () => {
     expect(roundToStep(0.0137, 0.001)).toBe(0.014);
     expect(roundToStep(60123.46, 0.5)).toBe(60123.5);
     expect(roundToStep(7, 5)).toBe(5);
+    expect(roundToStep(0.125, 0.125)).toBe(0.125);
+    expect(roundToStep(0.3, 0.125)).toBe(0.25);
+    expect(roundToStep(3.7, 2.5)).toBe(2.5);
   });
   it('returns the value for a non-positive step', () => {
     expect(roundToStep(1.234, 0)).toBe(1.234);

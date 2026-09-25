@@ -21,6 +21,9 @@ describe('decimalsForStep', () => {
     [0.0000001, 7],
     [1, 0],
     [10, 0],
+    [2.5, 1],
+    [0.125, 3],
+    [1.5e-7, 8],
     [0, 0],
     [-0.1, 0],
     [Number.NaN, 0],
@@ -78,6 +81,15 @@ describe('formatPrice', () => {
   });
   it('returns a dash for invalid input', () => {
     expect(formatPrice(undefined)).toBe('—');
+  });
+});
+
+describe('negative zero', () => {
+  it('drops the minus when the value rounds to zero', () => {
+    expect(formatPct(-0.00001)).toBe('0%');
+    expect(formatR(-0.001)).toBe('0R');
+    expect(formatUsd(-0.001)).toBe('$0,00');
+    expect(formatR(0.001)).toBe('0R');
   });
 });
 

@@ -5,17 +5,45 @@
 
 const LOCALE = 'ru-RU';
 const DASH = '—';
+const MINUS = '−';
 
 function isFiniteNumber(value: number | null | undefined): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
-/** Decimals needed to show a price with the given tick size (0.1 → 1, 0.001 → 3). */
+// Intl.NumberFormat construction is expensive; tables format hundreds of cells per render.
+const formatters = new Map<string, Intl.NumberFormat>();
+
+function numberFormat(minDecimals: number, maxDecimals: number): Intl.NumberFormat {
+  const key = `${minDecimals}:${maxDecimals}`;
+  let formatter = formatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(LOCALE, {
+      minimumFractionDigits: minDecimals,
+      maximumFractionDigits: maxDecimals,
+    });
+    formatters.set(key, formatter);
+  }
+  return formatter;
+}
+
+/**
+ * Sign for display, decided AFTER rounding to `decimals` so that e.g. −0.0001 shown with
+ * 2 decimals is "0", not "−0".
+ */
+function displaySign(value: number, decimals: number, plusForPositive: boolean): string {
+  const rounded = Number(Math.abs(value).toFixed(decimals));
+  if (rounded === 0) return '';
+  if (value < 0) return MINUS;
+  return plusForPositive ? '+' : '';
+}
+
+/** Decimals needed to show values on the given step (0.1 → 1, 2.5 → 1, 1.5e-7 → 8). */
 export function decimalsForStep(step: number): number {
-  if (!isFiniteNumber(step) || step <= 0 || step >= 1) return 0;
-  const text = step.toString();
-  if (text.includes('e-')) return Number(text.split('e-')[1]);
-  return text.split('.')[1]?.length ?? 0;
+  if (!isFiniteNumber(step) || step <= 0) return 0;
+  const [mantissa = '', exponent] = step.toString().toLowerCase().split('e');
+  const fraction = mantissa.split('.')[1]?.length ?? 0;
+  return Math.max(0, fraction - (exponent ? Number(exponent) : 0));
 }
 
 export function formatNumber(
@@ -24,20 +52,14 @@ export function formatNumber(
   opts: { minDecimals?: number } = {},
 ): string {
   if (!isFiniteNumber(value)) return DASH;
-  return new Intl.NumberFormat(LOCALE, {
-    minimumFractionDigits: opts.minDecimals ?? 0,
-    maximumFractionDigits: decimals,
-  }).format(value);
+  return numberFormat(opts.minDecimals ?? 0, decimals).format(value);
 }
 
 /** $1 234,56 style with the minus sign as a proper "−". */
 export function formatUsd(value: number | null | undefined, decimals = 2): string {
   if (!isFiniteNumber(value)) return DASH;
-  const abs = new Intl.NumberFormat(LOCALE, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(Math.abs(value));
-  return `${value < 0 ? '−' : ''}$${abs}`;
+  const abs = numberFormat(decimals, decimals).format(Math.abs(value));
+  return `${displaySign(value, decimals, false)}$${abs}`;
 }
 
 /** 0.0123 → "1,23%". `signed` adds "+" for positive values. */
@@ -48,26 +70,20 @@ export function formatPct(
 ): string {
   if (!isFiniteNumber(fraction)) return DASH;
   const pct = fraction * 100;
-  const body = formatNumber(Math.abs(pct), decimals);
-  const sign = pct < 0 ? '−' : signed && pct > 0 ? '+' : '';
-  return `${sign}${body}%`;
+  return `${displaySign(pct, decimals, signed)}${formatNumber(Math.abs(pct), decimals)}%`;
 }
 
 /** Price with fixed decimals derived from the instrument tick size. */
 export function formatPrice(value: number | null | undefined, step = 0.01): string {
   if (!isFiniteNumber(value)) return DASH;
   const decimals = decimalsForStep(step);
-  return new Intl.NumberFormat(LOCALE, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
+  return numberFormat(decimals, decimals).format(value);
 }
 
 /** R-multiple: 1.5 → "+1,5R", -1 → "−1R". */
 export function formatR(value: number | null | undefined, decimals = 2): string {
   if (!isFiniteNumber(value)) return DASH;
-  const sign = value < 0 ? '−' : value > 0 ? '+' : '';
-  return `${sign}${formatNumber(Math.abs(value), decimals)}R`;
+  return `${displaySign(value, decimals, true)}${formatNumber(Math.abs(value), decimals)}R`;
 }
 
 /** Seconds → "1 ч 5 мин", "12 мин", "45 с". */

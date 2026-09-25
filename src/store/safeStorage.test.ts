@@ -44,6 +44,20 @@ describe('safeStorage', () => {
     expect(isStorageHealthy()).toBe(false);
   });
 
+  it('returns the newer in-memory value when the last write failed', () => {
+    safeStorage.setItem('k', 'old');
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
+      throw new DOMException('quota', 'QuotaExceededError');
+    });
+    safeStorage.setItem('k', 'new');
+    expect(localStorage.getItem('k')).toBe('old');
+    expect(safeStorage.getItem('k')).toBe('new');
+    spy.mockRestore();
+    safeStorage.setItem('k', 'newest');
+    expect(localStorage.getItem('k')).toBe('newest');
+    expect(safeStorage.getItem('k')).toBe('newest');
+  });
+
   it('recovers health after a successful write', () => {
     const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
       throw new Error('fail once');

@@ -62,6 +62,9 @@
   --mascot-cap: #16c26a;
   --mascot-cap-shade: #0e9a52;
   --mascot-outline: #2a1d14;
+  --mascot-eye: #ffffff;
+  --mascot-cheek: #f08a8a;
+  --mascot-mouth: #8a2f2f;
 }
 
 :root[data-theme='dark'] {

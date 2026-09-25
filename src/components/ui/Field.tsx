@@ -15,7 +15,8 @@ export function Field({ label, hint, error, className, children }: FieldProps) {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ');
+  // Only reference elements that are actually rendered (the hint is hidden while an error shows).
+  const describedBy = error ? errorId : hint ? hintId : '';
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <label htmlFor={id} className="text-sm font-bold text-text">

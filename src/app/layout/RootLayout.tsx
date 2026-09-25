@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router';
 import { useApplyTheme } from '@/hooks/useTheme';
+import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { Toaster } from '@/components/ui/Toaster';
 import { ScrollToTop } from './ScrollToTop';
 import { Sidebar } from './Sidebar';
@@ -10,6 +11,7 @@ import { Footer } from './Footer';
 /** App shell: sidebar on desktop, top bar + bottom nav on mobile. */
 export function RootLayout() {
   useApplyTheme();
+  useApplyMotion();
   return (
     <div className="flex min-h-dvh">
       <a

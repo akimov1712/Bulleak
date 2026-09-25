@@ -1,6 +1,6 @@
 import { useState, type InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/cn';
-import { clamp, parseNumber } from '@/lib/parseNumber';
+import { clamp, parseNumber, toPlainString } from '@/lib/parseNumber';
 import { inputClass } from './styles';
 
 export interface NumberInputProps extends Omit<
@@ -16,7 +16,7 @@ export interface NumberInputProps extends Omit<
 }
 
 function toText(value: number | null): string {
-  return value === null ? '' : String(value).replace('.', ',');
+  return value === null ? '' : toPlainString(value).replace('.', ',');
 }
 
 /**
@@ -59,7 +59,11 @@ export function NumberInput({
         }}
         onBlur={(e) => {
           const parsed = parseNumber(text);
-          if (parsed !== null) {
+          if (parsed === null) {
+            // Invalid text already emitted null; clear it so the field matches its value
+            // (otherwise a later external reset to null could not be detected).
+            setText('');
+          } else {
             const bounded = clamp(parsed, min, max);
             setText(toText(bounded));
             if (bounded !== parsed) {
