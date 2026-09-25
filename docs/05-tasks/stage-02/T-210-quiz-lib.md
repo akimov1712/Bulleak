@@ -1,7 +1,7 @@
 # T-210 · Логика тестов: подготовка и оценка
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/quiz-engine.md (Логика)
@@ -17,7 +17,7 @@
 - `src/lib/quiz/grade.ts`
 
 ## Критерии приёмки
-- [ ] 8/10 сдан, 7/10 нет, 9/12 нет, 10/12 сдан
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] 8/10 сдан, 7/10 нет, 9/12 нет, 10/12 сдан
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(quiz): add quiz preparation and grading logic`
