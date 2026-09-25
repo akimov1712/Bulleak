@@ -1,7 +1,7 @@
 # T-002 · Каркас Vite 6 + React 19 + TypeScript strict
 
 - **Этап:** 00 Среда разработки
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/stack.md
@@ -24,9 +24,9 @@
 - `src/app/App.tsx`
 
 ## Критерии приёмки
-- [ ] `npm run build` без ошибок
-- [ ] `npm run typecheck` без ошибок
-- [ ] Импорт через `@/` работает
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] `npm run build` без ошибок
+- [x] `npm run typecheck` без ошибок
+- [x] Импорт через `@/` работает
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `chore: scaffold vite react typescript app`
