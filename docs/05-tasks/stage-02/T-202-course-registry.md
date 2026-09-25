@@ -1,7 +1,7 @@
 # T-202 · Реестр курса: 13 модулей, 62 урока
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/03-content/content-plan.md
@@ -16,8 +16,8 @@
 - `src/lib/content.ts`
 
 ## Критерии приёмки
-- [ ] 62 урока, id уникальны и соответствуют content-plan.md
-- [ ] nextLesson последнего урока модуля → первый урок следующего
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] 62 урока, id уникальны и соответствуют content-plan.md
+- [x] nextLesson последнего урока модуля → первый урок следующего
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(content): add course registry with all lessons`

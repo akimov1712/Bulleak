@@ -7,3 +7,4 @@ public/data
 package-lock.json
 docs
 *.md
+src/content/course.ts
