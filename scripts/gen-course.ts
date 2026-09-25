@@ -156,7 +156,9 @@ function parseBrief(file: string, moduleId: string, index: number): ParsedLesson
     .split('\n')
     .map((l) => l.replace(/^\d+\.\s*/, '').trim())
     .filter(Boolean);
-  const firstGoal = goals[0] ?? title;
+  // Briefs use Markdown; the app shows plain text.
+  const plain = (text: string) => text.replace(/\*\*|__|`/g, '').trim();
+  const firstGoal = plain(goals[0] ?? title);
   const summary = firstGoal.endsWith('.') ? firstGoal : `${firstGoal}.`;
   const terms = [...section(md, 'Термины').matchAll(/`([a-z0-9-]+)`/g)].map((m) => m[1] ?? '');
   return {

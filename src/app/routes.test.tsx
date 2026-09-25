@@ -14,7 +14,7 @@ describe('routes', () => {
   it.each([
     [paths.home(), 'Главная'],
     [paths.path(), 'Карта курса'],
-    [paths.module('m03'), 'Модуль m03'],
+    [paths.module('m03'), 'Чтение графика'],
     [paths.lesson('m03-l02'), 'Таймфреймы'],
     [paths.lessonQuiz('m03-l02'), 'Таймфреймы'],
     [paths.exam('m03'), 'Экзамен m03'],

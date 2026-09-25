@@ -25,6 +25,7 @@
   --xp: #ffb020;
   --xp-shade: #d98e00;
   --on-xp: #3d2800;
+  --on-mod: #14172a;
   --info: #2563eb;
   --info-soft: #dbe8ff;
   --epic: #7c4dea;
@@ -36,8 +37,8 @@
   --mod-green-shade: #0e9a52;
   --mod-blue: #3b82f6;
   --mod-blue-shade: #2563c9;
-  --mod-purple: #8b5cf6;
-  --mod-purple-shade: #6d3fd6;
+  --mod-purple: #a07af8;
+  --mod-purple-shade: #7c4dea;
   --mod-orange: #ff8a1f;
   --mod-orange-shade: #d96a00;
   --mod-pink: #ec4899;
@@ -119,6 +120,7 @@
   --color-xp: var(--xp);
   --color-xp-shade: var(--xp-shade);
   --color-on-xp: var(--on-xp);
+  --color-on-mod: var(--on-mod);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --color-epic: var(--epic);

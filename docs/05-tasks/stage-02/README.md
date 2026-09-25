@@ -25,7 +25,7 @@
 | [T-212](T-212-questions-choice.md) | Вопросы: single, multi, truefalse | ☑ |
 | [T-213](T-213-questions-numeric-match-order.md) | Вопросы: numeric, match, order | ☑ |
 | [T-214](T-214-content-validation.md) | Автоматическая валидация контента | ☑ |
-| [T-215](T-215-module-page.md) | Страница модуля | ☐ |
+| [T-215](T-215-module-page.md) | Страница модуля | ☑ |
 | [T-216](T-216-e2e-lesson-quiz.md) | E2E: урок → тест → прогресс сохранён | ☐ |
 
 ## Завершение этапа

@@ -1,7 +1,7 @@
 # T-215 · Страница модуля
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -13,7 +13,7 @@
 - `src/pages/ModulePage.tsx`
 
 ## Критерии приёмки
-- [ ] Статусы совпадают с unlock.ts
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Статусы совпадают с unlock.ts
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(module): add module overview page`
