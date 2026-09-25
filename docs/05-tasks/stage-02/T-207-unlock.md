@@ -1,7 +1,7 @@
 # T-207 · Логика разблокировки уроков
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/path-map.md (Правила разблокировки)
@@ -15,7 +15,7 @@
 - `src/lib/progress/unlock.test.ts`
 
 ## Критерии приёмки
-- [ ] Все правила path-map.md покрыты тестами
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Все правила path-map.md покрыты тестами
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(progress): add lesson unlock rules`
