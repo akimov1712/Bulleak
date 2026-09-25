@@ -12,7 +12,7 @@ function renderAt(url: string) {
 
 describe('routes', () => {
   it.each([
-    [paths.home(), 'Главная'],
+    [paths.home(), 'Добро пожаловать в курс!'],
     [paths.path(), 'Карта курса'],
     [paths.module('m03'), 'Чтение графика'],
     [paths.lesson('m03-l02'), 'Таймфреймы'],

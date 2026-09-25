@@ -25,6 +25,8 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: 'jsdom',
+    // First MDX compile of a lesson can take several seconds when the suite runs in parallel.
+    testTimeout: 15_000,
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],

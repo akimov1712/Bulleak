@@ -19,7 +19,9 @@ async function expectNoHorizontalScroll(page: Page) {
 test('home opens without console errors', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Главная' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Добро пожаловать в курс!' }),
+  ).toBeVisible();
   await expect(page).toHaveTitle(/Трейдинг на Bybit с нуля/);
   await expectNoHorizontalScroll(page);
   expect(errors).toEqual([]);
