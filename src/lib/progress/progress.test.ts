@@ -134,6 +134,30 @@ describe('migrateProgress', () => {
     expect(roundTrip).toEqual(JSON.parse(JSON.stringify(s)));
   });
 
+  it('normalizes every field of quiz attempts', () => {
+    const migrated = migrateProgress(
+      {
+        quizAttempts: [
+          {
+            quizId: 'a',
+            at: 1,
+            ratio: 'x',
+            passed: 'yes',
+            tags: { ok: [1, 2], bad: 'x', short: [1] },
+          },
+          { quizId: 'b', at: 2, ratio: 7, passed: true, tags: 'oops', durationSec: 30 },
+          { quizId: 'c', at: 'never' },
+        ],
+      },
+      1,
+      T0,
+    );
+    expect(migrated.quizAttempts).toEqual([
+      { quizId: 'a', at: 1, ratio: 0, passed: false, tags: { ok: [1, 2] }, durationSec: undefined },
+      { quizId: 'b', at: 2, ratio: 1, passed: true, tags: {}, durationSec: 30 },
+    ]);
+  });
+
   it('fills missing fields and drops corrupted ones', () => {
     const migrated = migrateProgress(
       {

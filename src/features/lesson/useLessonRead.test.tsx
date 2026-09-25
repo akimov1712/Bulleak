@@ -4,9 +4,11 @@ import { act, render } from '@testing-library/react';
 import { useLessonRead } from './useLessonRead';
 import { useProgress } from '@/store/progressStore';
 import { courseIndex } from '@/content/courseIndex';
+import type { LessonMeta } from '@/types/course';
 
-const lesson = courseIndex.getLesson('m00-l01');
-if (!lesson) throw new Error('fixture lesson missing');
+const found = courseIndex.getLesson('m00-l01');
+if (!found) throw new Error('fixture lesson missing');
+const lesson: LessonMeta = found;
 
 let intersect: (() => void) | null = null;
 
@@ -28,8 +30,6 @@ class FakeIntersectionObserver {
 
 function Harness({ ready = true }: { ready?: boolean }) {
   const ref = useRef<HTMLElement>(null);
-  if (!lesson) return null;
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- lesson is a module constant
   useLessonRead(lesson, ref, ready);
   return (
     <article ref={ref}>
@@ -67,6 +67,14 @@ describe('useLessonRead', () => {
     readFor(20);
     expect(useProgress.getState().lessons['m00-l01']?.readAt).toBeUndefined();
     readFor(45); // m00-l01: 8 min → threshold min(60, 144) = 60 s
+    expect(useProgress.getState().lessons['m00-l01']?.readAt).toBeTypeOf('number');
+  });
+
+  it('counts active time from earlier visits', () => {
+    useProgress.getState().addTime('m00-l01', 40);
+    render(<Harness />);
+    act(() => intersect?.());
+    readFor(25); // 40 s earlier + 25 s now ≥ 60 s
     expect(useProgress.getState().lessons['m00-l01']?.readAt).toBeTypeOf('number');
   });
 

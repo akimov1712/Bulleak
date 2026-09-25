@@ -15,7 +15,13 @@ import { forgetQuiz, lessonQuizPromise } from '@/features/quiz/quizContent';
 import { QuizRunner, type QuizFinish } from '@/features/quiz/QuizRunner';
 import { QuizResultView } from '@/features/quiz/QuizResultView';
 import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
-import { currentLesson, isLessonUnlocked, lessonStatus } from '@/lib/progress/unlock';
+import {
+  currentLesson,
+  isExamAvailable,
+  isExamPassed,
+  isLessonUnlocked,
+  lessonStatus,
+} from '@/lib/progress/unlock';
 import { formatPct, plural } from '@/lib/format';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -58,6 +64,8 @@ function LessonQuiz({ lesson }: { lesson: LessonMeta }) {
     const { result } = phase.finish;
     const next = courseIndex.nextLesson(lesson.id);
     const nextOpen = next !== undefined && isLessonUnlocked(ctx, next);
+    // Last lesson of a module: the exam (not the next lesson) is the next step.
+    const examOpen = isExamAvailable(ctx, lesson.moduleId) && !isExamPassed(ctx, lesson.moduleId);
     return (
       <QuizResultView
         result={result}
@@ -76,6 +84,13 @@ function LessonQuiz({ lesson }: { lesson: LessonMeta }) {
               {nextOpen && next ? (
                 <Link to={paths.lesson(next.id)} className={buttonClass({ size: 'lg' })}>
                   Следующий урок
+                </Link>
+              ) : examOpen ? (
+                <Link
+                  to={paths.exam(lesson.moduleId)}
+                  className={buttonClass({ variant: 'xp', size: 'lg' })}
+                >
+                  К экзамену модуля
                 </Link>
               ) : (
                 <Link to={paths.path()} className={buttonClass({ size: 'lg' })}>

@@ -18,7 +18,7 @@ export function NumericQuestionView({
   value,
   onChange,
   state,
-}: QuestionProps<NumericQuestion, number>) {
+}: QuestionProps<NumericQuestion, number | undefined>) {
   const id = useId();
   return (
     <div className={cn('flex flex-col gap-2', feedbackBorder[state])}>
@@ -28,9 +28,8 @@ export function NumericQuestionView({
       <NumberInput
         id={id}
         value={value ?? null}
-        onValueChange={(v) => {
-          if (v !== null) onChange(v);
-        }}
+        // Empty or invalid text clears the answer, so a stale number is never submitted.
+        onValueChange={(v) => onChange(v ?? undefined)}
         unit={question.unit}
         disabled={state !== 'answering'}
         className="max-w-xs text-lg"

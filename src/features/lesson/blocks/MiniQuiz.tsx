@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useId, useState } from 'react';
 import { HelpCircle } from 'lucide-react';
 import type { Question } from '@/types/quiz';
 import { prepareQuiz } from '@/lib/quiz/prepare';
@@ -12,14 +12,13 @@ import { QuestionView } from '@/features/quiz/QuestionView';
 /** Practice question inside a lesson: instant feedback, retry, no XP. */
 export function MiniQuiz({ question }: { question: Question }) {
   const titleId = useId();
-  // Stable shuffle per question id (no reshuffle on re-render).
-  const prepared = useMemo(
+  // Prepared once per mount: MDX passes a new object literal on every render.
+  const [prepared] = useState(
     () =>
       prepareQuiz(
         { id: question.id, kind: 'lesson', passRatio: 1, questions: [question] },
         hashString(question.id),
       ).questions[0],
-    [question],
   );
   const [value, setValue] = useState<unknown>(() =>
     prepared ? initialAnswer(prepared) : undefined,

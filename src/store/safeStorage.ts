@@ -44,7 +44,8 @@ export const safeStorage: StateStorage = {
     try {
       const store = backend();
       if (!store) throw new Error('localStorage unavailable');
-      return store.getItem(name) ?? memory.get(name) ?? null;
+      // localStorage is the source of truth: a missing key may have been removed by another tab.
+      return store.getItem(name);
     } catch {
       setHealthy(false);
       return memory.get(name) ?? null;

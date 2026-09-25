@@ -2,7 +2,7 @@ import { use } from 'react';
 import { MDXProvider } from '@mdx-js/react';
 import type { LessonId } from '@/types/course';
 import { mdxComponents } from './mdxComponents';
-import { lessonContentPromise } from './lessonComponent';
+import { lessonContentPromise } from './lessonCache';
 
 /** Suspends until the lesson's MDX chunk is loaded, then renders it with lesson components. */
 export function LessonContent({ id }: { id: LessonId }) {

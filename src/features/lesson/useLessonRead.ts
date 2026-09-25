@@ -18,6 +18,8 @@ export function useLessonRead(
   const alreadyRead = useProgress((s) => s.lessons[lesson.id]?.readAt !== undefined);
   const [summarySeen, setSummarySeen] = useState(false);
   const activeSec = useRef(0);
+  // Time from earlier visits counts too (captured once: flushes during this visit update the store).
+  const [priorSec] = useState(() => useProgress.getState().lessons[lesson.id]?.timeSpentSec ?? 0);
 
   useEffect(() => {
     if (!ready || alreadyRead || summarySeen) return;
@@ -31,7 +33,7 @@ export function useLessonRead(
   }, [ready, alreadyRead, summarySeen, articleRef]);
 
   const tryMarkRead = () => {
-    if (!alreadyRead && isLessonRead(summarySeen, activeSec.current, lesson.minutes)) {
+    if (!alreadyRead && isLessonRead(summarySeen, priorSec + activeSec.current, lesson.minutes)) {
       markRead(lesson.id);
     }
   };

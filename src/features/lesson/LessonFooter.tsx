@@ -4,7 +4,7 @@ import { buttonClass } from '@/components/ui/styles';
 import { Card } from '@/components/ui/Card';
 import { paths } from '@/app/paths';
 import { formatPct } from '@/lib/format';
-import type { LessonMeta } from '@/types/course';
+import type { LessonMeta, ModuleId } from '@/types/course';
 import type { LessonProgress, LessonStatus } from '@/types/progress';
 
 interface LessonFooterProps {
@@ -14,6 +14,10 @@ interface LessonFooterProps {
   prev?: LessonMeta;
   next?: LessonMeta;
   nextUnlocked: boolean;
+  /** Set when the next lesson is in the following module, which opens only after this exam. */
+  examModuleId?: ModuleId;
+  /** The module exam can be taken now. */
+  examOpen?: boolean;
 }
 
 export function LessonFooter({
@@ -23,6 +27,8 @@ export function LessonFooter({
   prev,
   next,
   nextUnlocked,
+  examModuleId,
+  examOpen = false,
 }: LessonFooterProps) {
   const completed = status === 'completed';
   return (
@@ -78,9 +84,20 @@ export function LessonFooter({
               </span>
               <ArrowRight className="size-5 shrink-0 text-text-muted" aria-hidden="true" />
             </Link>
+          ) : examModuleId && examOpen ? (
+            <Link
+              to={paths.exam(examModuleId)}
+              className={buttonClass({ variant: 'xp', size: 'lg' })}
+            >
+              <Trophy className="size-5" aria-hidden="true" />К экзамену модуля
+            </Link>
           ) : (
             <p className="flex items-center justify-end rounded-2xl border-2 border-dashed border-border p-4 text-right text-sm text-text-muted">
-              Следующий урок откроется после сдачи теста
+              {examModuleId
+                ? completed
+                  ? 'Следующий модуль откроется после экзамена этого модуля'
+                  : 'Дальше — тест этого урока, а затем экзамен модуля'
+                : 'Следующий урок откроется после сдачи теста'}
             </p>
           ))}
       </nav>

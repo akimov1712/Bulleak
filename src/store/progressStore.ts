@@ -28,32 +28,17 @@ interface ProgressActions {
 
 export type ProgressStore = ProgressState & ProgressActions;
 
+/**
+ * Data fields of the store. Derived from the initial state, so a new ProgressState field
+ * (which must be added to createInitialProgress to type-check) is persisted automatically.
+ */
+const PROGRESS_KEYS = Object.keys(createInitialProgress(0)) as (keyof ProgressState)[];
+
 /** Strip actions so only data is persisted / passed to pure functions. */
 export function selectProgressData(s: ProgressStore): ProgressState {
-  const {
-    version,
-    lessons,
-    exams,
-    xp,
-    activity,
-    streak,
-    achievements,
-    quizAttempts,
-    counters,
-    profile,
-  } = s;
-  return {
-    version,
-    lessons,
-    exams,
-    xp,
-    activity,
-    streak,
-    achievements,
-    quizAttempts,
-    counters,
-    profile,
-  };
+  const data: Partial<Record<keyof ProgressState, unknown>> = {};
+  for (const key of PROGRESS_KEYS) data[key] = s[key];
+  return data as ProgressState;
 }
 
 /** Actions delegate to pure functions in lib/progress; the store only wires state and time. */
@@ -93,7 +78,10 @@ export const useProgress = create<ProgressStore>()(
 /** Keep several open tabs in sync: reload state when another tab writes it. */
 export function subscribeToOtherTabs(): () => void {
   function onStorage(event: StorageEvent) {
-    if (event.key === PROGRESS_STORAGE_KEY) void useProgress.persist.rehydrate();
+    // key === null means localStorage.clear() in another tab (e.g. a full reset).
+    if (event.key === PROGRESS_STORAGE_KEY || event.key === null) {
+      void useProgress.persist.rehydrate();
+    }
   }
   window.addEventListener('storage', onStorage);
   return () => window.removeEventListener('storage', onStorage);

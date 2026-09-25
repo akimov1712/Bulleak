@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Mascot } from '@/components/mascot/Mascot';
 import { buttonClass } from '@/components/ui/styles';
 import { moduleColors } from '@/components/ui/moduleColors';
-import { forgetLessonContent } from '@/features/lesson/lessonComponent';
+import { forgetLessonContent } from '@/features/lesson/lessonCache';
 import { LessonContent } from '@/features/lesson/LessonContent';
 import { ReadingProgress } from '@/features/lesson/ReadingProgress';
 import { TableOfContents } from '@/features/lesson/TableOfContents';
@@ -21,7 +21,12 @@ import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { useProgress } from '@/store/progressStore';
-import { currentLesson, isLessonUnlocked, lessonStatus } from '@/lib/progress/unlock';
+import {
+  currentLesson,
+  isExamAvailable,
+  isLessonUnlocked,
+  lessonStatus,
+} from '@/lib/progress/unlock';
 import { cn } from '@/lib/cn';
 import { paths } from '@/app/paths';
 import type { LessonMeta } from '@/types/course';
@@ -148,6 +153,10 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             prev={prev}
             next={next}
             nextUnlocked={next ? isLessonUnlocked(ctx, next) : false}
+            examModuleId={
+              next && next.moduleId !== module.id && module.hasExam ? module.id : undefined
+            }
+            examOpen={isExamAvailable(ctx, module.id)}
           />
         </article>
         <aside className="hidden xl:block">

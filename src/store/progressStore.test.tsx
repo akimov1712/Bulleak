@@ -71,6 +71,26 @@ describe('progressStore', () => {
   });
 });
 
+describe('selectProgressData / cross-tab reset', () => {
+  it('persists exactly the data fields of ProgressState', () => {
+    useProgress.getState().markRead('m00-l01');
+    const saved = JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? '{}');
+    expect(Object.keys(saved.state).sort()).toEqual(Object.keys(createInitialProgress(0)).sort());
+  });
+
+  it('resets when another tab clears storage (storage event with key null)', async () => {
+    const off = subscribeToOtherTabs();
+    useProgress.getState().markRead('m00-l01');
+    localStorage.clear();
+    await act(async () => {
+      window.dispatchEvent(new StorageEvent('storage', { key: null }));
+      await Promise.resolve();
+    });
+    expect(useProgress.getState().lessons).toEqual({});
+    off();
+  });
+});
+
 describe('StorageBanner', () => {
   it('appears when storage writes fail', () => {
     render(<StorageBanner />);

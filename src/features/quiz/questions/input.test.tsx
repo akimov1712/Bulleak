@@ -47,7 +47,7 @@ const valueOf = () => JSON.parse(screen.getByTestId('v').textContent ?? 'null');
 describe('NumericQuestionView', () => {
   it('emits parsed numbers with comma decimals', async () => {
     render(
-      <Harness<number>>
+      <Harness<number | undefined>>
         {(v, on) => (
           <NumericQuestionView question={numeric} value={v} onChange={on} state="answering" />
         )}
@@ -55,6 +55,21 @@ describe('NumericQuestionView', () => {
     );
     await userEvent.type(screen.getByLabelText('Твой ответ (BTC)'), '0,01');
     expect(valueOf()).toBe(0.01);
+  });
+
+  it('clears the answer when the field is emptied', async () => {
+    render(
+      <Harness<number | undefined>>
+        {(v, on) => (
+          <NumericQuestionView question={numeric} value={v} onChange={on} state="answering" />
+        )}
+      </Harness>,
+    );
+    const input = screen.getByLabelText('Твой ответ (BTC)');
+    await userEvent.type(input, '10');
+    expect(valueOf()).toBe(10);
+    await userEvent.clear(input);
+    expect(valueOf()).toBeNull();
   });
 
   it('is disabled after checking', () => {

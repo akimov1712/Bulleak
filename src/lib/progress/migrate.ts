@@ -103,12 +103,25 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
     dailyGoalsMet: num(counterRaw.dailyGoalsMet),
   };
 
-  const attempts = Array.isArray(raw.quizAttempts)
-    ? raw.quizAttempts.filter(
-        (a): a is ProgressState['quizAttempts'][number] =>
-          isObject(a) && typeof a.quizId === 'string' && typeof a.at === 'number',
-      )
-    : [];
+  // Every field is normalized: statistics later sum ratios and iterate tag pairs.
+  const attempts: ProgressState['quizAttempts'] = [];
+  for (const a of Array.isArray(raw.quizAttempts) ? raw.quizAttempts : []) {
+    if (!isObject(a) || typeof a.quizId !== 'string' || optNum(a.at) === undefined) continue;
+    const tags = record(a.tags, (pair) =>
+      Array.isArray(pair) && pair.length === 2 && pair.every((n) => optNum(n) !== undefined)
+        ? ([num(pair[0]), num(pair[1])] as [number, number])
+        : null,
+    );
+    const ratio = Math.min(1, Math.max(0, num(a.ratio)));
+    attempts.push({
+      quizId: a.quizId,
+      at: num(a.at),
+      ratio,
+      passed: typeof a.passed === 'boolean' ? a.passed : false,
+      tags,
+      durationSec: optNum(a.durationSec),
+    });
+  }
 
   const profileRaw = isObject(raw.profile) ? raw.profile : {};
 
