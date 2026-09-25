@@ -46,11 +46,11 @@ TradingLearning/
 │  │  │     └─ exam.ts           экзамен модуля
 │  │  └─ content.test.ts         валидация всего контента
 │  ├─ lib/                       чистая логика + тесты
-│  │  ├─ xp.ts, levels.ts, streak.ts, achievements.ts
+│  │  ├─ gamification/          xp.ts, levels.ts, streak.ts, achievements.ts
 │  │  ├─ quiz/grade.ts, quiz/shuffle.ts
 │  │  ├─ trading/position.ts, liquidation.ts, rr.ts, fees.ts, simulate.ts
 │  │  ├─ journal/metrics.ts
-│  │  ├─ progress/unlock.ts, progress/migrate.ts
+│  │  ├─ progress/              applyEvent.ts (конвейер событий), actions.ts, unlock.ts, migrate.ts, nextStep.ts, read.ts
 │  │  ├─ io/exportSchema.ts
 │  │  ├─ date.ts, format.ts, cn.ts, random.ts
 │  ├─ store/

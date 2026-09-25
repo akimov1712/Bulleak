@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Rewards } from '@/types/events';
-import { achievementById } from '@/content/achievements';
+import { achievementById, RARITY_LABELS } from '@/content/achievements';
 import { rankForLevel } from '@/lib/gamification/levels';
 import { useUi } from '@/store/uiStore';
 import { useSettings } from '@/store/settingsStore';
@@ -9,13 +9,6 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Mascot } from '@/components/mascot/Mascot';
 import { fireConfetti, playSound } from './effects';
-
-const RARITY_LABEL = {
-  common: 'Обычное',
-  rare: 'Редкое',
-  epic: 'Эпическое',
-  legendary: 'Легендарное',
-} as const;
 
 /**
  * Consumes the rewards queue (filled by progressStore.dispatch) and celebrates:
@@ -37,7 +30,7 @@ export function RewardsPresenter() {
           tone: 'achievement',
           icon: def.icon,
           title: `Достижение: ${def.title}`,
-          description: `${def.description} · ${RARITY_LABEL[def.rarity]} · +${def.xp} XP`,
+          description: `${def.description} · ${RARITY_LABELS[def.rarity]} · +${def.xp} XP`,
           durationMs: 6000,
         });
       }
@@ -51,7 +44,9 @@ export function RewardsPresenter() {
         });
       }
       if (rewards.levelUp) {
-        setLevelUp(rewards.levelUp);
+        const gained = rewards.levelUp;
+        // Several level-ups in one batch: show one modal from the first "from" to the last "to".
+        setLevelUp((prev) => (prev ? { from: prev.from, to: gained.to } : gained));
         playSound('levelUp', sound);
         fireConfetti('big', !reduced);
       }

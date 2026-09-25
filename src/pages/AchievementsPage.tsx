@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
-import { achievements } from '@/content/achievements';
+import { achievements, RARITY_LABELS } from '@/content/achievements';
 import { courseIndex } from '@/content/courseIndex';
 import { Pill } from '@/components/ui/Badge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -19,11 +19,11 @@ const CATEGORIES: { id: AchievementCategory | 'all'; label: string }[] = [
   { id: 'other', label: 'Прочее' },
 ];
 
-const RARITY: Record<AchievementRarity, { label: string; card: string; badge: string }> = {
-  common: { label: 'Обычное', card: 'border-border', badge: 'bg-surface-2 text-text-muted' },
-  rare: { label: 'Редкое', card: 'border-info', badge: 'bg-info-soft text-info' },
-  epic: { label: 'Эпическое', card: 'border-epic', badge: 'bg-epic-soft text-epic' },
-  legendary: { label: 'Легендарное', card: 'border-xp-shade', badge: 'bg-xp text-on-xp' },
+const RARITY: Record<AchievementRarity, { card: string; badge: string }> = {
+  common: { card: 'border-border', badge: 'bg-surface-2 text-text-muted' },
+  rare: { card: 'border-info', badge: 'bg-info-soft text-info' },
+  epic: { card: 'border-epic', badge: 'bg-epic-soft text-epic' },
+  legendary: { card: 'border-xp-shade', badge: 'bg-xp text-on-xp' },
 };
 
 const dateFormat = new Intl.DateTimeFormat('ru-RU', {
@@ -99,7 +99,7 @@ export function AchievementsPage() {
                 </p>
                 <div className="mt-auto flex flex-wrap items-center gap-2 pt-1 text-xs font-bold">
                   <span className={cn('rounded-full px-2 py-0.5', rarity.badge)}>
-                    {rarity.label}
+                    {RARITY_LABELS[a.rarity]}
                   </span>
                   <span className="text-xp-text">+{a.xp} XP</span>
                   {got && <span className="text-text-muted">{dateFormat.format(at)}</span>}

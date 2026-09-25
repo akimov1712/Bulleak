@@ -1,8 +1,9 @@
 import { forwardRef } from 'react';
 import { Link } from 'react-router';
-import { Check, ClipboardCheck, Lock, Play, Star } from 'lucide-react';
+import { Check, ClipboardCheck, Lock, Play } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Popover } from '@/components/ui/Popover';
+import { Stars } from '@/components/ui/Stars';
 import { buttonClass } from '@/components/ui/styles';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { toast } from '@/store/uiStore';
@@ -115,20 +116,7 @@ export const PathNode = forwardRef<HTMLDivElement, PathNodeProps>(function PathN
           </button>
         </Popover>
       )}
-      {status === 'completed' && (
-        <span className="mt-1.5 flex gap-0.5" role="img" aria-label={`${stars} из 3 звёзд`}>
-          {[1, 2, 3].map((i) => (
-            <Star
-              key={i}
-              aria-hidden="true"
-              className={cn(
-                'size-4',
-                i <= stars ? 'fill-xp text-xp-shade' : 'fill-surface-2 text-border',
-              )}
-            />
-          ))}
-        </span>
-      )}
+      {status === 'completed' && <Stars count={stars} size="size-4" className="mt-1.5 gap-0.5" />}
     </div>
   );
 });

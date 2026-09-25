@@ -88,6 +88,15 @@ describe('recordLessonQuiz', () => {
     expect(s.activity[DAY]?.lessonsCompleted).toBe(1);
   });
 
+  it('improving failed attempts before the first pass does not use up the improvement cap', () => {
+    let s = createInitialProgress(T0);
+    for (const correct of [4, 5, 6, 7]) s = recordLessonQuiz(s, 'm00-l01', result(correct, 10), T0);
+    expect(s.lessons['m00-l01']?.improvements).toBe(0);
+    s = recordLessonQuiz(s, 'm00-l01', result(8, 10), T0);
+    s = recordLessonQuiz(s, 'm00-l01', result(9, 10), T0);
+    expect(s.lessons['m00-l01']?.improvements).toBe(1);
+  });
+
   it('first pass after failures is not an "improvement"', () => {
     let s = recordLessonQuiz(createInitialProgress(T0), 'm00-l01', result(5, 10), T0);
     s = recordLessonQuiz(s, 'm00-l01', result(9, 10), T0 + 1);

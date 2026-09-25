@@ -4,11 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { Hud } from './Hud';
 import { useProgress } from '@/store/progressStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
+import { useUi } from '@/store/uiStore';
 
 beforeEach(() => {
   localStorage.clear();
   useProgress.getState().reset();
   useSettings.setState(DEFAULT_SETTINGS);
+  useUi.setState({ rewardsQueue: [], lastXpGain: null });
 });
 
 describe('Hud', () => {
@@ -29,6 +31,15 @@ describe('Hud', () => {
     expect(screen.getByRole('button', { name: 'Серия: 1 день подряд' })).toBeInTheDocument();
   });
 
+  it('does not flash when XP changes from outside (other tab, import)', () => {
+    render(<Hud />);
+    act(() => {
+      useProgress.setState({ xp: 500 });
+    });
+    expect(screen.getByRole('button', { name: 'Опыт: 500 XP' })).toBeInTheDocument();
+    expect(screen.queryByText(/^\+\d+$/)).not.toBeInTheDocument();
+  });
+
   it('explains the daily goal and streak in popovers', async () => {
     const user = userEvent.setup();
     render(<Hud />);
@@ -37,6 +48,8 @@ describe('Hud', () => {
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: /Серия/ }));
     expect(await screen.findByText('Начни серию сегодня')).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Эта неделя' }).children).toHaveLength(7);
+    expect(screen.getByRole('list', { name: 'Активность на этой неделе' }).children).toHaveLength(
+      7,
+    );
   });
 });

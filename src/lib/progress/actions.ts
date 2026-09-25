@@ -65,7 +65,8 @@ export function recordLessonQuiz(
 ): ProgressState {
   const lesson = state.lessons[id] ?? emptyLessonProgress();
   const firstPass = result.passed && lesson.completedAt === undefined;
-  const improved = lesson.quizAttempts > 0 && result.ratio > lesson.quizBest;
+  // Only retakes of an already completed lesson count (they are what the improvement XP rewards).
+  const improved = lesson.completedAt !== undefined && result.ratio > lesson.quizBest;
   const perfect = result.ratio === 1;
   return {
     ...state,
@@ -76,7 +77,7 @@ export function recordLessonQuiz(
         quizBest: Math.max(lesson.quizBest, result.ratio),
         quizAttempts: lesson.quizAttempts + 1,
         completedAt: firstPass ? now : lesson.completedAt,
-        improvements: lesson.improvements + (improved && !firstPass ? 1 : 0),
+        improvements: lesson.improvements + (improved ? 1 : 0),
       },
     },
     quizAttempts: pushAttempt(state, {

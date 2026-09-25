@@ -56,6 +56,22 @@ describe('RewardsPresenter', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('merges several level-ups from one batch into one modal', () => {
+    const reward = (from: number, to: number) => ({
+      xp: 10,
+      reasons: [],
+      newAchievements: [],
+      levelUp: { from, to },
+      dailyGoalMet: false,
+      streak: { before: 0, after: 0 },
+    });
+    useUi.setState({ rewardsQueue: [reward(2, 3), reward(3, 4)] });
+    render(<RewardsPresenter />);
+    const dialog = screen.getByRole('dialog', { name: 'Новый уровень!' });
+    expect(dialog).toHaveTextContent('4');
+    expect(dialog).toHaveTextContent('Новое звание: Наблюдатель');
+  });
+
   it('drains rewards queued before it mounted', () => {
     act(() => {
       useProgress.getState().dispatch({ type: 'backupMade' });

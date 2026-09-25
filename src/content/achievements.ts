@@ -1,7 +1,14 @@
-import type { AchievementDef } from '@/types/achievements';
+import type { AchievementDef, AchievementRarity } from '@/types/achievements';
 import type { ProgressState } from '@/types/progress';
 import { fromDateKey, addDays, isDateKey } from '@/lib/date';
 import { levelFromXp } from '@/lib/gamification/levels';
+
+export const RARITY_LABELS: Record<AchievementRarity, string> = {
+  common: 'Обычное',
+  rare: 'Редкое',
+  epic: 'Эпическое',
+  legendary: 'Легендарное',
+};
 
 /** All calculators (docs/04-features/calculators.md) — for «Считаю всё». */
 export const CALCULATOR_IDS = [

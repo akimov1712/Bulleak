@@ -17,7 +17,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { buttonClass } from '@/components/ui/styles';
 import { Mascot } from '@/components/mascot/Mascot';
-import { Stars } from '@/features/quiz/QuizResultView';
+import { Stars } from '@/components/ui/Stars';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useProgress } from '@/store/progressStore';

@@ -29,13 +29,16 @@ export function nextStep(ctx: UnlockContext): NextStep {
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Remind about a backup when there is progress and no backup in the last 7 days. */
+/** Remind about a backup when there is progress, no backup in the last 7 days and no snooze. */
 export function shouldRemindBackup(
   profile: { startedAt: number; lastBackupAt?: number },
   xp: number,
   now: number,
+  snoozedUntil = 0,
 ): boolean {
-  if (xp <= 0) return false;
+  if (xp <= 0 || now < snoozedUntil) return false;
   const since = profile.lastBackupAt ?? profile.startedAt;
   return now - since >= WEEK_MS;
 }
+
+export const BACKUP_SNOOZE_MS = WEEK_MS;

@@ -65,5 +65,7 @@ describe('shouldRemindBackup', () => {
     expect(shouldRemindBackup({ startedAt: 0 }, 10, 6 * DAY)).toBe(false);
     expect(shouldRemindBackup({ startedAt: 0 }, 10, 7 * DAY)).toBe(true);
     expect(shouldRemindBackup({ startedAt: 0, lastBackupAt: 5 * DAY }, 10, 8 * DAY)).toBe(false);
+    expect(shouldRemindBackup({ startedAt: 0 }, 10, 8 * DAY, 9 * DAY)).toBe(false);
+    expect(shouldRemindBackup({ startedAt: 0 }, 10, 10 * DAY, 9 * DAY)).toBe(true);
   });
 });

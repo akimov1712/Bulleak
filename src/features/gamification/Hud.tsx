@@ -4,11 +4,13 @@ import { Flame, Snowflake, Star, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatNumber, plural } from '@/lib/format';
 import { levelFromXp } from '@/lib/gamification/levels';
-import { effectiveStreak, weekView } from '@/lib/gamification/streak';
+import { effectiveStreak } from '@/lib/gamification/streak';
+import { WeekStreak } from './WeekStreak';
 import { Popover } from '@/components/ui/Popover';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ProgressRing } from '@/components/ui/ProgressRing';
 import { useProgress } from '@/store/progressStore';
+import { useUi } from '@/store/uiStore';
 import { useSettings } from '@/store/settingsStore';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useToday } from '@/hooks/useToday';
@@ -18,11 +20,9 @@ const chipClass =
 
 export function StreakChip() {
   const streak = useProgress((s) => s.streak);
-  const activity = useProgress((s) => s.activity);
   const today = useToday();
   const { value, atRisk } = effectiveStreak(streak, today);
   const activeToday = streak.lastActiveDay === today;
-  const week = weekView(activity, today);
 
   return (
     <Popover
@@ -34,26 +34,7 @@ export function StreakChip() {
               ? `${value} ${plural(value, ['день', 'дня', 'дней'])} подряд`
               : 'Начни серию сегодня'}
           </p>
-          <ol className="flex justify-between" aria-label="Эта неделя">
-            {week.map((d) => (
-              <li
-                key={d.day}
-                className="flex flex-col items-center gap-1 text-xs font-bold text-text-muted"
-              >
-                <span
-                  className={cn(
-                    'grid size-7 place-items-center rounded-full border-2',
-                    d.active ? 'border-xp-shade bg-xp text-on-xp' : 'border-border',
-                    d.isToday && !d.active && 'border-info',
-                    d.isFuture && 'opacity-40',
-                  )}
-                >
-                  {d.active && <Flame className="size-4" aria-label="занимался" />}
-                </span>
-                {d.label}
-              </li>
-            ))}
-          </ol>
+          <WeekStreak size="sm" />
           <p className="flex items-center gap-2 text-sm text-text-muted">
             <Snowflake className="size-4 text-info" aria-hidden="true" />
             Заморозки: {streak.freezes} из 2 — спасают серию, если пропустишь день. +1 за каждые 7
@@ -83,20 +64,16 @@ export function StreakChip() {
   );
 }
 
-/** "+N" that floats up whenever total XP grows. */
-function useXpDelta(xp: number): { delta: number; key: number } | null {
-  const [shown, setShown] = useState(xp);
-  const [flash, setFlash] = useState<{ delta: number; key: number } | null>(null);
-  if (xp !== shown) {
-    setShown(xp);
-    if (xp > shown) setFlash({ delta: xp - shown, key: xp });
-  }
+/** "+N" that floats up after XP is earned in this tab (not on rehydrate or import). */
+function useXpFlash(): { amount: number; id: number } | null {
+  const gain = useUi((s) => s.lastXpGain);
+  const [hiddenId, setHiddenId] = useState<number | null>(null);
   useEffect(() => {
-    if (!flash) return;
-    const timer = window.setTimeout(() => setFlash(null), 1400);
+    if (!gain) return;
+    const timer = window.setTimeout(() => setHiddenId(gain.id), 1400);
     return () => window.clearTimeout(timer);
-  }, [flash]);
-  return flash;
+  }, [gain]);
+  return gain && gain.id !== hiddenId ? gain : null;
 }
 
 export function XpChip() {
@@ -104,7 +81,7 @@ export function XpChip() {
   const today = useToday();
   const todayXp = useProgress((s) => s.activity[today]?.xp ?? 0);
   const goal = useSettings((s) => s.dailyGoalXp);
-  const flash = useXpDelta(xp);
+  const flash = useXpFlash();
   const reduced = useReducedMotion();
 
   return (
@@ -133,7 +110,7 @@ export function XpChip() {
         <AnimatePresence>
           {flash && (
             <motion.span
-              key={flash.key}
+              key={flash.id}
               aria-hidden="true"
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 4 }}
               animate={reduced ? { opacity: 1 } : { opacity: 1, y: -22 }}
@@ -141,7 +118,7 @@ export function XpChip() {
               transition={{ duration: 0.6 }}
               className="pointer-events-none absolute -top-1 right-0 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp"
             >
-              +{flash.delta}
+              +{flash.amount}
             </motion.span>
           )}
         </AnimatePresence>

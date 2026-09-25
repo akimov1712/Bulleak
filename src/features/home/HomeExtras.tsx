@@ -86,7 +86,7 @@ export function QuickLinks() {
   );
 }
 
-export function BackupReminder() {
+export function BackupReminder({ onSnooze }: { onSnooze: () => void }) {
   return (
     <div
       role="note"
@@ -99,6 +99,13 @@ export function BackupReminder() {
       <Link to={paths.settings()} className="font-extrabold text-info hover:underline">
         Сделать копию
       </Link>
+      <button
+        type="button"
+        onClick={onSnooze}
+        className="font-bold text-text-muted hover:text-text"
+      >
+        Напомнить позже
+      </button>
     </div>
   );
 }

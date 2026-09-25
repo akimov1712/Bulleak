@@ -2,7 +2,8 @@ import { Flame, Snowflake } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { plural } from '@/lib/format';
 import { levelFromXp } from '@/lib/gamification/levels';
-import { effectiveStreak, weekView } from '@/lib/gamification/streak';
+import { effectiveStreak } from '@/lib/gamification/streak';
+import { WeekStreak } from '@/features/gamification/WeekStreak';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ProgressRing } from '@/components/ui/ProgressRing';
@@ -15,12 +16,10 @@ export function TodayCard() {
   const today = useToday();
   const goal = useSettings((s) => s.dailyGoalXp);
   const todayXp = useProgress((s) => s.activity[today]?.xp ?? 0);
-  const activity = useProgress((s) => s.activity);
   const streak = useProgress((s) => s.streak);
   const xp = useProgress((s) => s.xp);
   const { value: streakValue, atRisk } = effectiveStreak(streak, today);
   const level = levelFromXp(xp);
-  const week = weekView(activity, today);
   const goalDone = todayXp >= goal;
 
   return (
@@ -62,26 +61,7 @@ export function TodayCard() {
             {streak.freezes}
           </span>
         </div>
-        <ol className="flex justify-between" aria-label="Активность на этой неделе">
-          {week.map((d) => (
-            <li
-              key={d.day}
-              className="flex flex-col items-center gap-1 text-xs font-bold text-text-muted"
-            >
-              <span
-                className={cn(
-                  'grid size-8 place-items-center rounded-full border-2',
-                  d.active ? 'border-xp-shade bg-xp text-on-xp' : 'border-border',
-                  d.isToday && !d.active && 'border-info border-dashed',
-                  d.isFuture && 'opacity-40',
-                )}
-              >
-                {d.active && <Flame className="size-4" aria-label="занимался" />}
-              </span>
-              {d.label}
-            </li>
-          ))}
-        </ol>
+        <WeekStreak />
         {atRisk && streak.lastActiveDay !== today && (
           <p className="text-sm font-bold text-warn">
             Позанимайся сегодня, чтобы не потерять серию!

@@ -1,12 +1,11 @@
 import { useEffect, type ReactNode } from 'react';
-import { Star } from 'lucide-react';
 import type { PreparedQuestion } from '@/lib/quiz/prepare';
 import type { QuizResult } from '@/types/quiz';
 import { correctAnswerText } from '@/lib/quiz/describe';
 import { starsForScore } from '@/lib/progress/unlock';
 import { formatPct, plural } from '@/lib/format';
-import { cn } from '@/lib/cn';
 import { ProgressRing } from '@/components/ui/ProgressRing';
+import { Stars } from '@/components/ui/Stars';
 import { Mascot } from '@/components/mascot/Mascot';
 import { fireConfetti } from '@/features/gamification/effects';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -20,20 +19,6 @@ interface QuizResultViewProps {
   actions: ReactNode;
   /** Extra line under the verdict (e.g. best score). */
   note?: ReactNode;
-}
-
-export function Stars({ count, size = 'size-8' }: { count: 0 | 1 | 2 | 3; size?: string }) {
-  return (
-    <span className="flex gap-1" role="img" aria-label={`${count} из 3 звёзд`}>
-      {[1, 2, 3].map((i) => (
-        <Star
-          key={i}
-          aria-hidden="true"
-          className={cn(size, i <= count ? 'fill-xp text-xp-shade' : 'fill-surface-2 text-border')}
-        />
-      ))}
-    </span>
-  );
 }
 
 export function QuizResultView({
