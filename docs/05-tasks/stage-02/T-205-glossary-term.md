@@ -1,7 +1,7 @@
 # T-205 · Модель глоссария и компонент Term
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/glossary.md
@@ -17,7 +17,7 @@
 - `src/features/glossary/Term.tsx`
 
 ## Критерии приёмки
-- [ ] Поповер доступен с клавиатуры и тапом
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Поповер доступен с клавиатуры и тапом
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(glossary): add glossary model and term popover`

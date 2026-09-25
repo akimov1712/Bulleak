@@ -2,6 +2,7 @@ import type { MDXComponents } from 'mdx/types';
 import * as Prose from './blocks/Prose';
 import { BybitNote, Example, Tip, Warning } from './blocks/Callouts';
 import { Checklist, Compare, Figure, Goals, Reveal, Step, Steps, Summary } from './blocks/Blocks';
+import { Term } from '@/features/glossary/Term';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
 export const mdxComponents: MDXComponents = {
@@ -32,6 +33,5 @@ export const mdxComponents: MDXComponents = {
   Step,
   Compare,
   Checklist,
-  // Replaced by the glossary popover in T-205.
-  Term: Prose.Strong,
+  Term,
 };
