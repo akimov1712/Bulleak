@@ -1,6 +1,6 @@
 # Модель данных
 
-Все типы живут в `src/types/`. Ниже — источник правды для реализации.
+Все типы живут в `src/types/`. Ниже — источник правды для реализации (синхронизировано с кодом 2026-09-25, T-201).
 
 ## Курс (`types/course.ts`)
 ```ts
@@ -73,13 +73,13 @@ interface ProgressState {
   achievements: Record<string, number>;              // id -> timestamp разблокировки
   quizAttempts: QuizAttempt[];                       // последние 500
   counters: Counters;                                // для достижений
-  profile: { name: string; startedAt: number };
+  profile: { name: string; startedAt: number; lastBackupAt?: number };
 }
-interface LessonProgress { readAt?: number; quizBest: number; quizAttempts: number; completedAt?: number; timeSpentSec: number; xpEarned: number }
-interface ExamProgress   { best: number; attempts: number; passedAt?: number }
+interface LessonProgress { readAt?: number; quizBest: number; quizAttempts: number; completedAt?: number; timeSpentSec: number; xpEarned: number; improvements: number } // improvements — сколько раз пересдача улучшила результат (лимит XP)
+interface ExamProgress   { best: number; attempts: number; passedAt?: number; lastAttemptAt?: number } // lastAttemptAt — для паузы перед пересдачей
 interface DayActivity    { xp: number; minutes: number; lessonsCompleted: number; quizzes: number; simTrades: number }
-interface QuizAttempt    { quizId: string; at: number; ratio: number; passed: boolean; tags: Record<string, [number, number]> } // тег → [верно, всего]
-interface Counters { perfectQuizzes: number; simTrades: number; simWins: number; journalEntries: number; calculatorsUsed: string[]; glossaryViewed: number; nightSessions: number; }
+interface QuizAttempt    { quizId: string; at: number; ratio: number; passed: boolean; tags: Record<string, [number, number]>; durationSec?: number } // тег → [верно, всего]
+interface Counters { perfectQuizzes: number; simTrades: number; simWins: number; journalEntries: number; calculatorsUsed: string[]; glossaryViewed: string[]; dailyGoalsMet: number } // glossaryViewed — уникальные id
 ```
 Статус урока вычисляется, не хранится: `locked | available | read | completed` — `lib/progress/unlock.ts`.
 
@@ -94,7 +94,7 @@ type Side = 'long' | 'short';
 interface Candle { t: number; o: number; h: number; l: number; c: number; v: number }   // t — ms UTC
 
 interface SimTrade {
-  id?: number; at: number; scenarioId: string | null; dataset: string; startIndex: number;
+  id?: number; at: number; scenarioId: string | null; strategyTag?: string; dataset: string; startIndex: number;
   side: Side; entry: number; sl: number; tp: number; riskPct: number; balanceBefore: number;
   qty: number; exitPrice: number; exitIndex: number; outcome: 'tp'|'sl'|'timeout'|'manual';
   pnl: number; r: number; fees: number; notes?: string;
