@@ -12,7 +12,7 @@
 ## Что сделать
 1. Сверить факты из брифа с источниками (WebSearch/WebFetch), записать URL и дату в раздел «Источники» брифа
 2. Написать src/content/modules/m11/l05/index.mdx по структуре content-guidelines.md (Goals → теория с визуалами → интерактив → Summary)
-3. Сделать визуалы из брифа: новые SVG-схемы в src/components/diagrams, разметка графиков, фото/скриншоты с записью в credits.md
+3. Сделать визуалы из брифа: новые SVG-схемы в src/components/diagrams, разметка графиков, фото/картинки и макеты Bybit (bybit-mockups.md) с записью источника в credits.md
 4. Написать src/content/modules/m11/l05/quiz.ts: 8–12 вопросов по идеям брифа, объяснения к каждому
 5. Добавить определения всех терминов урока в src/content/glossary.ts (short + full)
 6. Отчёт бэктеста по strategyTag на странице статистики

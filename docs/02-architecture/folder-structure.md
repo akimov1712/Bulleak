@@ -6,7 +6,7 @@ TradingLearning/
 ├─ docs/                         ТЗ (этот каталог)
 ├─ public/
 │  ├─ data/                      свечи Bybit: BTCUSDT-240.json и т.д. (генерируются скриптом, коммитятся)
-│  ├─ img/                       фото, скриншоты: img/m02/..., img/bybit/...
+│  ├─ img/                       фото и картинки: img/covers/..., img/m02/...
 │  └─ favicon.svg
 ├─ scripts/
 │  └─ fetch-klines.ts            загрузка свечей с Bybit API

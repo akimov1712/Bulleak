@@ -39,8 +39,8 @@
 - [quiz-spec.md](03-content/quiz-spec.md) — формат вопросов
 - [glossary-list.md](03-content/glossary-list.md) — термины глоссария
 - [achievements-list.md](03-content/achievements-list.md) — достижения
-- [credits.md](03-content/credits.md) — лицензии изображений
-- [bybit-screenshots-todo.md](03-content/bybit-screenshots-todo.md) — какие скриншоты делает пользователь
+- [credits.md](03-content/credits.md) — источники изображений
+- [bybit-mockups.md](03-content/bybit-mockups.md) — SVG-макеты экранов Bybit (вместо скриншотов)
 
 ## 04-features
 [path-map](04-features/path-map.md) · [lesson-player](04-features/lesson-player.md) · [quiz-engine](04-features/quiz-engine.md) · [gamification](04-features/gamification.md) · [stats](04-features/stats.md) · [simulator](04-features/simulator.md) · [calculators](04-features/calculators.md) · [journal](04-features/journal.md) · [glossary](04-features/glossary.md) · [settings-export](04-features/settings-export.md) · [exams-certificate](04-features/exams-certificate.md)
