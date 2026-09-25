@@ -16,11 +16,11 @@
 | [T-004](T-004-eslint-prettier.md) | ESLint 9 + Prettier + скрипт check | ☑ |
 | [T-005](T-005-vitest.md) | Vitest + Testing Library + покрытие | ☑ |
 | [T-006](T-006-playwright.md) | Playwright: smoke e2e desktop + mobile | ☑ |
-| [T-007](T-007-preview-config.md) | Конфигурация превью и проверка в браузере | ☐ |
+| [T-007](T-007-preview-config.md) | Конфигурация превью и проверка в браузере | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
-- [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
-- [ ] Тег `stage-00-done`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
+- [x] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
+- [x] Тег `stage-00-done`
