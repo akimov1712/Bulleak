@@ -7,6 +7,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
+import { StorageBanner } from './StorageBanner';
 
 /** App shell: sidebar on desktop, top bar + bottom nav on mobile. */
 export function RootLayout() {
@@ -23,6 +24,7 @@ export function RootLayout() {
       <ScrollToTop />
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
+        <StorageBanner />
         <TopBar />
         <main
           id="main"

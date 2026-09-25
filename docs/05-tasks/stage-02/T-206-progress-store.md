@@ -1,7 +1,7 @@
 # T-206 · Стор прогресса с persist и миграциями
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/storage.md
@@ -19,8 +19,8 @@
 - `src/lib/progress/initial.ts`
 
 ## Критерии приёмки
-- [ ] Тест migrate (v0 → v1 заглушка, неизвестная форма → initial)
-- [ ] Две вкладки видят изменения друг друга
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Тест migrate (v0 → v1 заглушка, неизвестная форма → initial)
+- [x] Две вкладки видят изменения друг друга
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(store): add persisted progress store`
