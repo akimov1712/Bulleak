@@ -35,8 +35,39 @@ const pages: [string, string][] = [
   ['#/stats', 'Статистика'],
   ['#/achievements', 'Достижения'],
   ['#/settings', 'Настройки'],
+  ['#/about', 'О курсе'],
   ['#/definitely-missing', 'Такой страницы нет'],
 ];
+
+test('navigation reaches sections on every screen size', async ({ page, isMobile }) => {
+  await page.goto('/');
+  if (isMobile) {
+    const bottomNav = page.getByRole('navigation', { name: 'Основная навигация' });
+    await bottomNav.getByRole('link', { name: 'Тренажёр' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Тренажёр' })).toBeVisible();
+    await bottomNav.getByRole('button', { name: 'Ещё' }).click();
+    await page
+      .getByRole('dialog', { name: 'Разделы' })
+      .getByRole('link', { name: 'Глоссарий' })
+      .click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Глоссарий' })).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+  } else {
+    await page.getByRole('link', { name: 'Статистика' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Статистика' })).toBeVisible();
+    await page.getByRole('link', { name: 'О курсе' }).first().click();
+    await expect(page.getByRole('heading', { level: 1, name: 'О курсе' })).toBeVisible();
+  }
+});
+
+test('theme toggle switches and persists', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Включить тёмную тему' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
 
 for (const [hash, heading] of pages) {
   test(`${hash} renders "${heading}"`, async ({ page }) => {

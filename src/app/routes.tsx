@@ -81,6 +81,10 @@ export const routes: RouteObject[] = [
         path: 'plan',
         lazy: () => import('@/pages/PlanPage').then((m) => ({ Component: m.PlanPage })),
       },
+      {
+        path: 'about',
+        lazy: () => import('@/pages/AboutPage').then((m) => ({ Component: m.AboutPage })),
+      },
       // Dev-only UI showcase: the whole branch is removed from production builds.
       ...(import.meta.env.DEV
         ? [

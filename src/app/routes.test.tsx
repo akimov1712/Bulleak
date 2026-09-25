@@ -32,6 +32,7 @@ describe('routes', () => {
     [paths.settings(), 'Настройки'],
     [paths.certificate(), 'Сертификат'],
     [paths.plan(), 'Торговый план'],
+    [paths.about(), 'О курсе'],
   ])('%s renders "%s"', async (url, heading) => {
     renderAt(url);
     expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
