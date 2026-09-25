@@ -1,7 +1,7 @@
 # T-302 · Уровни и ранги
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/gamification.md (Уровни)
@@ -14,7 +14,7 @@
 - `src/lib/levels.ts`
 
 ## Критерии приёмки
-- [ ] levelFromXp монотонна, 0 XP = уровень 1
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] levelFromXp монотонна, 0 XP = уровень 1
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(gamification): add levels and ranks`

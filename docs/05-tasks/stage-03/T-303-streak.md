@@ -1,7 +1,7 @@
 # T-303 · Стрик и заморозки
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/gamification.md (Стрик)
@@ -14,7 +14,7 @@
 - `src/lib/streak.ts`
 
 ## Критерии приёмки
-- [ ] Все сценарии покрыты тестами
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Все сценарии покрыты тестами
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(gamification): add streak with freezes`
