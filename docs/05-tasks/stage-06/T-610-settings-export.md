@@ -1,0 +1,25 @@
+# T-610 · Настройки, экспорт, импорт, сброс
+
+- **Этап:** 06 Инструменты: калькуляторы, журнал, глоссарий, статистика, настройки
+- **Статус:** ☐ не начата
+
+## Контекст (прочитать перед началом)
+- docs/04-features/settings-export.md
+- docs/02-architecture/storage.md
+
+## Что сделать
+1. Установить zod
+2. lib/io/exportSchema.ts (zod), buildExport, parseImport (с migrate) + тесты на битые файлы
+3. SettingsPage: профиль, тема, цель дня, звуки, анимации, свободный режим, данные
+4. Импорт с предпросмотром, сброс со словом «СБРОС»
+5. Событие backup → достижение
+
+## Файлы
+- `src/pages/SettingsPage.tsx`
+- `src/lib/io/*`
+
+## Критерии приёмки
+- [ ] Импорт битого файла не меняет данные
+- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+
+**Коммит:** `feat(settings): add settings with export, import and reset`

@@ -1,0 +1,46 @@
+# Контент-пайплайн
+
+## Файлы
+```
+src/content/course.ts                 массив CourseModule[] — единственный реестр порядка и метаданных
+src/content/modules/m03/l02/index.mdx текст урока
+src/content/modules/m03/l02/quiz.ts   export const quiz: Quiz
+src/content/modules/m03/exam.ts       export const exam: Quiz (пул 20–30 вопросов, sample: 15)
+src/content/final-exam.ts             финальный экзамен (пул 60, sample: 40)
+src/content/glossary.ts               Term[]
+src/content/achievements.ts           AchievementDef[]
+src/content/scenarios.ts              SimScenario[]
+```
+
+## Загрузка
+- `import.meta.glob('./modules/*/*/index.mdx')` → карта `lessonId → () => import(...)`, урок грузится лениво.
+- Аналогично `quiz.ts` и `exam.ts`.
+- Путь `modules/m03/l02` ↔ id `m03-l02` (функция `lessonPath(id)` в `lib/content.ts`).
+
+## MDX
+- Плагины: `remark-gfm` (таблицы).
+- Компоненты передаются через `MDXProvider` (`features/lesson/mdxComponents.tsx`): стилизованные h2/h3/p/ul/table/blockquote + кастомные:
+
+| Компонент | Назначение |
+|---|---|
+| `<Goals items={[...]}/>` | «Что узнаешь» |
+| `<Summary items={[...]}/>` | Итоги |
+| `<Tip>`, `<Warning>`, `<Example>`, `<BybitNote>` | Callout-блоки |
+| `<Term id="leverage">плечо</Term>` | Термин с поповером из глоссария |
+| `<CandleChart dataset="BTCUSDT-240" from={..} to={..} annotations={[...]}/>` | Живой график с разметкой |
+| `<Diagram name="candle-anatomy"/>` | SVG-схема из `components/diagrams` |
+| `<Figure src alt caption credit/>` | Фото/скриншот |
+| `<MiniQuiz question={...}/>` | Вопрос посреди урока (без XP, для закрепления) |
+| `<Reveal title="...">` | Раскрывающийся блок «проверь себя» |
+| `<CalcEmbed id="position"/>` | Встроенный калькулятор |
+| `<SimScenario id="..."/>` | Кнопка/превью сценария тренажёра |
+| `<Steps>` / `<Step>` | Пошаговая инструкция (например, в Bybit) |
+| `<Compare left right/>` | Сравнение двух понятий (спот vs фьючерсы) |
+| `<Checklist items/>` | Чек-лист с галочками (локально) |
+
+## Валидация (`content.test.ts`)
+- У каждого урока из `course.ts` есть `index.mdx` и `quiz.ts`; лишних файлов без записи нет.
+- Уникальность id уроков, вопросов, терминов, сценариев.
+- Квиз: 8–12 вопросов (экзамен — пул ≥ sample), ≥ 2 типа, explanation непустой, correct ссылается на существующий option, numeric tolerance ≥ 0, chart-click dataset существует.
+- Все `terms` урока есть в глоссарии; все `scenarioIds` есть в scenarios.
+- Все упоминания `<Term id>` в MDX (регэксп по исходнику) существуют в глоссарии.
