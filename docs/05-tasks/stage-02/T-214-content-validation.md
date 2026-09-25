@@ -1,7 +1,7 @@
 # T-214 · Автоматическая валидация контента
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/content-pipeline.md (Валидация)
@@ -15,7 +15,7 @@
 - `src/content/content.test.ts`
 
 ## Критерии приёмки
-- [ ] Намеренная ошибка в quiz-образце роняет тест
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Намеренная ошибка в quiz-образце роняет тест
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test(content): add content validation suite`

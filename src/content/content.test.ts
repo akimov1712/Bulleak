@@ -1,0 +1,194 @@
+/**
+ * Content validation (docs/02-architecture/content-pipeline.md → «Валидация»).
+ * Validates every lesson/quiz/exam that exists. Completeness (all 62 lessons, all exams)
+ * is enforced only in strict mode — switched on permanently in T-828 when the course is full.
+ */
+import { describe, expect, it } from 'vitest';
+import type { Question, Quiz } from '@/types/quiz';
+import type { LessonId, ModuleId } from '@/types/course';
+import { contentInventory } from './loaders';
+import { courseIndex } from './courseIndex';
+import { getTerm } from './glossary';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const STRICT = import.meta.env.VITE_STRICT_CONTENT === '1';
+
+// Raw MDX text (the Vite MDX plugin compiles even ?raw imports, so read from disk).
+const mdxSources = Object.fromEntries(
+  contentInventory.lessons.map((id) => {
+    const [moduleId, lessonPart] = id.split('-');
+    const file = path.resolve('src/content/modules', moduleId ?? '', lessonPart ?? '', 'index.mdx');
+    return [id, fs.readFileSync(file, 'utf8')];
+  }),
+) as Record<LessonId, string>;
+
+/** Problems with one question (empty list = valid). */
+export function questionProblems(q: Question): string[] {
+  const p: string[] = [];
+  if (!q.prompt.trim()) p.push('empty prompt');
+  if (q.explanation.trim().length < 15) p.push('explanation too short');
+  if (q.tags.length < 1 || q.tags.length > 3) p.push('needs 1–3 tags');
+  switch (q.type) {
+    case 'single':
+    case 'multi': {
+      const ids = q.options.map((o) => o.id);
+      if (new Set(ids).size !== ids.length) p.push('duplicate option ids');
+      if (q.options.length < 2) p.push('needs ≥2 options');
+      if (q.options.some((o) => !o.text.trim())) p.push('empty option text');
+      const correct = q.type === 'single' ? [q.correct] : q.correct;
+      if (correct.length === 0) p.push('no correct option');
+      if (correct.some((c) => !ids.includes(c))) p.push('correct id not among options');
+      if (q.type === 'multi' && q.options.length < 3) p.push('multi needs ≥3 options');
+      break;
+    }
+    case 'numeric':
+      if (!Number.isFinite(q.correct)) p.push('correct is not a number');
+      if (!(q.tolerance >= 0)) p.push('tolerance must be ≥0');
+      break;
+    case 'match': {
+      if (q.pairs.length < 3 || q.pairs.length > 5) p.push('match needs 3–5 pairs');
+      if (new Set(q.pairs.map((x) => x.left)).size !== q.pairs.length)
+        p.push('duplicate left items');
+      if (new Set(q.pairs.map((x) => x.right)).size !== q.pairs.length)
+        p.push('duplicate right items');
+      break;
+    }
+    case 'order':
+      if (q.items.length < 3 || q.items.length > 6) p.push('order needs 3–6 items');
+      if (new Set(q.items).size !== q.items.length) p.push('duplicate items');
+      break;
+    case 'chart-click':
+      if (!(q.from < q.to)) p.push('from must be < to');
+      if (q.target.kind === 'price' && !(q.target.min < q.target.max)) p.push('price range empty');
+      if (q.target.kind === 'candle' && q.target.indices.length === 0) p.push('no target candles');
+      break;
+    case 'truefalse':
+      break;
+  }
+  return p;
+}
+
+function quizProblems(quiz: Quiz, expectedId: string, kind: Quiz['kind']): string[] {
+  const p: string[] = [];
+  if (quiz.id !== expectedId) p.push(`id "${quiz.id}" ≠ "${expectedId}"`);
+  if (quiz.kind !== kind) p.push(`kind "${quiz.kind}" ≠ "${kind}"`);
+  if (kind === 'lesson') {
+    if (quiz.questions.length < 8 || quiz.questions.length > 12)
+      p.push('lesson quiz needs 8–12 questions');
+    if (quiz.passRatio !== 0.8) p.push('lesson pass ratio must be 0.8');
+  } else {
+    if (!quiz.sample) p.push('exam needs sample');
+    else if (quiz.questions.length < quiz.sample) p.push('pool smaller than sample');
+  }
+  if (new Set(quiz.questions.map((q) => q.type)).size < 2) p.push('needs ≥2 question types');
+  for (const q of quiz.questions) {
+    for (const problem of questionProblems(q)) p.push(`${q.id}: ${problem}`);
+  }
+  return p;
+}
+
+describe('content inventory', () => {
+  it('every content file belongs to a lesson/module of the course', () => {
+    for (const id of [...contentInventory.lessons, ...contentInventory.quizzes]) {
+      expect(courseIndex.getLesson(id), `unknown lesson ${id}`).toBeDefined();
+    }
+    for (const id of contentInventory.exams) {
+      expect(courseIndex.getModule(id)?.hasExam, `module ${id} has no exam`).toBe(true);
+    }
+  });
+
+  it('lesson text and quiz always come together', () => {
+    expect([...contentInventory.lessons].sort()).toEqual([...contentInventory.quizzes].sort());
+  });
+
+  it.skipIf(!STRICT)('STRICT: all 62 lessons and all module exams exist', () => {
+    expect(contentInventory.lessons).toHaveLength(courseIndex.lessons.length);
+    const withExam = courseIndex.modules.filter((m) => m.hasExam).map((m) => m.id);
+    expect([...contentInventory.exams].sort()).toEqual(withExam.sort());
+  });
+});
+
+describe('lesson quizzes', () => {
+  const allIds = new Map<string, string>();
+
+  it.each(contentInventory.quizzes)('%s quiz is valid', async (id) => {
+    const quiz = await contentInventory.loadQuiz(id);
+    expect(quizProblems(quiz, id, 'lesson')).toEqual([]);
+    for (const q of quiz.questions) {
+      expect(q.id.startsWith(`${id}-q`), `${q.id} should start with ${id}-q`).toBe(true);
+      expect(allIds.get(q.id), `duplicate question id ${q.id}`).toBeUndefined();
+      allIds.set(q.id, id);
+    }
+  });
+});
+
+describe('module exams', () => {
+  if (contentInventory.exams.length === 0) {
+    it('no exams written yet', () => expect(contentInventory.exams).toEqual([]));
+  }
+  it.each(contentInventory.exams)('%s exam is valid', async (id: ModuleId) => {
+    const exam = await contentInventory.loadExam(id);
+    expect(quizProblems(exam, id, 'exam')).toEqual([]);
+  });
+});
+
+describe('lesson texts and glossary links', () => {
+  it.each(contentInventory.lessons)('%s: terms exist in the glossary', (id) => {
+    const lesson = courseIndex.getLesson(id);
+    const missing = (lesson?.terms ?? []).filter((t) => !getTerm(t));
+    expect(missing, 'terms from the brief missing in glossary.ts').toEqual([]);
+
+    const source = mdxSources[id] ?? '';
+    const usedInText = [...source.matchAll(/<Term\s+id="([^"]+)"/g)].map((m) => m[1] ?? '');
+    expect(
+      usedInText.filter((t) => !getTerm(t)),
+      '<Term id> without glossary entry',
+    ).toEqual([]);
+  });
+
+  it.each(contentInventory.lessons)('%s: has Goals and Summary blocks', (id) => {
+    const source = mdxSources[id] ?? '';
+    expect(source).toMatch(/<Goals[\s>]/);
+    expect(source).toMatch(/<Summary[\s>]/);
+  });
+});
+
+describe('questionProblems (validator self-test)', () => {
+  const base = {
+    id: 'x',
+    prompt: 'Вопрос?',
+    explanation: 'Достаточно длинное объяснение.',
+    tags: ['t'],
+  };
+
+  it('accepts a well-formed question', () => {
+    expect(questionProblems({ ...base, type: 'truefalse', correct: true })).toEqual([]);
+  });
+
+  it('catches typical authoring mistakes', () => {
+    expect(
+      questionProblems({
+        ...base,
+        type: 'single',
+        options: [
+          { id: 'a', text: 'A' },
+          { id: 'b', text: 'B' },
+        ],
+        correct: 'z',
+      }),
+    ).toContain('correct id not among options');
+    expect(
+      questionProblems({ ...base, explanation: '', type: 'truefalse', correct: true }),
+    ).toContain('explanation too short');
+    expect(questionProblems({ ...base, type: 'numeric', correct: 1, tolerance: -1 })).toContain(
+      'tolerance must be ≥0',
+    );
+    expect(questionProblems({ ...base, type: 'order', items: ['a', 'a', 'b'] })).toContain(
+      'duplicate items',
+    );
+    expect(
+      questionProblems({ ...base, type: 'match', pairs: [{ left: 'a', right: 'b' }] }),
+    ).toContain('match needs 3–5 pairs');
+  });
+});
