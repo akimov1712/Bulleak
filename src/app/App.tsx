@@ -1,5 +1,7 @@
 import { useApplyTheme, useResolvedTheme } from '@/hooks/useTheme';
 import { useSettings } from '@/store/settingsStore';
+import { Mascot } from '@/components/mascot/Mascot';
+import { MOOD_LIST, MOODS } from '@/components/mascot/moods';
 
 // Temporary start screen; replaced by the app shell in T-107/T-108.
 export function App() {
@@ -17,6 +19,14 @@ export function App() {
         <span className="rounded-full bg-bull-soft px-3 py-1 font-bold text-bull">+2.40R</span>
         <span className="rounded-full bg-bear-soft px-3 py-1 font-bold text-bear">−1.00R</span>
         <span className="rounded-full bg-xp px-3 py-1 font-bold text-on-xp">+50 XP</span>
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {MOOD_LIST.map((mood) => (
+          <figure key={mood} className="flex flex-col items-center gap-1">
+            <Mascot mood={mood} size={120} />
+            <figcaption className="text-sm text-text-muted">{MOODS[mood].label}</figcaption>
+          </figure>
+        ))}
       </div>
       <button
         type="button"

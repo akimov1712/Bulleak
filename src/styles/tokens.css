@@ -50,6 +50,18 @@
   --mod-red-shade: #c9283d;
 
   --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(26 29 43 / 0.18);
+
+  /* Mascot "Bullik": same character in both themes, only the outline adapts. */
+  --mascot-body: #c9824b;
+  --mascot-body-shade: #a8653a;
+  --mascot-snout: #f4c3a6;
+  --mascot-nostril: #b56b52;
+  --mascot-horn: #fbeccd;
+  --mascot-horn-shade: #e2c794;
+  --mascot-ink: #2a1d14;
+  --mascot-cap: #16c26a;
+  --mascot-cap-shade: #0e9a52;
+  --mascot-outline: #2a1d14;
 }
 
 :root[data-theme='dark'] {
@@ -81,6 +93,8 @@
   --warn-soft: #3d2610;
 
   --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+
+  --mascot-outline: #0b0d17;
 }
 
 @theme inline {
