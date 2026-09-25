@@ -1,7 +1,7 @@
 # T-212 · Вопросы: single, multi, truefalse
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -17,7 +17,7 @@
 - `TrueFalseQuestion.tsx`
 
 ## Критерии приёмки
-- [ ] Проходятся только клавиатурой
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Проходятся только клавиатурой
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(quiz): add choice question types`
