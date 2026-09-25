@@ -24,8 +24,8 @@ XP, уровни, стрик, цель дня, достижения, празд�
 | [T-311](T-311-e2e-gamification.md) | E2E: награды за урок | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
-- [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
-- [ ] Тег `stage-03-done`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
+- [x] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
+- [x] Тег `stage-03-done`
