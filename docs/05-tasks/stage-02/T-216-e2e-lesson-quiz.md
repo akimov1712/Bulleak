@@ -1,7 +1,7 @@
 # T-216 · E2E: урок → тест → прогресс сохранён
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/06-qa/test-plan.md
@@ -14,7 +14,7 @@
 - `e2e/lesson-flow.spec.ts`
 
 ## Критерии приёмки
-- [ ] Зелёный на desktop и mobile
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Зелёный на desktop и mobile
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test(e2e): cover lesson and quiz flow`
