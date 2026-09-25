@@ -11,7 +11,7 @@ import {
 } from './format';
 
 // Intl uses non-breaking spaces as group separators; normalize for readable assertions.
-const n = (s: string) => s.replace(/[  ]/g, ' ');
+const n = (s: string) => s.replace(/\s/g, ' ');
 
 describe('decimalsForStep', () => {
   it.each([
