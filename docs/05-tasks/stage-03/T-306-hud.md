@@ -1,7 +1,7 @@
 # T-306 · HUD: XP, уровень, стрик в TopBar
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -14,7 +14,7 @@
 - `src/features/gamification/*`
 
 ## Критерии приёмки
-- [ ] Без лишних ререндеров (точечные селекторы)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Без лишних ререндеров (точечные селекторы)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(gamification): add xp, level and streak hud`
