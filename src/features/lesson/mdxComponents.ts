@@ -1,0 +1,37 @@
+import type { MDXComponents } from 'mdx/types';
+import * as Prose from './blocks/Prose';
+import { BybitNote, Example, Tip, Warning } from './blocks/Callouts';
+import { Checklist, Compare, Figure, Goals, Reveal, Step, Steps, Summary } from './blocks/Blocks';
+
+/** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
+export const mdxComponents: MDXComponents = {
+  h2: Prose.H2,
+  h3: Prose.H3,
+  p: Prose.P,
+  ul: Prose.Ul,
+  ol: Prose.Ol,
+  li: Prose.Li,
+  strong: Prose.Strong,
+  a: Prose.A,
+  table: Prose.Table,
+  th: Prose.Th,
+  td: Prose.Td,
+  blockquote: Prose.Blockquote,
+  code: Prose.Code,
+  hr: Prose.Hr,
+
+  Goals,
+  Summary,
+  Tip,
+  Warning,
+  Example,
+  BybitNote,
+  Figure,
+  Reveal,
+  Steps,
+  Step,
+  Compare,
+  Checklist,
+  // Replaced by the glossary popover in T-205.
+  Term: Prose.Strong,
+};
