@@ -1,7 +1,7 @@
 # T-402 · Загрузка датасетов в приложении
 
 - **Этап:** 04 Графики и пилотный контент (модули 0–3)
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -15,7 +15,7 @@
 - `src/features/charts/useDataset.ts`
 
 ## Критерии приёмки
-- [ ] resample 1H→4H совпадает с загруженным 4H на пересечении (допуск по объёму)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] resample 1H→4H совпадает с загруженным 4H на пересечении (допуск по объёму)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(charts): add dataset loading and candle utils`
