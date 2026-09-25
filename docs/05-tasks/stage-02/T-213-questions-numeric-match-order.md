@@ -1,7 +1,7 @@
 # T-213 · Вопросы: numeric, match, order
 
 - **Этап:** 02 Движок уроков и тестов
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -17,7 +17,7 @@
 - `OrderQuestion.tsx`
 
 ## Критерии приёмки
-- [ ] Работают на тач-экране (проверка в mobile-эмуляции)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Работают на тач-экране (проверка в mobile-эмуляции)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(quiz): add numeric, match and order questions`
