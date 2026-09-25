@@ -22,17 +22,18 @@
 | `--color-border` | #DDE2EE | #2E3552 | рамки |
 | `--color-text` | #1A1D2B | #EEF0F8 | основной текст |
 | `--color-text-muted` | #5C6480 | #9AA3C0 | вторичный текст |
-| `--color-primary` | #16C26A | #2BD97F | основной (бычий зелёный), кнопки |
+| `--color-primary` | #16C26A | #2BD97F | основной (бычий зелёный), фон кнопок |
 | `--color-primary-shade` | #0E9A52 | #1AA862 | нижний бортик кнопки |
-| `--color-bull` | #16C26A | #2BD97F | рост, прибыль |
-| `--color-bear` | #F0445A | #FF5C70 | падение, убыток, ошибки |
-| `--color-xp` | #FFB020 | #FFC247 | XP, монеты, огонь стрика |
-| `--color-info` | #3B82F6 | #60A5FA | подсказки, ссылки |
-| `--color-epic` | #8B5CF6 | #A78BFA | достижения, уровни |
-| `--color-warn` | #FF8A1F | #FFA14D | предупреждения |
-Цвета модулей: green, blue, purple, orange, pink, teal, yellow, red — по паре `--mod-X` / `--mod-X-shade`.
+| `--color-on-primary` | #05301A | #04281A | текст на primary (тёмный, т.к. белый на ярко-зелёном < 4.5:1) |
+| `--color-bull` | #0A7F41 | #2BD97F | рост, прибыль (текст); `-soft` — фон плашек |
+| `--color-bear` | #C62A40 | #FF5C70 | падение, убыток, ошибки; `-soft`, `on-bear` |
+| `--color-xp` | #FFB020 | #FFC247 | XP, огонь стрика (фон); `on-xp` — тёмный текст |
+| `--color-info` | #2563EB | #60A5FA | подсказки, ссылки, фокус |
+| `--color-epic` | #7C4DEA | #A78BFA | достижения, уровни |
+| `--color-warn` | #B04E09 | #FFA14D | предупреждения |
+Цвета модулей: green, blue, purple, orange, pink, teal, yellow, red — по паре `--mod-X` / `--mod-X-shade` (используются как фоны/декор; текст на них — `text` или `on-primary`).
 
-Контраст всех пар текст/фон проверяется (≥ 4.5:1); для белого текста на ярких кнопках — затемнённые варианты.
+Контраст проверен скриптом (2026-09-25): все пары текст/фон ≥ 4.5:1 в обеих темах. Источник правды — `src/styles/tokens.css`.
 
 ## Базовые компоненты (`components/ui`)
 Button (variants: primary, secondary, ghost, danger, xp; size: sm/md/lg; 3D-эффект), IconButton, Card, Badge, Pill, ProgressBar (линейный), ProgressRing (круговой), Modal/Sheet, Tabs, Input, NumberInput (с единицами и шагом), Select, Switch, Tooltip, Popover, Toast, Skeleton, EmptyState (с маскотом), Kbd.

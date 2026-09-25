@@ -1,7 +1,7 @@
 # T-003 · Tailwind v4, базовые токены и шрифты
 
 - **Этап:** 00 Среда разработки
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/design-system.md
@@ -20,9 +20,9 @@
 - `src/lib/cn.ts`
 
 ## Критерии приёмки
-- [ ] Классы `bg-primary`, `text-bull`, `font-mono` работают
-- [ ] Смена `data-theme` на html меняет цвета
-- [ ] Шрифты грузятся локально (нет запросов к Google Fonts)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Классы `bg-primary`, `text-bull`, `font-mono` работают
+- [x] Смена `data-theme` на html меняет цвета
+- [x] Шрифты грузятся локально (нет запросов к Google Fonts)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `chore: add tailwind v4 with design tokens and fonts`

@@ -1,0 +1,138 @@
+/*
+ * Design tokens. Raw values live in :root / [data-theme='dark'];
+ * Tailwind utilities (bg-surface, text-bull, …) map to them via @theme inline.
+ * See docs/02-architecture/design-system.md.
+ */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f7f8fc;
+  --surface: #ffffff;
+  --surface-2: #eef1f8;
+  --border: #dde2ee;
+  --text: #1a1d2b;
+  --text-muted: #5c6480;
+
+  --primary: #16c26a;
+  --primary-shade: #0e9a52;
+  --on-primary: #05301a;
+  --bull: #0a7f41;
+  --bull-soft: #e8f8ee;
+  --bear: #c62a40;
+  --bear-soft: #fdeef0;
+  --on-bear: #ffffff;
+  --xp: #ffb020;
+  --xp-shade: #d98e00;
+  --on-xp: #3d2800;
+  --info: #2563eb;
+  --info-soft: #dbe8ff;
+  --epic: #7c4dea;
+  --epic-soft: #ece4ff;
+  --warn: #b04e09;
+  --warn-soft: #ffe8d4;
+
+  --mod-green: #16c26a;
+  --mod-green-shade: #0e9a52;
+  --mod-blue: #3b82f6;
+  --mod-blue-shade: #2563c9;
+  --mod-purple: #8b5cf6;
+  --mod-purple-shade: #6d3fd6;
+  --mod-orange: #ff8a1f;
+  --mod-orange-shade: #d96a00;
+  --mod-pink: #ec4899;
+  --mod-pink-shade: #c42a78;
+  --mod-teal: #14b8a6;
+  --mod-teal-shade: #0d9083;
+  --mod-yellow: #f5b800;
+  --mod-yellow-shade: #c99700;
+  --mod-red: #f0445a;
+  --mod-red-shade: #c9283d;
+
+  --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(26 29 43 / 0.18);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0f1220;
+  --surface: #181c2e;
+  --surface-2: #222840;
+  --border: #2e3552;
+  --text: #eef0f8;
+  --text-muted: #9aa3c0;
+
+  --primary: #2bd97f;
+  --primary-shade: #1aa862;
+  --on-primary: #04281a;
+  --bull: #2bd97f;
+  --bull-soft: #123826;
+  --bear: #ff5c70;
+  --bear-soft: #3d1a22;
+  --on-bear: #2a0409;
+  --xp: #ffc247;
+  --xp-shade: #d99a1a;
+  --on-xp: #2e1f00;
+  --info: #60a5fa;
+  --info-soft: #172a4a;
+  --epic: #a78bfa;
+  --epic-soft: #2a2150;
+  --warn: #ffa14d;
+  --warn-soft: #3d2610;
+
+  --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+
+  --color-primary: var(--primary);
+  --color-primary-shade: var(--primary-shade);
+  --color-on-primary: var(--on-primary);
+  --color-bull: var(--bull);
+  --color-bull-soft: var(--bull-soft);
+  --color-bear: var(--bear);
+  --color-bear-soft: var(--bear-soft);
+  --color-on-bear: var(--on-bear);
+  --color-xp: var(--xp);
+  --color-xp-shade: var(--xp-shade);
+  --color-on-xp: var(--on-xp);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-epic: var(--epic);
+  --color-epic-soft: var(--epic-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --color-mod-green: var(--mod-green);
+  --color-mod-green-shade: var(--mod-green-shade);
+  --color-mod-blue: var(--mod-blue);
+  --color-mod-blue-shade: var(--mod-blue-shade);
+  --color-mod-purple: var(--mod-purple);
+  --color-mod-purple-shade: var(--mod-purple-shade);
+  --color-mod-orange: var(--mod-orange);
+  --color-mod-orange-shade: var(--mod-orange-shade);
+  --color-mod-pink: var(--mod-pink);
+  --color-mod-pink-shade: var(--mod-pink-shade);
+  --color-mod-teal: var(--mod-teal);
+  --color-mod-teal-shade: var(--mod-teal-shade);
+  --color-mod-yellow: var(--mod-yellow);
+  --color-mod-yellow-shade: var(--mod-yellow-shade);
+  --color-mod-red: var(--mod-red);
+  --color-mod-red-shade: var(--mod-red-shade);
+
+  --shadow-card: var(--shadow-card);
+}
+
+@theme {
+  --font-sans: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  --radius-card: 1.25rem;
+  --radius-btn: 1rem;
+}
