@@ -1,7 +1,7 @@
 # T-005 · Vitest + Testing Library + покрытие
 
 - **Этап:** 00 Среда разработки
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/01-rules/testing-policy.md
@@ -17,8 +17,8 @@
 - `src/app/App.test.tsx`
 
 ## Критерии приёмки
-- [ ] `npm test` зелёный
-- [ ] `npm run test:coverage` формирует отчёт
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] `npm test` зелёный
+- [x] `npm run test:coverage` формирует отчёт
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test: set up vitest with testing library`

@@ -14,7 +14,7 @@
 | [T-002](T-002-vite-scaffold.md) | Каркас Vite 6 + React 19 + TypeScript strict | ☑ |
 | [T-003](T-003-tailwind-fonts.md) | Tailwind v4, базовые токены и шрифты | ☑ |
 | [T-004](T-004-eslint-prettier.md) | ESLint 9 + Prettier + скрипт check | ☑ |
-| [T-005](T-005-vitest.md) | Vitest + Testing Library + покрытие | ☐ |
+| [T-005](T-005-vitest.md) | Vitest + Testing Library + покрытие | ☑ |
 | [T-006](T-006-playwright.md) | Playwright: smoke e2e desktop + mobile | ☐ |
 | [T-007](T-007-preview-config.md) | Конфигурация превью и проверка в браузере | ☐ |
 
