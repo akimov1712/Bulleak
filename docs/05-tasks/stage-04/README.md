@@ -13,7 +13,7 @@
 |---|---|---|
 | [T-401](T-401-fetch-klines.md) | Скрипт загрузки свечей Bybit | ☑ |
 | [T-402](T-402-dataset-hook.md) | Загрузка датасетов в приложении | ☑ |
-| [T-403](T-403-indicators.md) | Индикаторы и детекторы | ☐ |
+| [T-403](T-403-indicators.md) | Индикаторы и детекторы | ☑ |
 | [T-404](T-404-candle-chart.md) | Компонент CandleChart | ☐ |
 | [T-405](T-405-chart-click-question.md) | Вопрос chart-click и MDX-компонент CandleChart | ☐ |
 | [T-406](T-406-diagrams-m00-m03.md) | SVG-схемы для модулей 0–3 | ☐ |
