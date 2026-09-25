@@ -1,7 +1,7 @@
 # T-102 · Стор настроек и переключение темы
 
 - **Этап:** 01 Каркас приложения и дизайн-система
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/storage.md
@@ -21,9 +21,9 @@
 - `src/hooks/useReducedMotion.ts`
 
 ## Критерии приёмки
-- [ ] Тема сохраняется после перезагрузки
-- [ ] Режим system реагирует на смену системной темы
-- [ ] Тест safeStorage при исключении localStorage
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Тема сохраняется после перезагрузки
+- [x] Режим system реагирует на смену системной темы
+- [x] Тест safeStorage при исключении localStorage
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(settings): add settings store with theme switching`

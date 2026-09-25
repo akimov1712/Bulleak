@@ -1,16 +1,11 @@
-import { useState } from 'react';
+import { useApplyTheme, useResolvedTheme } from '@/hooks/useTheme';
+import { useSettings } from '@/store/settingsStore';
 
-type Theme = 'light' | 'dark';
-
-// Temporary start screen for stage 00; replaced by the app shell in stage 01.
+// Temporary start screen; replaced by the app shell in T-107/T-108.
 export function App() {
-  const [theme, setTheme] = useState<Theme>('light');
-
-  function toggleTheme() {
-    const next: Theme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = next;
-    setTheme(next);
-  }
+  useApplyTheme();
+  const theme = useResolvedTheme();
+  const update = useSettings((s) => s.update);
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-16">
@@ -25,7 +20,7 @@ export function App() {
       </div>
       <button
         type="button"
-        onClick={toggleTheme}
+        onClick={() => update({ theme: theme === 'light' ? 'dark' : 'light' })}
         className="w-fit rounded-(--radius-btn) bg-primary px-6 py-3 text-lg font-extrabold text-on-primary shadow-[0_4px_0_0_var(--primary-shade)] transition active:translate-y-1 active:shadow-none"
       >
         {theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}

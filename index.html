@@ -10,6 +10,20 @@
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Трейдинг на Bybit с нуля</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a light/dark flash.
+      (function () {
+        var theme = 'system';
+        try {
+          var saved = JSON.parse(localStorage.getItem('tc-settings') || '{}');
+          if (saved && saved.state && saved.state.theme) theme = saved.state.theme;
+        } catch (e) {}
+        if (theme === 'system') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
