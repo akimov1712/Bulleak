@@ -131,7 +131,8 @@
 
 @theme {
   --font-sans: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
 
   --radius-card: 1.25rem;
   --radius-btn: 1rem;

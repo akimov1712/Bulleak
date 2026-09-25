@@ -1,7 +1,7 @@
 # T-004 · ESLint 9 + Prettier + скрипт check
 
 - **Этап:** 00 Среда разработки
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 - docs/01-rules/coding-standards.md
@@ -17,8 +17,8 @@
 - `.prettierignore`
 
 ## Критерии приёмки
-- [ ] `npm run lint` без ошибок на текущем коде
-- [ ] Намеренный `any` даёт ошибку линта
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] `npm run lint` без ошибок на текущем коде
+- [x] Намеренный `any` даёт ошибку линта
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `chore: configure eslint and prettier`
