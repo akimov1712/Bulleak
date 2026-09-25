@@ -1,7 +1,7 @@
 # T-105 · UI-кит 3: Modal/Sheet, Popover/Tooltip, Toast, Skeleton, EmptyState
 
 - **Этап:** 01 Каркас приложения и дизайн-система
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -19,8 +19,8 @@
 - `src/store/uiStore.ts`
 
 ## Критерии приёмки
-- [ ] Модалка закрывается по Esc и возвращает фокус
-- [ ] Тосты не перекрывают нижнюю навигацию на мобильном
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Модалка закрывается по Esc и возвращает фокус
+- [x] Тосты не перекрывают нижнюю навигацию на мобильном
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(ui): add modal, popover and toast system`
