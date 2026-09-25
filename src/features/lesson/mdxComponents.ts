@@ -3,6 +3,7 @@ import * as Prose from './blocks/Prose';
 import { BybitNote, Example, Tip, Warning } from './blocks/Callouts';
 import { Checklist, Compare, Figure, Goals, Reveal, Step, Steps, Summary } from './blocks/Blocks';
 import { Term } from '@/features/glossary/Term';
+import { MiniQuiz } from './blocks/MiniQuiz';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
 export const mdxComponents: MDXComponents = {
@@ -34,4 +35,5 @@ export const mdxComponents: MDXComponents = {
   Compare,
   Checklist,
   Term,
+  MiniQuiz,
 };

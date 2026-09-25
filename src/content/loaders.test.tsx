@@ -26,6 +26,7 @@ const stubs = Object.fromEntries(
     'Steps',
     'Step',
     'Checklist',
+    'MiniQuiz',
   ].map((name) => [name, Stub]),
 );
 
