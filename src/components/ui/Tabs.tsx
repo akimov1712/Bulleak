@@ -39,7 +39,7 @@ export function Tabs<T extends string>({ items, value, onChange, label, classNam
       role="tablist"
       aria-label={label}
       className={cn(
-        'inline-flex gap-1 rounded-2xl border-2 border-border bg-surface-2 p-1',
+        'inline-flex max-w-full gap-1 overflow-x-auto rounded-2xl border-2 border-border bg-surface-2 p-1',
         className,
       )}
     >
@@ -59,7 +59,7 @@ export function Tabs<T extends string>({ items, value, onChange, label, classNam
             onClick={() => onChange(item.id)}
             onKeyDown={(e) => onKeyDown(e, index)}
             className={cn(
-              'min-h-9 flex-1 rounded-xl px-4 text-sm font-extrabold whitespace-nowrap transition-colors',
+              'min-h-9 flex-1 shrink-0 rounded-xl px-3 text-sm sm:px-4 font-extrabold whitespace-nowrap transition-colors',
               selected
                 ? 'bg-surface text-text shadow-[0_2px_0_0_var(--border)]'
                 : 'text-text-muted hover:text-text',
