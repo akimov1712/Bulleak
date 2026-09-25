@@ -2,6 +2,7 @@ import { Outlet } from 'react-router';
 import { useApplyTheme } from '@/hooks/useTheme';
 import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { Toaster } from '@/components/ui/Toaster';
+import { RewardsPresenter } from '@/features/gamification/RewardsPresenter';
 import { ScrollToTop } from './ScrollToTop';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -42,6 +43,7 @@ export function RootLayout() {
       </div>
       <BottomNav />
       <Toaster />
+      <RewardsPresenter />
     </div>
   );
 }

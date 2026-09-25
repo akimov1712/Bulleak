@@ -1,7 +1,7 @@
 # T-307 · Празднования: конфетти, level up, тосты достижений
 
 - **Этап:** 03 Геймификация и карта пути
-- **Статус:** ☐ не начата
+- **Статус:** ☑ выполнена
 
 ## Контекст (прочитать перед началом)
 
@@ -17,7 +17,7 @@
 - `sound.ts`
 
 ## Критерии приёмки
-- [ ] При reduced motion нет конфетти и анимаций
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] При reduced motion нет конфетти и анимаций
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(gamification): add celebrations and achievement toasts`

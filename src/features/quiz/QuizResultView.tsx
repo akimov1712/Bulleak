@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Star } from 'lucide-react';
 import type { PreparedQuestion } from '@/lib/quiz/prepare';
 import type { QuizResult } from '@/types/quiz';
@@ -8,6 +8,8 @@ import { formatPct, plural } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import { ProgressRing } from '@/components/ui/ProgressRing';
 import { Mascot } from '@/components/mascot/Mascot';
+import { fireConfetti } from '@/features/gamification/effects';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface QuizResultViewProps {
   result: QuizResult;
@@ -42,6 +44,12 @@ export function QuizResultView({
   note,
 }: QuizResultViewProps) {
   const stars = starsForScore(result.ratio, result.passed);
+  const reduced = useReducedMotion();
+  // Celebrate once when the result appears; intensity follows the stars.
+  useEffect(() => {
+    if (stars > 0) fireConfetti(stars === 3 ? 'big' : stars === 2 ? 'medium' : 'small', !reduced);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount
+  }, []);
   const mistakes = questions.filter((q) => !result.perQuestion.find((p) => p.id === q.id)?.correct);
 
   return (

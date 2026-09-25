@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { playSound } from '@/features/gamification/effects';
+import { useSettings } from '@/store/settingsStore';
 import { Button } from '@/components/ui/Button';
 
 interface FeedbackPanelProps {
@@ -25,6 +27,11 @@ export function FeedbackPanel({
   const nextRef = useRef<HTMLButtonElement>(null);
   // Move focus to "Дальше" so keyboard users can continue with Enter.
   useEffect(() => nextRef.current?.focus(), []);
+  const sound = useSettings((s) => s.sound);
+  useEffect(() => {
+    playSound(correct ? 'correct' : 'wrong', sound);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the panel appears
+  }, []);
   return (
     <div
       role="status"
