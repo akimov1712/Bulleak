@@ -13,6 +13,7 @@ src/content/scenarios.ts              SimScenario[]
 ```
 
 ## Загрузка
+- `src/content/course.ts` **генерируется** скриптом `npm run gen:course` из брифов (`docs/03-content/module-XX/lesson-YY.md`) — править брифы, затем перегенерировать.
 - `import.meta.glob('./modules/*/*/index.mdx')` → карта `lessonId → () => import(...)`, урок грузится лениво.
 - Аналогично `quiz.ts` и `exam.ts`.
 - Путь `modules/m03/l02` ↔ id `m03-l02` (функция `lessonPath(id)` в `lib/content.ts`).
