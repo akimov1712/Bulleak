@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
-import type { Plugin } from 'vite';
+import { normalizePath, type Plugin } from 'vite';
 
 /**
  * Without HMR (pane mode) Vite does not re-run import.meta.glob when files are added,
@@ -16,10 +16,15 @@ function refreshContentGlobs(): Plugin {
     name: 'refresh-content-globs',
     apply: 'serve',
     configureServer(server) {
-      const loaders = fileURLToPath(new URL('./src/content/loaders.ts', import.meta.url));
+      // The module graph keys files by forward-slash paths, also on Windows.
+      const loaders = normalizePath(
+        fileURLToPath(new URL('./src/content/loaders.ts', import.meta.url)),
+      );
       const refresh = (file: string) => {
         if (!file.replaceAll('\\', '/').includes('/src/content/modules/')) return;
-        for (const mod of server.moduleGraph.getModulesByFile(loaders) ?? []) {
+        const mods = server.moduleGraph.getModulesByFile(loaders);
+        server.config.logger.info(`[refresh-content-globs] ${file} -> ${mods?.size ?? 0}`);
+        for (const mod of mods ?? []) {
           server.moduleGraph.invalidateModule(mod);
         }
       };
