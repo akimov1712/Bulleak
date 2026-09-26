@@ -2,18 +2,17 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MDXProvider } from '@mdx-js/react';
-import { loadLesson } from '@/content/loaders';
+import AllBlocks from './__fixtures__/all-blocks.mdx';
 import { mdxComponents } from '../mdxComponents';
 import { Checklist, Figure } from './Blocks';
 
 beforeEach(() => localStorage.clear());
 
-describe('lesson blocks in the sample lesson', () => {
-  it('renders every block type', async () => {
-    const Lesson = await loadLesson('m00-l01');
+describe('lesson blocks (fixture with every block)', () => {
+  it('renders every block type', () => {
     render(
       <MDXProvider components={mdxComponents}>
-        <Lesson />
+        <AllBlocks />
       </MDXProvider>,
     );
     expect(screen.getByRole('region', { name: 'Что узнаешь' })).toBeInTheDocument();

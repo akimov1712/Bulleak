@@ -38,7 +38,9 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
     page,
   }) => {
     await page.goto('/#/lesson/m00-l01/quiz');
-    await runLessonQuiz(page, quiz.questions, 6); // 6/8 = 75%
+    // Derived from the quiz so the test survives content edits: one below / exactly at 80%.
+    const toPass = Math.ceil(quiz.questions.length * quiz.passRatio);
+    await runLessonQuiz(page, quiz.questions, toPass - 1);
     await expect(page.getByRole('heading', { name: 'Почти получилось' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Разбор ошибок' })).toBeVisible();
 
@@ -46,7 +48,7 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
     await expect(page.getByText('Урок пока закрыт')).toBeVisible();
 
     await page.goto('/#/lesson/m00-l01/quiz');
-    await runLessonQuiz(page, quiz.questions, 7); // 7/8 = 87.5%
+    await runLessonQuiz(page, quiz.questions, toPass);
     await expect(page.getByRole('heading', { name: 'Тест сдан!' })).toBeVisible();
     await dismissLevelUp(page);
     await page.getByRole('link', { name: 'Следующий урок' }).click();

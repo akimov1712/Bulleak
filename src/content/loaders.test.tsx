@@ -27,6 +27,9 @@ const stubs = Object.fromEntries(
     'Step',
     'Checklist',
     'MiniQuiz',
+    'MascotSay',
+    'Diagram',
+    'CandleChart',
   ].map((name) => [name, Stub]),
 );
 
@@ -38,7 +41,7 @@ describe('content loaders', () => {
     expect(hasLessonContent('m12-l04')).toBe(false);
   });
 
-  it('compiles and renders MDX with GFM tables', async () => {
+  it('compiles and renders a lesson MDX file', async () => {
     const Lesson = await loadLesson('m00-l01');
     render(
       <MDXProvider components={stubs}>
@@ -48,7 +51,6 @@ describe('content loaders', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Трейдинг простыми словами' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('table')).toBeInTheDocument();
   });
 
   it('loads the quiz module', async () => {

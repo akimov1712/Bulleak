@@ -98,7 +98,9 @@ describe('QuizPage', () => {
   it('shows the intro with question count and threshold', async () => {
     renderAt('/lesson/m00-l01/quiz');
     expect(await screen.findByRole('heading', { name: 'Тест по уроку' })).toBeInTheDocument();
-    expect(screen.getByText(/8 вопросов/)).toBeInTheDocument();
+    expect(
+      screen.getByText(`${quiz.questions.length} вопросов`, { exact: false }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/нужно 80%/)).toBeInTheDocument();
   });
 

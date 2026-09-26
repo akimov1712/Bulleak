@@ -4,6 +4,7 @@
  * Example: npx tsx scripts/shot.ts "#/dev/ui" 375 dark tmp/ui-mobile-dark.png
  * SHOT_PROGRESS=path/to/state.json preloads localStorage['tc-progress'] (persist format).
  * SHOT_ELEMENTS=<css selector> saves every matching element as <out>-<n>.png instead.
+ * SHOT_SLICE=<px> cuts a full-page shot into <out>-<n>.png pieces of that height (long lessons).
  */
 import { chromium } from '@playwright/test';
 
@@ -51,6 +52,20 @@ if (selector) {
     const file = out.replace(/.png$/, `-${i}.png`);
     await el.scrollIntoViewIfNeeded();
     await el.screenshot({ path: file });
+    files.push(file);
+  }
+} else if (process.env.SHOT_SLICE) {
+  const slice = Number(process.env.SHOT_SLICE);
+  await page.waitForTimeout(500);
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  const width = page.viewportSize()?.width ?? 1280;
+  for (let y = 0, i = 0; y < height; y += slice, i++) {
+    const file = out.replace(/.png$/, `-${i}.png`);
+    await page.screenshot({
+      path: file,
+      fullPage: true,
+      clip: { x: 0, y, width, height: Math.min(slice, height - y) },
+    });
     files.push(file);
   }
 } else {

@@ -6,6 +6,7 @@ import { Term } from '@/features/glossary/Term';
 import { MiniQuiz } from './blocks/MiniQuiz';
 import { LazyCandleChart } from '@/features/charts/LazyCandleChart';
 import { Diagram } from '@/components/diagrams/Diagram';
+import { MascotSay } from '@/components/mascot/MascotSay';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
 export const mdxComponents: MDXComponents = {
@@ -40,4 +41,5 @@ export const mdxComponents: MDXComponents = {
   MiniQuiz,
   CandleChart: LazyCandleChart,
   Diagram,
+  MascotSay,
 };

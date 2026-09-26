@@ -1,7 +1,7 @@
 # m00-l01 · Добро пожаловать: что такое трейдинг и чем он не является
 
 - **Модуль:** 0 Старт   **Время:** ~8 мин   **Практика:** MiniQuiz
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понять, что такое трейдинг: заработок на изменении цены за счёт сделок с положительным матожиданием.
@@ -40,7 +40,16 @@
 `trading`, `investing`, `swing-trading`, `scalping`, `volatility`, `edge`
 
 ## Источники
-- Investopedia: Day Trading vs Swing Trading; Trading vs Investing — сверить при написании.
+Сверено 2026-09-26 (Investopedia недоступен для инструментов проверки — использованы равнозначные источники):
+- Corporate Finance Institute, «Swing Trading» — удержание свинговой сделки «от ночи до нескольких недель», дейтрейдеры не держат позиции на ночь: https://corporatefinanceinstitute.com/resources/knowledge/trading-investing/swing-trading/
+- CFI, «Scalping» — сделки на секунды–минуты, много сделок в день: https://corporatefinanceinstitute.com/resources/wealth-management/scalping-day-trading-technique/
+- Bybit Learn, «Crypto Investing vs. Trading» — разный горизонт инвестиций и трейдинга: https://learn.bybit.com/en/investing/crypto-investing-vs-trading
+- Bybit Learn, «Beginner's Guide on How To Day Trade Cryptocurrency» — крипторынок работает 24/7: https://www.bybit.com/en/learn/trading/what-is-day-trading-cryptocurrency
+- Волатильность — собственный расчёт по дневным свечам Bybit (public/data, 730 дней до 2026-09-25): медианный дневной размах high−low BTC 3,1%, ETH 4,8%, SOL 5,6%; 90-й перцентиль BTC 6,2%, ETH 9,8%.
+
+## Заметки
+- Обложка модуля (Figure) — в задаче T-429 (партия фото согласуется с пользователем).
+- Интерактив «Какой стиль тебе подходит?» сделан одним MiniQuiz-вопросом со сценарием (работа 9–18, 30 минут вечером) вместо трёх: тот же вывод без отдельного компонента.
 
 ## Связи
 Готовит к: m00-l02.
