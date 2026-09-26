@@ -30,6 +30,7 @@ const stubs = Object.fromEntries(
     'MascotSay',
     'Diagram',
     'CandleChart',
+    'CalcEmbed',
   ].map((name) => [name, Stub]),
 );
 

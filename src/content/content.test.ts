@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
 import { isDiagramName } from '@/components/diagrams/registry';
+import { isCalculatorId } from '@/features/calculators/registry';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -178,6 +179,11 @@ describe('lesson texts and glossary links', () => {
     expect(
       datasets.filter((d) => !isDatasetName(d)),
       '<CandleChart dataset> unknown',
+    ).toEqual([]);
+    const calcs = [...source.matchAll(/<CalcEmbeds+id="([^"]+)"/g)].map((m) => m[1] ?? '');
+    expect(
+      calcs.filter((c) => !isCalculatorId(c)),
+      '<CalcEmbed id> unknown',
     ).toEqual([]);
   });
 

@@ -14,3 +14,6 @@
 - [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(lesson): embed calculators in lessons`
+
+## Заметки
+- Сделано заранее в T-408: `<CalcEmbed id>` + реестр `features/calculators/registry.ts`, проверка id в content.test. Осталось: зарегистрировать остальные калькуляторы.

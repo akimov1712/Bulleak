@@ -19,3 +19,6 @@
 - [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(tools): add expectancy, fees, drawdown and monte carlo tools`
+
+## Заметки
+- Сделано заранее в T-408: `lib/trading/compounding.ts` (+тесты) и калькулятор `compounding` (`features/calculators/CompoundingCalc.tsx`). Осталось: expectancy, fees, drawdown, monteCarlo.

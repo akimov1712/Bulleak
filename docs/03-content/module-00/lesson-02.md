@@ -1,7 +1,7 @@
 # m00-l02 · Реалистичные ожидания: риск, статистика новичков, время
 
 - **Модуль:** 0 Старт   **Время:** ~10 мин   **Практика:** калькулятор compounding
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Знать, что большинство розничных трейдеров теряют деньги, и почему.
@@ -37,7 +37,15 @@
 `compounding`, `drawdown`, `retail-trader`
 
 ## Источники
-- ESMA CFD risk warnings; Investopedia «Why most traders lose money» — сверить.
+Сверено 2026-09-26:
+- ESMA, «ESMA agrees to prohibit binary options and restrict CFDs to protect retail investors» (2018) — анализ национальных регуляторов: 74–89% розничных CFD-счетов теряют деньги; стандартное предупреждение с долей убыточных клиентов провайдера: https://www.esma.europa.eu/press-news/esma-news/esma-agrees-prohibit-binary-options-and-restrict-cfds-protect-retail-investors
+- Chague, De-Losso, Giovannetti, «Day Trading for a Living?» (2019, SSRN) — дейтрейдеры фьючерсов в Бразилии 2013–2015: из продержавшихся > 300 дней 97% в убытке, ~1,1% заработали больше минимальной зарплаты, эффекта обучения нет: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3423101
+- Fidelity, «What is the S&P 500 and stock market average return?» — средняя годовая доходность S&P 500 около 10% с 1957 г.: https://www.fidelity.com/learning-center/trading-investing/sp-500-average-return
+- Расчёты сложного процента — `lib/trading/compounding.ts` (тесты): 1000 $ × 1,02¹² ≈ 1268 $; 1000 $ × 1,1³⁶ ≈ 30 913 $; × 1,1¹²⁰ ≈ 92,7 млн $.
+
+## Заметки
+- Тезис брифа «реальные 1–3% в месяц у опытных» не нашёл надёжного источника — в тексте заменён проверяемым ориентиром (S&P 500 ≈ 10% годовых), а оценка 2% в месяц подана как «очень хороший результат», без статистики.
+- Калькулятор `compounding` и блок `CalcEmbed` сделаны заранее (из T-602/T-603), чтобы урок имел интерактив.
 
 ## Связи
 Опирается на: m00-l01 · Готовит к: m00-l03, m09.
