@@ -57,7 +57,11 @@ export function LessonFooter({
         </Link>
       </Card>
 
-      <nav aria-label="Соседние уроки" className="grid gap-3 sm:grid-cols-2">
+      <nav
+        aria-label="Соседние уроки"
+        // min-w-0: grid items default to min-width:auto, which defeats `truncate` on long titles.
+        className="grid gap-3 sm:grid-cols-2 [&>*]:min-w-0"
+      >
         {prev ? (
           <Link
             to={paths.lesson(prev.id)}

@@ -75,5 +75,19 @@ if (selector) {
 const overflow = await page.evaluate(
   () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
 );
+// When the page scrolls sideways, name the widest offenders to make the fix obvious.
+const offenders = overflow
+  ? await page.evaluate(() => {
+      const vw = document.documentElement.clientWidth;
+      return [...document.querySelectorAll<HTMLElement>('body *')]
+        .filter((el) => el.getBoundingClientRect().right > vw + 1)
+        .slice(0, 8)
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          const cls = typeof el.className === 'string' ? el.className.slice(0, 60) : '';
+          return `${el.tagName.toLowerCase()}.${cls} right=${Math.round(r.right)} text=${(el.textContent ?? '').slice(0, 40)}`;
+        });
+    })
+  : [];
 await browser.close();
-console.log(JSON.stringify({ files, overflow, errors }));
+console.log(JSON.stringify({ files, overflow, offenders, errors }));
