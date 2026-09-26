@@ -21,6 +21,7 @@ import {
 import type { Side } from '@/lib/trading/pnl';
 import { simRepo } from '@/db/simRepo';
 import { toast } from '@/store/uiStore';
+import { useProgress } from '@/store/progressStore';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useDataset } from '../charts/useDataset';
 import {
@@ -49,7 +50,6 @@ export interface SimSessionProps {
   onNewPoint: () => void;
   /** Lesson scenario: fixed start, task before and debrief after the decision. */
   scenario?: SimScenario;
-  onScenarioDecision?: (decision: SimDecision, correct: boolean) => void;
 }
 
 interface ActiveTrade {
@@ -74,6 +74,7 @@ export function SimSession(props: SimSessionProps) {
   );
   const atrSeries = useMemo(() => atr(candles), [candles]);
   const wide = useMediaQuery('(min-width: 1024px)');
+  const dispatch = useProgress((s) => s.dispatch);
 
   const [anchor, setAnchor] = useState(start ?? 0);
   const [lines, setLines] = useState<number[]>([]);
@@ -105,6 +106,8 @@ export function SimSession(props: SimSessionProps) {
     if (!trade || !result || bookedRef.current === result) return;
     bookedRef.current = result;
     onBalance((b) => b + result.pnl);
+    // XP (daily cap), counters and sim-* achievements go through the progress pipeline.
+    dispatch({ type: 'simTrade', outcome: result.outcome, r: result.r });
     simRepo
       .add({
         at: Date.now(),
@@ -132,7 +135,7 @@ export function SimSession(props: SimSessionProps) {
           description: error instanceof Error ? error.message : undefined,
         }),
       );
-  }, [trade, result, dataset, onBalance, scenario]);
+  }, [trade, result, dataset, onBalance, scenario, dispatch]);
 
   if (start === null) {
     return <p role="alert">В этом наборе данных слишком мало свечей для тренажёра.</p>;
@@ -144,9 +147,6 @@ export function SimSession(props: SimSessionProps) {
     : skippedTo !== null
       ? 'skip'
       : null;
-  const decide = (d: SimDecision) => {
-    if (scenario) props.onScenarioDecision?.(d, isDecisionCorrect(scenario, d));
-  };
   const entryPrice = candles[anchor]?.c ?? 0;
   const plan = draft.side
     ? planTrade({
@@ -179,7 +179,6 @@ export function SimSession(props: SimSessionProps) {
     const { side, sl, tp } = draft;
     if (!side || sl === null || tp === null || !plan || plan.error || plan.qty === null) return;
     setPaused(false);
-    decide(side);
     setTrade({
       order: { side, entry: entryPrice, sl, tp, qty: plan.qty },
       start: anchor,
@@ -339,7 +338,8 @@ export function SimSession(props: SimSessionProps) {
             onOpen={open}
             onSkip={() => {
               if (scenario) {
-                decide('skip');
+                // A skip is a decision too: correct skips count towards sim-skip.
+                dispatch({ type: 'simSkip', correct: isDecisionCorrect(scenario, 'skip') });
                 setSkippedTo(Math.min(anchor + SIM_SKIP, candles.length - 1));
                 return;
               }
