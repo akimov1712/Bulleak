@@ -1,7 +1,7 @@
 # T-507 · Сценарии и связь с уроками
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -17,7 +17,7 @@
 - `src/features/lesson/blocks/SimScenario.tsx`
 
 ## Критерии приёмки
-- [ ] Правильный пропуск засчитывается (для достижения sim-skip)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Правильный пропуск засчитывается (для достижения sim-skip)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add lesson-linked scenarios`

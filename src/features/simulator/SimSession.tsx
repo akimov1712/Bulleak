@@ -6,6 +6,7 @@ import { defaultLevels, INSTRUMENT_STEPS, planTrade, roundToTick } from '@/lib/t
 import {
   pickStart,
   SIM_FUTURE,
+  SIM_SKIP,
   skipAhead,
   SPEED_MS,
   type PlaybackSpeed,
@@ -33,6 +34,9 @@ import { SimToolbar } from './SimToolbar';
 import { OrderPanel, type OrderDraft } from './OrderPanel';
 import { Playback } from './Playback';
 import { TradeResult } from './TradeResult';
+import { ScenarioBrief, ScenarioDebrief } from './ScenarioBrief';
+import { isDecisionCorrect } from '@/content/scenarios';
+import type { SimDecision, SimScenario } from '@/types/trading';
 
 export interface SimSessionProps {
   dataset: DatasetName;
@@ -43,6 +47,9 @@ export interface SimSessionProps {
   onBalance: (next: SetStateAction<number>) => void;
   /** Pick another random moment (new seed). */
   onNewPoint: () => void;
+  /** Lesson scenario: fixed start, task before and debrief after the decision. */
+  scenario?: SimScenario;
+  onScenarioDecision?: (decision: SimDecision, correct: boolean) => void;
 }
 
 interface ActiveTrade {
@@ -60,9 +67,10 @@ export function SimSession(props: SimSessionProps) {
   const { dataset, balance, onBalance } = props;
   const { candles, symbol } = useDataset(dataset);
   const steps = INSTRUMENT_STEPS[symbol];
+  const scenario = props.scenario;
   const start = useMemo(
-    () => pickStart(candles.length, mulberry32(props.seed)),
-    [candles, props.seed],
+    () => scenario?.startIndex ?? pickStart(candles.length, mulberry32(props.seed)),
+    [candles, props.seed, scenario],
   );
   const atrSeries = useMemo(() => atr(candles), [candles]);
   const wide = useMediaQuery('(min-width: 1024px)');
@@ -74,6 +82,8 @@ export function SimSession(props: SimSessionProps) {
   const [trade, setTrade] = useState<ActiveTrade | null>(null);
   const [speed, setSpeed] = useState<PlaybackSpeed>('1');
   const [paused, setPaused] = useState(false);
+  /** Scenario skipped: the candles revealed up to this index. */
+  const [skippedTo, setSkippedTo] = useState<number | null>(null);
 
   const result = trade?.state.result ?? null;
   const playing = trade !== null && result === null;
@@ -98,7 +108,7 @@ export function SimSession(props: SimSessionProps) {
     simRepo
       .add({
         at: Date.now(),
-        scenarioId: null,
+        scenarioId: scenario?.id ?? null,
         dataset,
         startIndex: trade.start,
         side: trade.order.side,
@@ -122,13 +132,21 @@ export function SimSession(props: SimSessionProps) {
           description: error instanceof Error ? error.message : undefined,
         }),
       );
-  }, [trade, result, dataset, onBalance]);
+  }, [trade, result, dataset, onBalance, scenario]);
 
   if (start === null) {
     return <p role="alert">В этом наборе данных слишком мало свечей для тренажёра.</p>;
   }
 
-  const cursor = trade ? trade.state.index : anchor;
+  const cursor = trade ? trade.state.index : (skippedTo ?? anchor);
+  const decision: SimDecision | null = trade
+    ? trade.order.side
+    : skippedTo !== null
+      ? 'skip'
+      : null;
+  const decide = (d: SimDecision) => {
+    if (scenario) props.onScenarioDecision?.(d, isDecisionCorrect(scenario, d));
+  };
   const entryPrice = candles[anchor]?.c ?? 0;
   const plan = draft.side
     ? planTrade({
@@ -161,6 +179,7 @@ export function SimSession(props: SimSessionProps) {
     const { side, sl, tp } = draft;
     if (!side || sl === null || tp === null || !plan || plan.error || plan.qty === null) return;
     setPaused(false);
+    decide(side);
     setTrade({
       order: { side, entry: entryPrice, sl, tp, qty: plan.qty },
       start: anchor,
@@ -197,6 +216,12 @@ export function SimSession(props: SimSessionProps) {
       levels.push({ id: 'tp', price: shownOrder.tp, tone: 'bull', label: 'TP', draggable: !trade });
     }
   }
+  if (scenario?.ideal && decision) {
+    levels.push(
+      { id: 'ideal-sl', price: scenario.ideal.sl, tone: 'epic', label: 'SL учеб.', dashed: true },
+      { id: 'ideal-tp', price: scenario.ideal.tp, tone: 'epic', label: 'TP учеб.', dashed: true },
+    );
+  }
   const markers: SimMarker[] = [];
   if (trade) {
     const long = trade.order.side === 'long';
@@ -225,10 +250,13 @@ export function SimSession(props: SimSessionProps) {
     : 0;
   const openRisk = trade ? Math.abs(trade.order.entry - trade.order.sl) * trade.order.qty : 1;
   const nextAfterTrade =
-    result && result.exitIndex <= candles.length - 1 - SIM_FUTURE ? result.exitIndex : null;
+    !scenario && result && result.exitIndex <= candles.length - 1 - SIM_FUTURE
+      ? result.exitIndex
+      : null;
 
   return (
     <div className="flex flex-col gap-3">
+      {scenario && !decision && <ScenarioBrief scenario={scenario} />}
       <SimToolbar
         indicators={props.indicators}
         onToggleIndicator={props.onToggleIndicator}
@@ -264,13 +292,18 @@ export function SimSession(props: SimSessionProps) {
           }
           height={wide ? 480 : 340}
         />
-        {result ? (
-          <TradeResult
-            result={result}
-            balance={balance}
-            onNext={nextAfterTrade === null ? null : () => newDecision(nextAfterTrade)}
-            onNewPoint={props.onNewPoint}
-          />
+        {scenario && skippedTo !== null ? (
+          <ScenarioDebrief scenario={scenario} decision="skip" />
+        ) : result ? (
+          <div className="flex flex-col gap-4">
+            <TradeResult
+              result={result}
+              balance={balance}
+              onNext={nextAfterTrade === null ? null : () => newDecision(nextAfterTrade)}
+              onNewPoint={scenario ? undefined : props.onNewPoint}
+            />
+            {scenario && decision && <ScenarioDebrief scenario={scenario} decision={decision} />}
+          </div>
         ) : trade ? (
           <Playback
             side={trade.order.side}
@@ -305,6 +338,11 @@ export function SimSession(props: SimSessionProps) {
             qtyStep={steps.qty}
             onOpen={open}
             onSkip={() => {
+              if (scenario) {
+                decide('skip');
+                setSkippedTo(Math.min(anchor + SIM_SKIP, candles.length - 1));
+                return;
+              }
               const next = skipAhead(anchor, candles.length);
               if (next === null) props.onNewPoint();
               else newDecision(next);

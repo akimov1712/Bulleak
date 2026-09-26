@@ -20,7 +20,7 @@ describe('routes', () => {
     [paths.exam('m03'), 'Экзамен пока закрыт'],
     [paths.finalExam(), 'Финальный экзамен'],
     [paths.simulator(), 'Тренажёр'],
-    [paths.simulator('m03-sr-bounce'), 'Тренажёр'],
+    [paths.simulator('m03-sr-bounce'), 'Отскок от поддержки'],
     [paths.tools(), 'Инструменты'],
     [paths.tools('position'), 'Инструменты'],
     [paths.journal(), 'Журнал сделок'],

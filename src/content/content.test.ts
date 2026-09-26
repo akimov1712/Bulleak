@@ -15,6 +15,7 @@ import path from 'node:path';
 import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
 import { isDiagramName } from '@/components/diagrams/registry';
 import { isCalculatorId } from '@/features/calculators/registry';
+import { getScenario } from './scenarios';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -193,23 +194,36 @@ describe('lesson texts and glossary links', () => {
 
   it.each(contentInventory.lessons)('%s: diagrams and charts reference real assets', (id) => {
     const source = mdxSources[id] ?? '';
-    const diagrams = [...source.matchAll(/<Diagrams+name="([^"]+)"/g)].map((m) => m[1] ?? '');
+    const diagrams = [...source.matchAll(/<Diagram\s+name="([^"]+)"/g)].map((m) => m[1] ?? '');
     expect(
       diagrams.filter((d) => !isDiagramName(d)),
       '<Diagram name> not in the registry',
     ).toEqual([]);
-    const datasets = [...source.matchAll(/<CandleCharts[^>]*dataset="([^"]+)"/g)].map(
+    const datasets = [...source.matchAll(/<CandleChart\s[^>]*dataset="([^"]+)"/g)].map(
       (m) => m[1] ?? '',
     );
     expect(
       datasets.filter((d) => !isDatasetName(d)),
       '<CandleChart dataset> unknown',
     ).toEqual([]);
-    const calcs = [...source.matchAll(/<CalcEmbeds+id="([^"]+)"/g)].map((m) => m[1] ?? '');
+    const calcs = [...source.matchAll(/<CalcEmbed\s+id="([^"]+)"/g)].map((m) => m[1] ?? '');
     expect(
       calcs.filter((c) => !isCalculatorId(c)),
       '<CalcEmbed id> unknown',
     ).toEqual([]);
+    const scenarios = [...source.matchAll(/<SimScenario\s+id="([^"]+)"/g)].map((m) => m[1] ?? '');
+    expect(
+      scenarios.filter((s) => !getScenario(s)),
+      '<SimScenario id> unknown',
+    ).toEqual([]);
+  });
+
+  it('asset checks above actually match something (guards against broken regexes)', () => {
+    const all = Object.values(mdxSources).join('\n');
+    expect(all).toMatch(/<Diagram\s+name="/);
+    expect(all).toMatch(/<CandleChart\s[^>]*dataset="/);
+    expect(all).toMatch(/<CalcEmbed\s+id="/);
+    expect(all).toMatch(/<SimScenario\s+id="/);
   });
 
   it.each(contentInventory.lessons)('%s: has Goals and Summary blocks', (id) => {

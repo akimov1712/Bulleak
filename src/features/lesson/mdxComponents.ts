@@ -8,6 +8,7 @@ import { LazyCandleChart } from '@/features/charts/LazyCandleChart';
 import { Diagram } from '@/components/diagrams/Diagram';
 import { MascotSay } from '@/components/mascot/MascotSay';
 import { CalcEmbed } from '@/features/calculators/CalcEmbed';
+import { SimScenario } from './blocks/SimScenario';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
 export const mdxComponents: MDXComponents = {
@@ -44,4 +45,5 @@ export const mdxComponents: MDXComponents = {
   Diagram,
   MascotSay,
   CalcEmbed,
+  SimScenario,
 };

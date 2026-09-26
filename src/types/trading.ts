@@ -67,3 +67,23 @@ export interface JournalTrade {
   notes: string;
   tags: string[];
 }
+
+export type SimDecision = Side | 'skip';
+
+/** A lesson-linked simulator task on a fixed moment of history (content/scenarios.ts). */
+export interface SimScenario {
+  id: string;
+  title: string;
+  lessonId: `m${string}-l${string}`;
+  /** Dataset name, e.g. "BTCUSDT-240". */
+  dataset: string;
+  /** Decision candle: the learner sees history up to and including it. */
+  startIndex: number;
+  /** What to look for, shown before the decision. */
+  task: string;
+  /** "Textbook" reading, shown after the decision. */
+  debrief: string;
+  expected: SimDecision;
+  /** Textbook levels for a trade scenario. */
+  ideal?: { sl: number; tp: number };
+}

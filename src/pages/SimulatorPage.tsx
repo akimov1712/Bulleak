@@ -1,4 +1,5 @@
 import { Suspense, useState } from 'react';
+import { Link, useParams } from 'react-router';
 import { RotateCcw, Shuffle, Wallet } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -21,6 +22,12 @@ import { SIM_START_BALANCE } from '@/lib/trading/simPlan';
 import { forgetDataset } from '@/features/charts/useDataset';
 import type { SimIndicators } from '@/features/simulator/SimChart';
 import { SimSession } from '@/features/simulator/SimSession';
+import { getScenario } from '@/content/scenarios';
+import { EmptyState } from '@/components/ui/Skeleton';
+import { Mascot } from '@/components/mascot/Mascot';
+import { buttonClass } from '@/components/ui/styles';
+import { paths } from '@/app/paths';
+import { isDatasetName } from '@/lib/trading/candles';
 
 interface Instrument {
   symbol: DatasetSymbol;
@@ -57,7 +64,9 @@ const SYMBOL_OPTIONS = DATASET_SYMBOLS.map((s) => ({ value: s, label: s.replace(
 const INTERVAL_OPTIONS = DATASET_INTERVALS.map((i) => ({ value: i, label: INTERVAL_LABEL[i] }));
 
 export function SimulatorPage() {
-  usePageTitle('Тренажёр');
+  const { scenarioId } = useParams();
+  const scenario = scenarioId ? getScenario(scenarioId) : undefined;
+  usePageTitle(scenario ? `Сценарий: ${scenario.title}` : 'Тренажёр');
   const [instrument, setInstrument] = useStoredState<Instrument>(
     'tc-sim:instrument',
     { symbol: 'BTCUSDT', interval: '240' },
@@ -70,13 +79,30 @@ export function SimulatorPage() {
   );
   const [seed, setSeed] = useState(() => Date.now());
   const [balance, setBalance] = useStoredState('tc-sim:balance', SIM_START_BALANCE, isBalance);
-  const dataset: DatasetName = `${instrument.symbol}-${instrument.interval}`;
+  const freeDataset: DatasetName = `${instrument.symbol}-${instrument.interval}`;
+  const dataset: DatasetName =
+    scenario && isDatasetName(scenario.dataset) ? scenario.dataset : freeDataset;
+
+  if (scenarioId && !scenario) {
+    return (
+      <EmptyState
+        headingLevel={1}
+        art={<Mascot mood="shocked" size={130} />}
+        title="Сценарий не найден"
+        action={
+          <Link to={paths.simulator()} className={buttonClass()}>
+            В свободный режим
+          </Link>
+        }
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
-        title="Тренажёр"
-        subtitle="Сделки вслепую на реальной истории Bybit"
+        title={scenario ? scenario.title : 'Тренажёр'}
+        subtitle={scenario ? 'Сценарий тренажёра' : 'Сделки вслепую на реальной истории Bybit'}
         actions={
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-2 rounded-2xl border-2 border-border bg-surface px-3 py-2 font-extrabold tabular-nums">
@@ -96,27 +122,33 @@ export function SimulatorPage() {
           </div>
         }
       />
-      <div className="flex flex-wrap items-end gap-4">
-        <Segmented
-          label="Инструмент"
-          value={instrument.symbol}
-          options={SYMBOL_OPTIONS}
-          onChange={(symbol) => setInstrument({ ...instrument, symbol })}
-        />
-        <Segmented
-          label="Таймфрейм"
-          value={instrument.interval}
-          options={INTERVAL_OPTIONS}
-          onChange={(interval) => setInstrument({ ...instrument, interval })}
-        />
-        <Button
-          variant="secondary"
-          leftIcon={<Shuffle className="size-5" aria-hidden="true" />}
-          onClick={() => setSeed(Date.now())}
-        >
-          Другой момент
-        </Button>
-      </div>
+      {scenario ? (
+        <Link to={paths.simulator()} className="self-start font-bold text-info hover:underline">
+          ← Свободный режим
+        </Link>
+      ) : (
+        <div className="flex flex-wrap items-end gap-4">
+          <Segmented
+            label="Инструмент"
+            value={instrument.symbol}
+            options={SYMBOL_OPTIONS}
+            onChange={(symbol) => setInstrument({ ...instrument, symbol })}
+          />
+          <Segmented
+            label="Таймфрейм"
+            value={instrument.interval}
+            options={INTERVAL_OPTIONS}
+            onChange={(interval) => setInstrument({ ...instrument, interval })}
+          />
+          <Button
+            variant="secondary"
+            leftIcon={<Shuffle className="size-5" aria-hidden="true" />}
+            onClick={() => setSeed(Date.now())}
+          >
+            Другой момент
+          </Button>
+        </div>
+      )}
       <ErrorBoundary
         resetKey={dataset}
         fallback={(error, reset) => (
@@ -136,7 +168,8 @@ export function SimulatorPage() {
       >
         <Suspense fallback={<Skeleton className="h-[420px] w-full rounded-2xl" />}>
           <SimSession
-            key={`${dataset}:${seed}`}
+            key={scenario ? `scenario:${scenario.id}` : `${dataset}:${seed}`}
+            scenario={scenario}
             dataset={dataset}
             seed={seed}
             indicators={indicators}

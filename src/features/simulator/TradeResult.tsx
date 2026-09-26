@@ -18,7 +18,8 @@ export interface TradeResultProps {
   balance: number;
   /** Next decision right after this trade (null when the data ran out). */
   onNext: (() => void) | null;
-  onNewPoint: () => void;
+  /** Free mode only: pick another random moment. */
+  onNewPoint?: () => void;
 }
 
 /** Outcome card after a simulated trade. */
@@ -72,14 +73,16 @@ export function TradeResult({ result, balance, onNext, onNewPoint }: TradeResult
             Следующая сделка
           </Button>
         )}
-        <Button
-          variant="secondary"
-          fullWidth
-          leftIcon={<Shuffle className="size-5" aria-hidden="true" />}
-          onClick={onNewPoint}
-        >
-          Другой момент
-        </Button>
+        {onNewPoint && (
+          <Button
+            variant="secondary"
+            fullWidth
+            leftIcon={<Shuffle className="size-5" aria-hidden="true" />}
+            onClick={onNewPoint}
+          >
+            Другой момент
+          </Button>
+        )}
       </div>
     </Card>
   );
