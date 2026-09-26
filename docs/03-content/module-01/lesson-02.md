@@ -1,7 +1,7 @@
 # m01-l02 · Альткоины, токены и стейблкоины
 
 - **Модуль:** 1   **Время:** ~10 мин   **Практика:** Compare
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Различать монеты (свой блокчейн) и токены (на чужом блокчейне).
@@ -35,7 +35,10 @@
 `altcoin`, `token`, `stablecoin`, `trading-pair`, `base-asset`, `quote-asset`, `memecoin`, `correlation`
 
 ## Источники
-- CoinGecko Learn / CoinMarketCap Academy: stablecoins, tokens — сверить.
+Сверено 2026-09-26:
+- CoinMarketCap Academy, «Are Algorithmic Stablecoins Dead Already? A Full Breakdown of the Terra Crash» — UST (алгоритмический, связка с LUNA) в мае 2022 упал с 1 $ до ~0,044 $: https://coinmarketcap.com/academy/article/are-algorithmic-stablecoins-dead-already-a-full-breakdown-of-the-terra-crash
+- CoinDesk, «Circle Confirms $3.3B of USDC's Cash Reserves Stuck at Failed Silicon Valley Bank» (11.03.2023); USDC опускался до ~0,86–0,88 $, привязка восстановлена 13.03.2023: https://www.coindesk.com/business/2023/03/11/circle-confirms-33b-of-usdcs-cash-reserves-stuck-at-failed-silicon-valley-bank
+- Корреляция — собственный расчёт по дневным свечам Bybit (public/data, 730 дней до 2026-09-25): корреляция дневных доходностей ETH/BTC 0,83, SOL/BTC 0,80; совпадение направления дня 82%.
 
 ## Связи
 Опирается на: m01-l01 · Готовит к: m01-l03.
