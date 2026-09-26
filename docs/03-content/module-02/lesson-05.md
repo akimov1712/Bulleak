@@ -1,7 +1,7 @@
 # m02-l05 · Типы ордеров: рыночный, лимитный, условный, TP/SL
 
 - **Модуль:** 2   **Время:** ~14 мин   **Практика:** Diagram ордеров
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Различать рыночный и лимитный ордер, maker и taker.
@@ -35,7 +35,14 @@
 `market-order`, `limit-order`, `conditional-order`, `trigger-price`, `stop-loss`, `take-profit`, `maker`, `taker`, `reduce-only`, `post-only`, `time-in-force`, `mark-price`
 
 ## Источники
-- Bybit Help Center: order types, TP/SL, conditional orders, time in force — сверить.
+Сверено 2026-09-26:
+- Bybit Help Center, «Types of Orders Available on Bybit» — рыночный, лимитный, условный (conditional market / conditional limit), триггер по Last / Mark / Index: https://www.bybit.com/en/help-center/article/Types-of-Orders-Available-on-Bybit
+- Bybit Help Center, «How to Set Up and Modify Your TP/SL (Perpetual and Futures Contracts)» — TP/SL при открытии и к позиции, базовая цена Last / Index / Mark: https://www.bybit.com/en/help-center/article/How-to-Set-Up-and-Modify-TP-SL-Perpetual-Futures-Contracts
+- Bybit Help Center, «Time In Force Selections (GTC, IOC, FOK)», «Post-Only Order», «Reduce-Only Order»: https://www.bybit.com/en/help-center/article/What-Are-Time-In-Force-TIF-GTC-IOC-FOK ; https://www.bybit.com/en/help-center/article/Post-Only-Order ; https://www.bybit.com/en/help-center/article/Reduce-Only-Order
+
+## Заметки
+- Макет BybitOrderForm: `bybit-ui-order-form`. Интерактивная схема order-types (срабатывание при касании уровня) — из T-406.
+- Markdown-списки внутри JSX-блоков пишутся с пустыми строками вокруг, иначе Prettier склеивает их в абзац.
 
 ## Связи
 Опирается на: m01-l03 · Готовит к: m02-l06, M9.
