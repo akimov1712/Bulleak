@@ -4,6 +4,30 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
+import type { Plugin } from 'vite';
+
+/**
+ * Without HMR (pane mode) Vite does not re-run import.meta.glob when files are added,
+ * so a new lesson folder stays "missing" until restart. Invalidate the module that
+ * owns the content globs whenever a content file appears or disappears.
+ */
+function refreshContentGlobs(): Plugin {
+  return {
+    name: 'refresh-content-globs',
+    apply: 'serve',
+    configureServer(server) {
+      const loaders = fileURLToPath(new URL('./src/content/loaders.ts', import.meta.url));
+      const refresh = (file: string) => {
+        if (!file.replaceAll('\\', '/').includes('/src/content/modules/')) return;
+        for (const mod of server.moduleGraph.getModulesByFile(loaders) ?? []) {
+          server.moduleGraph.invalidateModule(mod);
+        }
+      };
+      server.watcher.on('add', refresh);
+      server.watcher.on('unlink', refresh);
+    },
+  };
+}
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -14,6 +38,7 @@ export default defineConfig(({ mode }) => ({
     },
     react({ include: /\.(mdx|tsx?)$/ }),
     tailwindcss(),
+    ...(mode === 'pane' ? [refreshContentGlobs()] : []),
   ],
   // The in-app preview pane cannot open the HMR websocket, which makes the Vite client
   // reload in a loop. `--mode pane` (used by .claude/launch.json) turns HMR off there.
