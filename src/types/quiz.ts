@@ -52,6 +52,8 @@ export interface ChartClickQuestion extends BaseQuestion {
   from: number;
   to: number;
   target: ChartClickTarget;
+  /** Show the volume histogram under the candles. */
+  volume?: boolean;
 }
 
 export interface MatchQuestion extends BaseQuestion {

@@ -90,6 +90,7 @@ export function ChartClickQuestionView({
         dataset={q.dataset}
         from={{ index: q.from }}
         to={{ index: q.to }}
+        volume={q.volume}
         annotations={annotations}
         height={300}
         onPick={answering ? pick : undefined}

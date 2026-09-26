@@ -150,3 +150,21 @@ export function atr(candles: readonly Candle[], period = 14): Series {
 }
 
 export const closesOf = (candles: readonly Candle[]) => candles.map((c) => c.c);
+
+/**
+ * Volume divided by the average volume of the previous `period` candles
+ * (current candle excluded, so a spike does not dilute its own baseline).
+ */
+export function volumeRatio(volumes: readonly number[], period = 20): Series {
+  const out: Series = new Array<number | null>(volumes.length).fill(null);
+  let sum = 0;
+  for (let i = 0; i < volumes.length; i++) {
+    if (i >= period) {
+      const avg = sum / period;
+      out[i] = avg > 0 ? (volumes[i] ?? 0) / avg : null;
+      sum -= volumes[i - period] ?? 0;
+    }
+    sum += volumes[i] ?? 0;
+  }
+  return out;
+}

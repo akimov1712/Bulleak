@@ -25,6 +25,7 @@ import {
   macd,
   rsi,
   sma,
+  volumeRatio,
   type Series,
 } from '@/lib/indicators/indicators';
 import { INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
@@ -66,6 +67,8 @@ export interface CandleChartProps {
   annotations?: Annotation[];
   indicators?: IndicatorSpec[];
   volume?: boolean;
+  /** Highlight volume bars at least this many times the previous 20-candle average (e.g. 2). */
+  volumeSpikes?: number;
   /** Height of the candle pane in px (indicator panes are added below). */
   height?: number;
   /** Allow panning / zooming (off = static picture that never captures page scroll). */
@@ -177,6 +180,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   const indicatorsKey = JSON.stringify(props.indicators ?? []);
   const interactive = props.interactive ?? false;
   const volume = props.volume ?? false;
+  const volumeSpikes = props.volumeSpikes ?? 0;
   const height = props.totalHeight;
   const [chartType, setChartType] = useState<ChartType>(props.chartType ?? 'candles');
   const [hovered, setHovered] = useState<number | null>(null);
@@ -195,6 +199,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       end,
       indicators,
       volume,
+      volumeSpikes,
       interactive,
       intraday: interval !== 'D',
       palette,
@@ -245,7 +250,18 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       chart.api.unsubscribeCrosshairMove(handleMove);
       chart.api.remove();
     };
-  }, [candles, start, end, indicatorsKey, volume, interactive, interval, palette, chartType]);
+  }, [
+    candles,
+    start,
+    end,
+    indicatorsKey,
+    volume,
+    volumeSpikes,
+    interactive,
+    interval,
+    palette,
+    chartType,
+  ]);
 
   // Annotations change on every quiz click: redraw them without rebuilding the chart
   // (no flicker, zoom is kept). Lists the chart deps too, so it re-runs after a rebuild.
@@ -270,6 +286,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     annotationsKey,
     indicatorsKey,
     volume,
+    volumeSpikes,
     interactive,
     interval,
     palette,
@@ -339,6 +356,7 @@ interface BuildOptions {
   end: number;
   indicators: IndicatorSpec[];
   volume: boolean;
+  volumeSpikes: number;
   interactive: boolean;
   intraday: boolean;
   palette: Palette;
@@ -428,13 +446,18 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
       lastValueVisible: false,
       priceLineVisible: false,
     });
-    vol.priceScale().applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
+    vol.priceScale().applyOptions({ scaleMargins: { top: 0.7, bottom: 0 } });
+    // Ratio uses the full history so the first visible bars have a real baseline.
+    const ratio = o.volumeSpikes > 0 ? volumeRatio(candles.map((c) => c.v)) : [];
     vol.setData(
-      visible.map((c) => ({
-        time: toChartTime(c.t),
-        value: c.v,
-        color: withAlpha(c.c >= c.o ? p.tones.bull : p.tones.bear, 0.35),
-      })),
+      visible.map((c, i) => {
+        const spike = o.volumeSpikes > 0 && (ratio[start + i] ?? 0) >= o.volumeSpikes;
+        return {
+          time: toChartTime(c.t),
+          value: c.v,
+          color: spike ? p.tones.warn : withAlpha(c.c >= c.o ? p.tones.bull : p.tones.bear, 0.35),
+        };
+      }),
     );
   }
 

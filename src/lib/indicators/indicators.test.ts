@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Candle } from '@/types/trading';
-import { atr, bollinger, ema, macd, rsi, sma, trueRange } from './indicators';
+import { atr, bollinger, ema, macd, rsi, sma, trueRange, volumeRatio } from './indicators';
 import { detectEngulfing, detectInsideBars, detectPinBars, findSwings } from './patterns';
 
 const k = (o: number, h: number, l: number, c: number, t = 0): Candle => ({ t, o, h, l, c, v: 1 });
@@ -111,5 +111,15 @@ describe('patterns', () => {
     expect(detectEngulfing([k(9, 11, 8, 10.5), k(10.6, 10.8, 8.5, 8.9)])).toEqual([
       { index: 1, direction: 'bearish' },
     ]);
+  });
+});
+
+describe('volumeRatio', () => {
+  it('compares each volume with the average of the previous candles', () => {
+    const out = volumeRatio([10, 10, 10, 10, 50, 10], 4);
+    expect(out.slice(0, 4)).toEqual([null, null, null, null]);
+    expect(out[4]).toBe(5); // 50 / avg(10,10,10,10)
+    expect(out[5]).toBe(0.5); // 10 / avg(10,10,10,50)
+    expect(volumeRatio([0, 0, 5], 2)[2]).toBeNull();
   });
 });
