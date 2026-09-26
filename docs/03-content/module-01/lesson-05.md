@@ -1,7 +1,7 @@
 # m01-l05 · Безопасность: 2FA, фишинг и скам
 
 - **Модуль:** 1   **Время:** ~11 мин   **Практика:** MiniQuiz «найди фишинг»
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Настроить базовую гигиену: уникальный пароль, менеджер паролей, 2FA (приложение, не SMS).
@@ -36,7 +36,15 @@
 `2fa`, `phishing`, `anti-phishing-code`, `pump-and-dump`, `withdrawal-whitelist`
 
 ## Источники
-- Bybit Help Center: безопасность аккаунта, антифишинговый код — сверить.
+Сверено 2026-09-26:
+- Bybit Help Center, «How to Enhance the Security of Your Account» — антифишинговый код появляется во всех официальных письмах и SMS; рекомендация держать 2FA через Google Authenticator: https://www.bybit.com/en/help-center/article/How-to-Enhance-Your-Account-Security
+- Bybit Help Center, «How to Manage Your Withdrawal Security» — Withdraw via Address Book (вывод только на адреса из адресной книги), New Address Withdrawal Lock (новый адрес заблокирован для вывода 24 ч), Withdrawal Address Whitelist (без 2FA/почты для проверенных адресов): https://www.bybit.com/en/help-center/article/How-to-Manage-Your-Withdrawal-Address-Book
+- Bybit Help Center, «How to Identify Phishing Threats and Avoid Common Scams»: https://www.bybit.com/en/help-center/article/How-to-Identify-Spoofing-Emails-and-Avoid-Common-Scams
+
+## Заметки
+- «Белый список» в тексте объяснён как связка двух функций Bybit (адресная книга + блокировка новых адресов); отдельно предупреждение, что whitelisted-адреса у Bybit выводятся без 2FA.
+- Интерактив «3 сообщения» сделан одним multi-вопросом MiniQuiz на 4 сообщения (3 мошеннических + 1 похожее на настоящее).
+- В диаграмме phishing-anatomy домены в зоне .example (зарезервирована, не существует).
 
 ## Связи
 Готовит к: m02-l01.
