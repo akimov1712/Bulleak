@@ -1,7 +1,7 @@
 # m01-l01 · Деньги, блокчейн и биткоин
 
 - **Модуль:** 1 Основы крипты   **Время:** ~12 мин   **Практика:** Diagram
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понять, что такое блокчейн простыми словами.
@@ -38,7 +38,13 @@
 `blockchain`, `bitcoin`, `private-key`, `mining`, `proof-of-work`, `proof-of-stake`, `halving`
 
 ## Источники
-- bitcoin.org whitepaper; ethereum.org (PoS) — сверить.
+Сверено 2026-09-26:
+- Bitcoin whitepaper (Satoshi Nakamoto, 31.10.2008): https://bitcoin.org/bitcoin.pdf — проблема двойной траты, цепочка блоков с хэшами, proof-of-work.
+- bitcoin.org, «Bitcoin Halving»: https://bitcoin.org/en/halving; CoinGecko «What Is Bitcoin Halving»: https://www.coingecko.com/learn/what-is-bitcoin-halving — халвинг каждые 210 000 блоков (~4 года), 50 → 25 → 12,5 → 6,25 → 3,125 BTC (апрель 2024, блок 840 000), следующий ~2028, лимит 21 млн, выпуск до ~2140.
+- ethereum.org, «The Merge»: https://ethereum.org/en/roadmap/merge/ — переход на PoS 15.09.2022, энергопотребление −99,95%.
+
+## Заметки
+- Фото биткоин-монеты (Figure) перенесено в партию изображений T-429 (согласование с пользователем).
 
 ## Связи
 Готовит к: m01-l02, m07-l02 (халвинг).
