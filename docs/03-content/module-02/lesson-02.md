@@ -1,7 +1,7 @@
 # m02-l02 · Счета Bybit, пополнение и переводы
 
 - **Модуль:** 2   **Время:** ~10 мин   **Практика:** Steps
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понимать структуру счетов Bybit (Funding, Unified Trading Account) — сверить актуальные названия.
@@ -34,7 +34,16 @@
 `funding-account`, `unified-trading-account`, `p2p`, `network`, `memo-tag`
 
 ## Источники
-- Bybit Help Center: Unified Trading Account, deposit, P2P — сверить.
+Сверено 2026-09-26:
+- Bybit Help Center, «A Complete Guide to Bybit's Funding Account» — депозиты криптой зачисляются на Funding; для торговли — перевод на UTA; автоперевод депозитов: https://www.bybit.com/en/help-center/article/Funding-Account
+- Bybit Help Center, «How to Transfer Assets on Bybit»: https://www.bybit.com/en/help-center/article/How-to-Transfer-Assets-on-Bybit
+- Bybit Help Center, «How to Avoid Crypto P2P Scams» и «P2P Trading Safety and Dispute Solutions» — общение только в чате заказа, не доверять скриншотам, отпускать крипту после поступления денег: https://www.bybit.com/en/help-center/article/How-to-Avoid-Crypto-P2P-Scams
+
+## Заметки
+- Утверждение «внутренние переводы бесплатные» явно в справке не найдено; в тексте формулировка «без комиссии сети» (перевод не идёт в блокчейн).
+- Совет из справки Bybit не упоминать крипту в назначении банковского платежа в урок не включён (граничит с сокрытием от банка).
+- Добавлен раздел «Вывод» (зеркально депозиту) — не было в брифе.
+- Макеты BybitAssets и BybitDeposit: `bybit-ui-assets`, `bybit-ui-deposit`.
 
 ## Связи
 Готовит к: m02-l03.

@@ -35,6 +35,8 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
     import('./bybit/account').then((m) => ({ default: m.BybitKycLevels })),
+  'bybit-ui-assets': () => import('./bybit/funds').then((m) => ({ default: m.BybitAssets })),
+  'bybit-ui-deposit': () => import('./bybit/funds').then((m) => ({ default: m.BybitDeposit })),
 };
 
 export const isDiagramName = (name: string) => Object.hasOwn(DIAGRAM_LOADERS, name);
