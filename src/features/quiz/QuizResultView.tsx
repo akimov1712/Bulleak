@@ -19,6 +19,8 @@ interface QuizResultViewProps {
   actions: ReactNode;
   /** Extra line under the verdict (e.g. best score). */
   note?: ReactNode;
+  /** Wording: lesson test (default) or module exam. */
+  kind?: 'lesson' | 'exam';
 }
 
 export function QuizResultView({
@@ -27,7 +29,9 @@ export function QuizResultView({
   passRatio,
   actions,
   note,
+  kind = 'lesson',
 }: QuizResultViewProps) {
+  const exam = kind === 'exam';
   const stars = starsForScore(result.ratio, result.passed);
   const reduced = useReducedMotion();
   // Celebrate once when the result appears; intensity follows the stars.
@@ -41,10 +45,16 @@ export function QuizResultView({
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
       <Mascot mood={result.passed ? 'cheering' : 'sad'} size={150} />
       <h1 className="text-3xl font-extrabold">
-        {result.passed ? (stars === 3 ? 'Идеально!' : 'Тест сдан!') : 'Почти получилось'}
+        {result.passed
+          ? stars === 3
+            ? 'Идеально!'
+            : exam
+              ? 'Экзамен сдан!'
+              : 'Тест сдан!'
+          : 'Почти получилось'}
       </h1>
       <ProgressRing
-        label="Результат теста"
+        label={exam ? 'Результат экзамена' : 'Результат теста'}
         value={result.ratio}
         size={140}
         thickness={14}
@@ -63,7 +73,9 @@ export function QuizResultView({
           ? mistakes.length === 0
             ? 'Ни одной ошибки — так держать!'
             : `Ошибок: ${mistakes.length}. Разбор — ниже.`
-          : `Для сдачи нужно ${formatPct(passRatio, 0)}. Посмотри разбор ошибок, повтори урок и попробуй снова.`}
+          : exam
+            ? `Для сдачи нужно ${formatPct(passRatio, 0)}. Повтори уроки с ошибками — они ниже — и попробуй снова.`
+            : `Для сдачи нужно ${formatPct(passRatio, 0)}. Посмотри разбор ошибок, повтори урок и попробуй снова.`}
       </p>
       {note}
       <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">{actions}</div>

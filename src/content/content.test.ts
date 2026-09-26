@@ -9,6 +9,7 @@ import type { LessonId, ModuleId } from '@/types/course';
 import { contentInventory } from './loaders';
 import { courseIndex } from './courseIndex';
 import { getTerm } from './glossary';
+import { questionLesson } from '@/lib/quiz/exam';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
@@ -150,6 +151,27 @@ describe('module exams', () => {
     const exam = await contentInventory.loadExam(id);
     expect(quizProblems(exam, id, 'exam')).toEqual([]);
   });
+
+  it.each(contentInventory.exams)(
+    '%s exam covers every lesson of the module with ≥3 questions',
+    async (id: ModuleId) => {
+      const exam = await contentInventory.loadExam(id);
+      const lessons = courseIndex.getModule(id)?.lessons.map((l) => l.id) ?? [];
+      const lessonOfTag = (tag: string) => getTerm(tag)?.lessonId as LessonId | undefined;
+      const perLesson = new Map<string, number>();
+      for (const q of exam.questions) {
+        const lesson = questionLesson(q, lessonOfTag);
+        expect(
+          lesson && lessons.includes(lesson),
+          `${q.id}: first tag must be a term of this module`,
+        ).toBe(true);
+        if (lesson) perLesson.set(lesson, (perLesson.get(lesson) ?? 0) + 1);
+      }
+      for (const lesson of lessons) {
+        expect(perLesson.get(lesson) ?? 0, `${lesson} questions in exam`).toBeGreaterThanOrEqual(3);
+      }
+    },
+  );
 });
 
 describe('lesson texts and glossary links', () => {

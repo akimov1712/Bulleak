@@ -26,9 +26,19 @@ export interface EmptyStateProps {
   description?: ReactNode;
   action?: ReactNode;
   className?: string;
+  /** 1 when the empty state is the whole page (it then carries the page heading). */
+  headingLevel?: 1 | 2 | 3;
 }
 
-export function EmptyState({ art, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({
+  art,
+  title,
+  description,
+  action,
+  className,
+  headingLevel = 3,
+}: EmptyStateProps) {
+  const Heading = `h${headingLevel}` as const;
   return (
     <div
       className={cn(
@@ -37,7 +47,7 @@ export function EmptyState({ art, title, description, action, className }: Empty
       )}
     >
       {art}
-      <h3 className="text-xl font-extrabold">{title}</h3>
+      <Heading className="text-xl font-extrabold">{title}</Heading>
       {description && <div className="max-w-md text-text-muted">{description}</div>}
       {action && <div className="mt-2">{action}</div>}
     </div>

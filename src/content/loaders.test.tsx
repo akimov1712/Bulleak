@@ -63,6 +63,6 @@ describe('content loaders', () => {
   it('throws a typed error for missing content', async () => {
     await expect(loadLesson('m12-l04')).rejects.toBeInstanceOf(ContentMissingError);
     await expect(loadQuiz('m12-l04')).rejects.toBeInstanceOf(ContentMissingError);
-    await expect(loadExam('m01')).rejects.toBeInstanceOf(ContentMissingError);
+    await expect(loadExam('m12')).rejects.toBeInstanceOf(ContentMissingError);
   });
 });
