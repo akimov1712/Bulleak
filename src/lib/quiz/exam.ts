@@ -1,5 +1,5 @@
 /** Module exam rules: retake cooldown and "weak lessons" after a failed attempt. */
-import type { LessonId } from '@/types/course';
+import type { LessonId, LessonMeta } from '@/types/course';
 import type { ExamProgress } from '@/types/progress';
 import type { Question, QuizResult } from '@/types/quiz';
 
@@ -10,6 +10,18 @@ export const EXAM_RETAKE_COOLDOWN_MS = 10 * 60_000;
 export function examRetakeWaitMs(progress: ExamProgress | undefined, now: number): number {
   if (!progress?.lastAttemptAt || progress.passedAt !== undefined) return 0;
   return Math.max(0, progress.lastAttemptAt + EXAM_RETAKE_COOLDOWN_MS - now);
+}
+
+/**
+ * Tag → lesson for a module exam: a lesson of this module whose brief lists the term wins
+ * (terms like "2fa" are introduced earlier but also taught here); otherwise `fallback`
+ * (usually the lesson where the glossary introduces the term).
+ */
+export function moduleLessonOfTag(
+  lessons: readonly Pick<LessonMeta, 'id' | 'terms'>[],
+  fallback: (tag: string) => LessonId | undefined,
+): (tag: string) => LessonId | undefined {
+  return (tag) => lessons.find((l) => l.terms.includes(tag))?.id ?? fallback(tag);
 }
 
 /** Lesson a question belongs to: the lesson of its first tag that maps to one. */

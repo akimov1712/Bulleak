@@ -9,7 +9,7 @@ import type { LessonId, ModuleId } from '@/types/course';
 import { contentInventory } from './loaders';
 import { courseIndex } from './courseIndex';
 import { getTerm } from './glossary';
-import { questionLesson } from '@/lib/quiz/exam';
+import { moduleLessonOfTag, questionLesson } from '@/lib/quiz/exam';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
@@ -157,7 +157,10 @@ describe('module exams', () => {
     async (id: ModuleId) => {
       const exam = await contentInventory.loadExam(id);
       const lessons = courseIndex.getModule(id)?.lessons.map((l) => l.id) ?? [];
-      const lessonOfTag = (tag: string) => getTerm(tag)?.lessonId as LessonId | undefined;
+      const lessonOfTag = moduleLessonOfTag(
+        courseIndex.getModule(id)?.lessons ?? [],
+        (tag) => getTerm(tag)?.lessonId as LessonId | undefined,
+      );
       const perLesson = new Map<string, number>();
       for (const q of exam.questions) {
         const lesson = questionLesson(q, lessonOfTag);

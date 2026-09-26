@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { LessonId } from '@/types/course';
 import type { Question, QuizResult } from '@/types/quiz';
-import { EXAM_RETAKE_COOLDOWN_MS, examRetakeWaitMs, questionLesson, weakLessons } from './exam';
+import {
+  EXAM_RETAKE_COOLDOWN_MS,
+  examRetakeWaitMs,
+  moduleLessonOfTag,
+  questionLesson,
+  weakLessons,
+} from './exam';
 
 const L1 = 'm01-l01' as LessonId;
 const L2 = 'm01-l02' as LessonId;
@@ -71,5 +77,14 @@ describe('weak lessons', () => {
       { lessonId: L1, mistakes: 1 },
       { lessonId: L2, mistakes: 1 },
     ]);
+  });
+});
+
+describe('moduleLessonOfTag', () => {
+  it('prefers a lesson of the module that lists the term, then falls back', () => {
+    const M2L1 = 'm02-l01' as LessonId;
+    const map = moduleLessonOfTag([{ id: M2L1, terms: ['2fa', 'subaccount'] }], () => L1);
+    expect(map('2fa')).toBe(M2L1);
+    expect(map('bitcoin')).toBe(L1);
   });
 });

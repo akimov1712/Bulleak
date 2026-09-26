@@ -16,7 +16,7 @@ import { examPromise, forgetQuiz } from '@/features/quiz/quizContent';
 import { QuizRunner, type QuizFinish } from '@/features/quiz/QuizRunner';
 import { QuizResultView } from '@/features/quiz/QuizResultView';
 import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
-import { examRetakeWaitMs, weakLessons } from '@/lib/quiz/exam';
+import { examRetakeWaitMs, moduleLessonOfTag, weakLessons } from '@/lib/quiz/exam';
 import { isExamAvailable, isExamPassed } from '@/lib/progress/unlock';
 import { formatPct, plural } from '@/lib/format';
 import { useUnlockContext } from '@/hooks/useUnlock';
@@ -31,7 +31,7 @@ type Phase =
   | { kind: 'running'; prepared: PreparedQuiz }
   | { kind: 'result'; prepared: PreparedQuiz; finish: QuizFinish };
 
-const lessonOfTag = (tag: string) => getTerm(tag)?.lessonId as LessonId | undefined;
+const glossaryLesson = (tag: string) => getTerm(tag)?.lessonId as LessonId | undefined;
 
 function ModuleExam({ module }: { module: CourseModule }) {
   const quiz = use(examPromise(module.id));
@@ -69,7 +69,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
       : weakLessons(
           result,
           phase.prepared.questions,
-          lessonOfTag,
+          moduleLessonOfTag(module.lessons, glossaryLesson),
           module.lessons.map((l) => l.id),
         );
     return (
