@@ -1,7 +1,7 @@
 # T-506 · Воспроизведение и результат сделки
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -16,7 +16,7 @@
 - `src/features/simulator/TradeResult.tsx`
 
 ## Критерии приёмки
-- [ ] Результат совпадает с simulateTrade для тех же данных
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Результат совпадает с simulateTrade для тех же данных
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add playback and trade result`

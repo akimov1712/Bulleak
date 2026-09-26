@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react';
-import { Shuffle } from 'lucide-react';
+import { RotateCcw, Shuffle, Wallet } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -16,7 +16,8 @@ import {
   type DatasetName,
   type DatasetSymbol,
 } from '@/lib/trading/candles';
-import { formatNumber } from '@/lib/format';
+import { formatUsd } from '@/lib/format';
+import { SIM_START_BALANCE } from '@/lib/trading/simPlan';
 import { forgetDataset } from '@/features/charts/useDataset';
 import type { SimIndicators } from '@/features/simulator/SimChart';
 import { SimSession } from '@/features/simulator/SimSession';
@@ -50,6 +51,8 @@ const isIndicators = (v: unknown): v is SimIndicators =>
     (k) => typeof (v as Record<string, unknown>)[k] === 'boolean',
   );
 
+const isBalance = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+
 const SYMBOL_OPTIONS = DATASET_SYMBOLS.map((s) => ({ value: s, label: s.replace('USDT', '') }));
 const INTERVAL_OPTIONS = DATASET_INTERVALS.map((i) => ({ value: i, label: INTERVAL_LABEL[i] }));
 
@@ -66,11 +69,33 @@ export function SimulatorPage() {
     isIndicators,
   );
   const [seed, setSeed] = useState(() => Date.now());
+  const [balance, setBalance] = useStoredState('tc-sim:balance', SIM_START_BALANCE, isBalance);
   const dataset: DatasetName = `${instrument.symbol}-${instrument.interval}`;
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title="Тренажёр" subtitle="Сделки вслепую на реальной истории Bybit" />
+      <PageHeader
+        title="Тренажёр"
+        subtitle="Сделки вслепую на реальной истории Bybit"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2 rounded-2xl border-2 border-border bg-surface px-3 py-2 font-extrabold tabular-nums">
+              <Wallet className="size-5 text-info" aria-hidden="true" />
+              <span className="sr-only">Виртуальный баланс:</span>
+              {formatUsd(balance)}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<RotateCcw className="size-4" aria-hidden="true" />}
+              disabled={balance === SIM_START_BALANCE}
+              onClick={() => setBalance(SIM_START_BALANCE)}
+            >
+              Сбросить
+            </Button>
+          </div>
+        }
+      />
       <div className="flex flex-wrap items-end gap-4">
         <Segmented
           label="Инструмент"
@@ -116,15 +141,9 @@ export function SimulatorPage() {
             seed={seed}
             indicators={indicators}
             onToggleIndicator={(key) => setIndicators((prev) => ({ ...prev, [key]: !prev[key] }))}
-            panel={({ price }) => (
-              <Card className="flex flex-col gap-2">
-                <p className="text-sm font-bold text-text-muted">Текущая цена</p>
-                <p className="text-2xl font-extrabold tabular-nums">{formatNumber(price, 2)}</p>
-                <p className="text-sm text-text-muted">
-                  Правее этой свечи — будущее: его увидишь только после решения.
-                </p>
-              </Card>
-            )}
+            balance={balance}
+            onBalance={setBalance}
+            onNewPoint={() => setSeed(Date.now())}
           />
         </Suspense>
       </ErrorBoundary>

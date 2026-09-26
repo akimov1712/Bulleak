@@ -43,3 +43,8 @@ export function skipAhead(cursor: number, length: number, bars = SIM_SKIP): numb
   const next = cursor + bars;
   return next <= length - 1 - SIM_FUTURE ? next : null;
 }
+
+export type PlaybackSpeed = '1' | '4';
+
+/** Milliseconds per replayed candle for each playback speed. */
+export const SPEED_MS: Record<PlaybackSpeed, number> = { '1': 600, '4': 150 };
