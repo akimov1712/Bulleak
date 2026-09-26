@@ -14,6 +14,12 @@ export const INTERVAL_MS: Record<DatasetInterval, number> = {
 
 export const INTERVAL_LABEL: Record<DatasetInterval, string> = { '60': '1H', '240': '4H', D: '1D' };
 
+/** Interval part of a dataset name (e.g. 'BTCUSDT-240' → '240'). */
+export function datasetInterval(name: DatasetName): DatasetInterval {
+  const interval = name.slice(name.indexOf('-') + 1);
+  return DATASET_INTERVALS.find((i) => i === interval) ?? 'D';
+}
+
 export function isDatasetName(name: string): name is DatasetName {
   const [symbol, interval] = name.split('-');
   return (

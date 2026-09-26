@@ -28,7 +28,7 @@ import {
   volumeRatio,
   type Series,
 } from '@/lib/indicators/indicators';
-import { INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
+import { datasetInterval, INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
 import { formatNumber } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import type { Candle } from '@/types/trading';
@@ -94,20 +94,31 @@ export type ChartType = 'candles' | 'bars' | 'line';
 const TYPE_LABEL: Record<ChartType, string> = { candles: 'Свечи', bars: 'Бары', line: 'Линия' };
 
 const PANE_HEIGHT = 110;
+/** Chart chrome above/around the plot: header row(s) plus borders, measured in the browser. */
+const HEADER_HEIGHT = 35;
+const HEADER_OHLC_HEIGHT = 54;
 const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
 
 /** Candle chart with annotations; handles loading and errors itself. */
 export function CandleChart(props: CandleChartProps) {
   const [dataset, setDataset] = useState(props.dataset);
+  // The tabs pick a dataset locally; a new `dataset` prop from the parent still wins.
+  const [datasetProp, setDatasetProp] = useState(props.dataset);
+  if (datasetProp !== props.dataset) {
+    setDatasetProp(props.dataset);
+    setDataset(props.dataset);
+  }
   const paneCount = props.indicators?.filter(isPaneIndicator).length ?? 0;
   const total = (props.height ?? 320) + paneCount * PANE_HEIGHT;
+  // Placeholders cover the header and borders too, so nothing jumps when the chart loads.
+  const placeholderHeight = total + (props.ohlc === false ? HEADER_HEIGHT : HEADER_OHLC_HEIGHT);
   const timeframes = props.timeframes ?? [];
   return (
     <figure className={props.className}>
       {timeframes.length > 1 && (
         <div role="radiogroup" aria-label="Таймфрейм" className="mb-2 flex gap-1.5">
           {timeframes.map((tf) => {
-            const interval = tf.split('-')[1] as keyof typeof INTERVAL_LABEL;
+            const interval = datasetInterval(tf);
             return (
               <button
                 key={tf}
@@ -134,7 +145,7 @@ export function CandleChart(props: CandleChartProps) {
           <div
             role="alert"
             className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-border bg-surface p-4 text-center text-sm text-text-muted"
-            style={{ height: total }}
+            style={{ height: placeholderHeight }}
           >
             <p>График не загрузился: {error.message}</p>
             <button type="button" className="font-bold text-info underline" onClick={reset}>
@@ -145,7 +156,7 @@ export function CandleChart(props: CandleChartProps) {
       >
         <Suspense
           fallback={
-            <div style={{ height: total }}>
+            <div style={{ height: placeholderHeight }}>
               <Skeleton className="h-full w-full rounded-2xl" />
             </div>
           }
@@ -183,6 +194,11 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   const volumeSpikes = props.volumeSpikes ?? 0;
   const height = props.totalHeight;
   const [chartType, setChartType] = useState<ChartType>(props.chartType ?? 'candles');
+  const [chartTypeProp, setChartTypeProp] = useState(props.chartType);
+  if (chartTypeProp !== props.chartType) {
+    setChartTypeProp(props.chartType);
+    setChartType(props.chartType ?? 'candles');
+  }
   const [hovered, setHovered] = useState<number | null>(null);
   const showOhlc = props.ohlc ?? true;
 
@@ -243,6 +259,8 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     observer.observe(el);
     return () => {
       chartRef.current = null;
+      // The hovered index belongs to this data/range; a rebuilt chart starts from "last".
+      setHovered(null);
       observer.disconnect();
       cancelAnimationFrame(frame);
       chart.api.unsubscribeClick(handleClick);

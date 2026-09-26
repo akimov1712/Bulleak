@@ -116,9 +116,12 @@ function ModuleExam({ module }: { module: CourseModule }) {
             )
           ) : (
             <>
-              <p className="text-sm text-text-muted">
-                Пересдать можно через 10 минут — используй их, чтобы повторить уроки.
-              </p>
+              {/* No cooldown once the exam was passed earlier (examRetakeWaitMs). */}
+              {waitMs > 0 && (
+                <p className="text-sm text-text-muted">
+                  Пересдать можно через 10 минут — используй их, чтобы повторить уроки.
+                </p>
+              )}
               <Link
                 to={paths.module(module.id)}
                 className={buttonClass({ variant: 'secondary', size: 'lg' })}

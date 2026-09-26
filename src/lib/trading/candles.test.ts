@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Candle } from '@/types/trading';
 import {
+  datasetInterval,
   indexAtTime,
   INTERVAL_MS,
   isDatasetName,
@@ -49,6 +50,11 @@ describe('isDatasetName', () => {
     expect(isDatasetName('ETHUSDT-D')).toBe(true);
     expect(isDatasetName('DOGEUSDT-60')).toBe(false);
     expect(isDatasetName('BTCUSDT-15')).toBe(false);
+  });
+
+  it('reads the interval part', () => {
+    expect(datasetInterval('BTCUSDT-240')).toBe('240');
+    expect(datasetInterval('SOLUSDT-D')).toBe('D');
   });
 });
 
