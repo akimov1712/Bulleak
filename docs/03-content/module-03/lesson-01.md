@@ -1,7 +1,7 @@
 # m03-l01 · Японские свечи
 
 - **Модуль:** 3 Чтение графика   **Время:** ~12 мин   **Практика:** CandleChart, Diagram
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Читать свечу: open, high, low, close, тело, тени.
@@ -37,7 +37,14 @@
 `candlestick`, `ohlc`, `candle-body`, `wick`, `bullish`, `bearish`
 
 ## Источники
-- Investopedia: Candlestick; Babypips: Japanese candlesticks — сверить.
+Сверено 2026-09-26 (Investopedia и Babypips недоступны для инструментов проверки):
+- CFI, «Shadow (Candlestick Wick)» — тень показывает, куда цена ходила относительно открытия и закрытия; верх тени — максимум, низ — минимум: https://corporatefinanceinstitute.com/resources/knowledge/trading-investing/shadow-candlestick-wick/
+- CFI, «Candlestick Patterns» — тело, бычья свеча (закрытие выше открытия, зелёная), медвежья (ниже, красная): https://corporatefinanceinstitute.com/resources/equities/candlestick-patterns/
+- Данные графиков — свечи Bybit BTCUSDT 4H из public/data (индексы 2900–2959 для урока, 2840–2899 для вопроса chart-click; цель — свеча 2867 от 03.09.2026, тело в 5 раз больше любой другой бычьей в окне).
+
+## Заметки
+- CandleChart получил переключатель «Свечи / Бары / Линия» (`typeToggle`) и строку OHLC для свечи под курсором (по умолчанию включена на всех графиках).
+- Добавлены разделы «Свеча рождается у тебя на глазах» (решения по закрытым свечам) и «Читаем свечи подряд».
 
 ## Связи
 Готовит к: m03-l02, M4.

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Dataset } from '@/lib/trading/candles';
 import { CandleChart } from './CandleChart';
@@ -52,6 +52,7 @@ vi.mock('lightweight-charts', () => {
   });
   return {
     CandlestickSeries: 'Candlestick',
+    BarSeries: 'Bar',
     LineSeries: 'Line',
     HistogramSeries: 'Histogram',
     LineStyle: { Solid: 0, Dashed: 2 },
@@ -60,6 +61,7 @@ vi.mock('lightweight-charts', () => {
       const series: ReturnType<typeof makeSeries>[] = [];
       let clickHandler: ((p: unknown) => void) | null = null;
       let dblHandler: ((p: unknown) => void) | null = null;
+      let moveHandler: ((p: unknown) => void) | null = null;
       const chart = {
         options,
         series,
@@ -79,6 +81,11 @@ vi.mock('lightweight-charts', () => {
           dblHandler = h;
         },
         unsubscribeDblClick: vi.fn(),
+        subscribeCrosshairMove: (h: (p: unknown) => void) => {
+          moveHandler = h;
+        },
+        unsubscribeCrosshairMove: vi.fn(),
+        move: (p: unknown) => moveHandler?.(p),
         dblClick: (p: unknown) => dblHandler?.(p),
         click: (p: unknown) => clickHandler?.(p),
       };
@@ -101,6 +108,7 @@ interface FakeChart {
   remove: ReturnType<typeof vi.fn>;
   click: (p: unknown) => void;
   dblClick: (p: unknown) => void;
+  move: (p: unknown) => void;
 }
 const lastChart = () => mocks.created.at(-1) as unknown as FakeChart;
 
@@ -112,6 +120,20 @@ beforeEach(() => {
 });
 
 describe('CandleChart', () => {
+  it('switches between candles, bars and line and shows OHLC of the hovered candle', async () => {
+    render(<CandleChart dataset="BTCUSDT-60" bars={20} typeToggle />);
+    expect(lastChart().series[0]?.kind).toBe('Candlestick');
+    expect(screen.getByText(/Последняя:/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Линия' }));
+    expect(lastChart().series[0]?.kind).toBe('Line');
+    fireEvent.click(screen.getByRole('radio', { name: 'Бары' }));
+    expect(lastChart().series[0]?.kind).toBe('Bar');
+    act(() => lastChart().move({ logical: 0, point: { x: 1, y: 1 } }));
+    expect(screen.queryByText(/Последняя:/)).not.toBeInTheDocument();
+    act(() => lastChart().move({}));
+    expect(screen.getByText(/Последняя:/)).toBeInTheDocument();
+  });
+
   it('draws the visible slice with indicators, levels, markers and overlays', () => {
     render(
       <CandleChart

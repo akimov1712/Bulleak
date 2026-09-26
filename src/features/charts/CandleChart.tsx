@@ -1,5 +1,6 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  BarSeries,
   CandlestickSeries,
   createChart,
   createSeriesMarkers,
@@ -9,6 +10,7 @@ import {
   type IChartApi,
   type IPriceLine,
   type ISeriesApi,
+  type SeriesType,
   type LineData,
   type MouseEventParams,
   type Time,
@@ -26,6 +28,8 @@ import {
   type Series,
 } from '@/lib/indicators/indicators';
 import { INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
+import { formatNumber } from '@/lib/format';
+import { cn } from '@/lib/cn';
 import type { Candle } from '@/types/trading';
 import {
   buildMarkers,
@@ -69,7 +73,17 @@ export interface CandleChartProps {
   onPick?: (pick: ChartPick) => void;
   caption?: string;
   className?: string;
+  /** How the price is drawn (default candles). */
+  chartType?: ChartType;
+  /** Show a candles / bars / line switch above the chart. */
+  typeToggle?: boolean;
+  /** O/H/L/C line for the hovered (or last) candle; default on. */
+  ohlc?: boolean;
 }
+
+export type ChartType = 'candles' | 'bars' | 'line';
+
+const TYPE_LABEL: Record<ChartType, string> = { candles: 'Свечи', bars: 'Бары', line: 'Линия' };
 
 const PANE_HEIGHT = 110;
 const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
@@ -133,6 +147,9 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   const interactive = props.interactive ?? false;
   const volume = props.volume ?? false;
   const height = props.totalHeight;
+  const [chartType, setChartType] = useState<ChartType>(props.chartType ?? 'candles');
+  const [hovered, setHovered] = useState<number | null>(null);
+  const showOhlc = props.ohlc ?? true;
 
   const chartRef = useRef<BuiltChart | null>(null);
 
@@ -150,6 +167,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       interactive,
       intraday: interval !== 'D',
       palette,
+      chartType,
     });
     const handleClick = (param: MouseEventParams<Time>) => {
       const pick = onPickRef.current;
@@ -165,6 +183,15 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     // A quick second click is reported as a double click only; treat it as a click too
     // so re-placing an answer never gets lost.
     chart.api.subscribeDblClick(handleClick);
+    const handleMove = (param: MouseEventParams<Time>) => {
+      if (param.logical === undefined || !param.point) {
+        setHovered(null);
+        return;
+      }
+      const idx = Math.round(param.logical);
+      setHovered(idx >= 0 && idx <= end - start ? start + idx : null);
+    };
+    chart.api.subscribeCrosshairMove(handleMove);
     chartRef.current = chart;
     // autoSize measures the container asynchronously, so fitting at creation can use a
     // stale width. Refit on size changes; interactive charts only until the first real
@@ -184,9 +211,10 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       cancelAnimationFrame(frame);
       chart.api.unsubscribeClick(handleClick);
       chart.api.unsubscribeDblClick(handleClick);
+      chart.api.unsubscribeCrosshairMove(handleMove);
       chart.api.remove();
     };
-  }, [candles, start, end, indicatorsKey, volume, interactive, interval, palette]);
+  }, [candles, start, end, indicatorsKey, volume, interactive, interval, palette, chartType]);
 
   // Annotations change on every quiz click: redraw them without rebuilding the chart
   // (no flicker, zoom is kept). Lists the chart deps too, so it re-runs after a rebuild.
@@ -204,27 +232,72 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       // Skip when the chart was already removed by the effect above.
       if (chartRef.current === chart) clear();
     };
-  }, [candles, start, end, annotationsKey, indicatorsKey, volume, interactive, interval, palette]);
+  }, [
+    candles,
+    start,
+    end,
+    annotationsKey,
+    indicatorsKey,
+    volume,
+    interactive,
+    interval,
+    palette,
+    chartType,
+  ]);
 
   const legend = [
     `${symbol.replace('USDT', '/USDT')} · ${INTERVAL_LABEL[interval]}`,
     ...(props.indicators ?? []).filter((s) => !isPaneIndicator(s)).map(indicatorLabel),
   ].join(' · ');
 
+  const shown = candles[hovered ?? end];
+  const precision = pricePrecision(candles[end]?.c ?? 1);
+  const fmt = (v: number) => formatNumber(v, precision, { minDecimals: precision });
+
   return (
     <div
       className="relative overflow-hidden rounded-2xl border-2 border-border bg-surface"
       data-testid="candle-chart"
     >
+      <div className="flex flex-col gap-0.5 border-b-2 border-border px-3 py-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <span className="text-xs font-bold text-text-muted">{legend}</span>
+          {props.typeToggle && (
+            <div role="radiogroup" aria-label="Тип графика" className="flex gap-1">
+              {(Object.keys(TYPE_LABEL) as ChartType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  role="radio"
+                  aria-checked={chartType === t}
+                  onClick={() => setChartType(t)}
+                  className={cn(
+                    'rounded-md px-2 py-0.5 text-xs font-bold',
+                    chartType === t ? 'bg-info/20 text-info' : 'text-text-muted hover:bg-surface-2',
+                  )}
+                >
+                  {TYPE_LABEL[t]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        {showOhlc && shown && (
+          <p className="font-mono text-[11px] text-text-muted tabular-nums">
+            <span className="font-sans font-bold">{hovered === null ? 'Последняя: ' : ''}</span>O{' '}
+            <b className="text-text">{fmt(shown.o)}</b> H{' '}
+            <b className="text-text">{fmt(shown.h)}</b> L{' '}
+            <b className="text-text">{fmt(shown.l)}</b> C{' '}
+            <b className={shown.c >= shown.o ? 'text-bull' : 'text-bear'}>{fmt(shown.c)}</b>
+          </p>
+        )}
+      </div>
       <div
         ref={containerRef}
         style={{ height, touchAction: interactive ? 'pan-y' : 'auto' }}
         aria-label={`Свечной график ${legend}`}
         role="img"
       />
-      <div className="pointer-events-none absolute top-2 left-3 z-10 rounded-md bg-surface/80 px-1.5 text-xs font-bold text-text-muted">
-        {legend}
-      </div>
     </div>
   );
 }
@@ -238,11 +311,12 @@ interface BuildOptions {
   interactive: boolean;
   intraday: boolean;
   palette: Palette;
+  chartType: ChartType;
 }
 
 interface BuiltChart {
   api: IChartApi;
-  mainSeries: ISeriesApi<'Candlestick'>;
+  mainSeries: ISeriesApi<SeriesType>;
 }
 
 function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
@@ -281,18 +355,40 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
       : false,
   });
 
-  const mainSeries = api.addSeries(CandlestickSeries, {
-    upColor: p.tones.bull,
-    downColor: p.tones.bear,
-    borderUpColor: p.tones.bull,
-    borderDownColor: p.tones.bear,
-    wickUpColor: p.tones.bull,
-    wickDownColor: p.tones.bear,
-    priceFormat: { type: 'price', precision, minMove: 10 ** -precision },
-  });
-  mainSeries.setData(
-    visible.map((c) => ({ time: toChartTime(c.t), open: c.o, high: c.h, low: c.l, close: c.c })),
-  );
+  const priceFormat = { type: 'price' as const, precision, minMove: 10 ** -precision };
+  const ohlcData = visible.map((c) => ({
+    time: toChartTime(c.t),
+    open: c.o,
+    high: c.h,
+    low: c.l,
+    close: c.c,
+  }));
+  let mainSeries: ISeriesApi<SeriesType>;
+  if (o.chartType === 'line') {
+    const line = api.addSeries(LineSeries, { color: p.tones.info, lineWidth: 2, priceFormat });
+    line.setData(visible.map((c) => ({ time: toChartTime(c.t), value: c.c })));
+    mainSeries = line;
+  } else if (o.chartType === 'bars') {
+    const bars = api.addSeries(BarSeries, {
+      upColor: p.tones.bull,
+      downColor: p.tones.bear,
+      priceFormat,
+    });
+    bars.setData(ohlcData);
+    mainSeries = bars;
+  } else {
+    const candlesSeries = api.addSeries(CandlestickSeries, {
+      upColor: p.tones.bull,
+      downColor: p.tones.bear,
+      borderUpColor: p.tones.bull,
+      borderDownColor: p.tones.bear,
+      wickUpColor: p.tones.bull,
+      wickDownColor: p.tones.bear,
+      priceFormat,
+    });
+    candlesSeries.setData(ohlcData);
+    mainSeries = candlesSeries;
+  }
 
   if (o.volume) {
     const vol = api.addSeries(HistogramSeries, {
