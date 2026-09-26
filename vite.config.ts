@@ -57,6 +57,9 @@ export default defineConfig(({ mode }) => ({
     environment: 'jsdom',
     // First MDX compile of a lesson can take several seconds when the suite runs in parallel.
     testTimeout: 15_000,
+    // Each worker holds a jsdom + MDX compiler; with the default (cores − 1) workers the
+    // 8 GB machine ran out of memory (V8 "Zone Allocation failed") in some runs, even at 4.
+    maxWorkers: 2,
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
