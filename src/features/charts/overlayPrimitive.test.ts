@@ -51,6 +51,7 @@ describe('OverlayPrimitive', () => {
       fillRect: vi.fn(),
       strokeRect: vi.fn(),
       fillText: vi.fn(),
+      measureText: vi.fn(() => ({ width: 10 })),
       setLineDash: vi.fn(),
       beginPath: vi.fn(),
       moveTo: vi.fn(),
@@ -62,12 +63,18 @@ describe('OverlayPrimitive', () => {
         fn: (s: { context: typeof ctx; mediaSize: { width: number; height: number } }) => void,
       ) => fn({ context: ctx, mediaSize: { width: 200, height: 100 } }),
     };
-    const view = p.paneViews()[0];
-    expect(view?.zOrder()).toBe('bottom');
-    view?.renderer().draw(target as never);
+    const [shapes, labels] = p.paneViews();
+    // Shapes under the candles, labels on top of them.
+    expect(shapes?.zOrder()).toBe('bottom');
+    expect(labels?.zOrder()).toBe('top');
+    shapes?.renderer().draw(target as never);
     expect(ctx.fillRect).toHaveBeenCalledWith(15, 20, 30, 20);
+    expect(ctx.fillText).not.toHaveBeenCalled();
+    labels?.renderer().draw(target as never);
     expect(ctx.fillText).toHaveBeenCalledWith('Z', 21, 24);
     expect(ctx.fillText).toHaveBeenCalledWith('V', 55, 30);
+    // label backdrop: text width 10 + 6 padding
+    expect(ctx.fillRect).toHaveBeenCalledWith(18, 22, 16, 16);
     // the off-screen line at x=9990 is skipped
     expect(ctx.moveTo).toHaveBeenCalledTimes(1);
 

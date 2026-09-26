@@ -44,11 +44,27 @@ interface Resolved {
   vlines: { x: number; line: OverlayVLine }[];
 }
 
+type Layer = 'shapes' | 'labels';
+
+/**
+ * Two layers: shapes go under the candles, labels on top (with a backdrop) so candles never
+ * hide the text.
+ */
 class OverlayRenderer implements IPrimitivePaneRenderer {
   constructor(
     private readonly data: Resolved,
+    private readonly layer: Layer,
     private readonly font: string,
+    private readonly labelBackground: string,
   ) {}
+
+  private label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string) {
+    const w = ctx.measureText(text).width;
+    ctx.fillStyle = this.labelBackground;
+    ctx.fillRect(x - 3, y - 2, w + 6, 16);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
 
   draw(target: DrawTarget) {
     target.useMediaCoordinateSpace(({ context: ctx, mediaSize }) => {
@@ -60,6 +76,10 @@ class OverlayRenderer implements IPrimitivePaneRenderer {
         if (right <= left) continue;
         const top = Math.min(y1, y2);
         const h = Math.abs(y2 - y1);
+        if (this.layer === 'labels') {
+          if (zone.label) this.label(ctx, zone.label, left + 6, top + 4, zone.color);
+          continue;
+        }
         ctx.fillStyle = zone.fill;
         ctx.fillRect(left, top, right - left, h);
         ctx.strokeStyle = zone.color;
@@ -67,13 +87,13 @@ class OverlayRenderer implements IPrimitivePaneRenderer {
         ctx.setLineDash([4, 3]);
         ctx.strokeRect(left + 0.5, top + 0.5, right - left - 1, h - 1);
         ctx.setLineDash([]);
-        if (zone.label) {
-          ctx.fillStyle = zone.color;
-          ctx.fillText(zone.label, left + 6, top + 4);
-        }
       }
       for (const { x, line } of this.data.vlines) {
         if (x < 0 || x > mediaSize.width) continue;
+        if (this.layer === 'labels') {
+          if (line.label) this.label(ctx, line.label, x + 5, 30, line.color);
+          continue;
+        }
         ctx.strokeStyle = line.color;
         ctx.lineWidth = 1.5;
         ctx.setLineDash([5, 4]);
@@ -82,24 +102,28 @@ class OverlayRenderer implements IPrimitivePaneRenderer {
         ctx.lineTo(Math.round(x) + 0.5, mediaSize.height);
         ctx.stroke();
         ctx.setLineDash([]);
-        if (line.label) {
-          ctx.fillStyle = line.color;
-          ctx.fillText(line.label, x + 5, 30);
-        }
       }
     });
   }
 }
 
 class OverlayView implements IPrimitivePaneView {
-  constructor(private readonly source: OverlayPrimitive) {}
+  constructor(
+    private readonly source: OverlayPrimitive,
+    private readonly layer: Layer,
+  ) {}
 
   zOrder() {
-    return 'bottom' as const;
+    return this.layer === 'shapes' ? ('bottom' as const) : ('top' as const);
   }
 
   renderer() {
-    return new OverlayRenderer(this.source.resolve(), this.source.font);
+    return new OverlayRenderer(
+      this.source.resolve(),
+      this.layer,
+      this.source.font,
+      this.source.labelBackground,
+    );
   }
 }
 
@@ -107,10 +131,12 @@ export class OverlayPrimitive implements ISeriesPrimitive<Time> {
   private chart: IChartApi | null = null;
   private series: ISeriesApi<SeriesType> | null = null;
   private requestUpdate: (() => void) | null = null;
-  private readonly views = [new OverlayView(this)];
+  private readonly views = [new OverlayView(this, 'shapes'), new OverlayView(this, 'labels')];
 
   constructor(
     private items: OverlayItems,
+    /** Backdrop behind labels, e.g. the chart surface colour with some transparency. */
+    readonly labelBackground = 'rgba(255, 255, 255, 0.85)',
     readonly font = "600 12px 'Nunito Variable', Nunito, system-ui, sans-serif",
   ) {}
 

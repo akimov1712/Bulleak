@@ -584,7 +584,10 @@ function applyAnnotations(chart: BuiltChart, o: AnnotationInput): () => void {
         )
       : null;
   const items = overlayItems(visible, o.start, o.annotations, p);
-  const overlay = items.zones.length + items.vlines.length > 0 ? new OverlayPrimitive(items) : null;
+  const overlay =
+    items.zones.length + items.vlines.length > 0
+      ? new OverlayPrimitive(items, withAlpha(p.surface, 0.85))
+      : null;
   if (overlay) mainSeries.attachPrimitive(overlay);
   return () => {
     for (const line of priceLines) mainSeries.removePriceLine(line);
