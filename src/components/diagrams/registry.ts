@@ -31,6 +31,10 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'support-resistance': () => import('./m03').then((m) => ({ default: m.SupportResistance })),
   'role-reversal': () => import('./m03').then((m) => ({ default: m.RoleReversal })),
   'volume-confirmation': () => import('./m03').then((m) => ({ default: m.VolumeConfirmation })),
+  // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
+  'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
+  'bybit-ui-kyc-levels': () =>
+    import('./bybit/account').then((m) => ({ default: m.BybitKycLevels })),
 };
 
 export const isDiagramName = (name: string) => Object.hasOwn(DIAGRAM_LOADERS, name);

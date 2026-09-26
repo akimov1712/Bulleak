@@ -22,7 +22,8 @@ describe('Diagram', () => {
     '%s renders with an accessible name',
     async (name) => {
       render(<Diagram name={name} />);
-      const img = await screen.findByRole('img');
+      // Static diagrams are SVG images; Bybit mock-ups are interactive groups.
+      const img = await screen.findByRole(name.startsWith('bybit-ui-') ? 'group' : 'img');
       expect(img.getAttribute('aria-label')?.length).toBeGreaterThan(20);
     },
   );
