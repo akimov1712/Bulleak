@@ -13,6 +13,7 @@ import {
 } from '@/lib/progress/unlock';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { ModuleIcon } from '@/components/ui/ModuleIcon';
+import { ModuleCover } from '@/components/covers/ModuleCover';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { buttonClass } from '@/components/ui/styles';
@@ -78,6 +79,7 @@ export function ModulePage() {
             <p className="text-sm font-extrabold tracking-wide uppercase">Модуль {module.index}</p>
             <h1 className="text-3xl leading-tight font-extrabold md:text-4xl">{module.title}</h1>
           </div>
+          <ModuleCover moduleId={module.id} className="ml-auto w-24 sm:w-36 md:w-44" />
         </div>
       </header>
 

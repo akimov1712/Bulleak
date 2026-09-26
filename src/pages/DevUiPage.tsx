@@ -23,6 +23,9 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatUsd } from '@/lib/format';
 import { CandleChart, type ChartPick } from '@/features/charts/CandleChart';
 import { Diagram } from '@/components/diagrams/Diagram';
+import { ModuleCover } from '@/components/covers/ModuleCover';
+import { moduleColors } from '@/components/ui/moduleColors';
+import { courseIndex } from '@/content/courseIndex';
 import { DIAGRAM_LOADERS } from '@/components/diagrams/registry';
 import { QuestionView } from '@/features/quiz/QuestionView';
 import type { QuestionState } from '@/features/quiz/questions/types';
@@ -127,6 +130,20 @@ export function DevUiPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader title="UI-кит" subtitle="Витрина компонентов (только в dev)" />
+
+      <Section title="Обложки модулей">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="covers">
+          {courseIndex.modules.map((m) => (
+            <div
+              key={m.id}
+              className={`flex flex-col items-center gap-1 rounded-2xl p-3 text-on-mod ${moduleColors[m.color].bg}`}
+            >
+              <ModuleCover moduleId={m.id} className="w-full max-w-40" />
+              <span className="text-center text-xs font-extrabold">{m.title}</span>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       <Section title="Схемы">
         <div className="flex max-w-2xl flex-col gap-6">

@@ -3,6 +3,7 @@ import { Lock, Trophy } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { ModuleIcon } from '@/components/ui/ModuleIcon';
+import { ModuleCover } from '@/components/covers/ModuleCover';
 import { Mascot } from '@/components/mascot/Mascot';
 import { paths } from '@/app/paths';
 import { toast } from '@/store/uiStore';
@@ -72,6 +73,7 @@ export function ModuleSection({
             {module.title}
           </span>
         </span>
+        {unlocked && <ModuleCover moduleId={module.id} className="hidden w-20 sm:block" />}
         <span className="shrink-0 rounded-full bg-white/30 px-3 py-1 font-mono text-sm font-extrabold">
           {done}/{total}
         </span>
