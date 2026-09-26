@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { Receipt } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { NumberInput } from '@/components/ui/NumberInput';
+import { Segmented } from '@/components/ui/Segmented';
 import { BYBIT_BASE_FEES, roundTripFees, type FeeRole } from '@/lib/trading/fees';
 import { formatNumber, formatUsd } from '@/lib/format';
 import { cn } from '@/lib/cn';
@@ -41,43 +42,6 @@ const isInputs = (v: unknown): v is Inputs => {
 
 const MARKET_LABEL: Record<Market, string> = { spot: 'Спот', perpetual: 'Бессрочные' };
 const ROLE_LABEL: Record<FeeRole, string> = { maker: 'Мейкер (лимит)', taker: 'Тейкер (рынок)' };
-
-function Segmented<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm font-bold text-text-muted">{label}</span>
-      <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
-        {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            role="radio"
-            aria-checked={value === o.value}
-            onClick={() => onChange(o.value)}
-            className={cn(
-              'rounded-full border-2 px-3 py-1 text-sm font-bold transition-colors',
-              value === o.value
-                ? 'border-primary-shade bg-primary text-on-primary'
-                : 'border-border bg-surface hover:border-primary-shade',
-            )}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 /** Fee calculator: entry + exit fees on the notional and their share of the planned risk. */
 export function FeesCalc({ storageKey = 'tc-calc:fees' }: { storageKey?: string }) {
