@@ -22,6 +22,11 @@ import { toast } from '@/store/uiStore';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatUsd } from '@/lib/format';
 import { CandleChart, type ChartPick } from '@/features/charts/CandleChart';
+import { QuestionView } from '@/features/quiz/QuestionView';
+import type { QuestionState } from '@/features/quiz/questions/types';
+import { gradeQuestion } from '@/lib/quiz/grade';
+import { isAnswered } from '@/lib/quiz/describe';
+import type { ChartClickQuestion } from '@/types/quiz';
 
 const SWATCHES = [
   'bg',
@@ -46,6 +51,56 @@ const SWATCHES = [
   'mod-yellow',
   'mod-red',
 ] as const;
+
+const DEMO_QUESTIONS: ChartClickQuestion[] = [
+  {
+    id: 'demo-price',
+    type: 'chart-click',
+    prompt: 'Кликни по уровню поддержки',
+    explanation: '',
+    tags: [],
+    dataset: 'BTCUSDT-240',
+    from: 2880,
+    to: 2999,
+    target: { kind: 'price', min: 74500, max: 76500 },
+  },
+  {
+    id: 'demo-candle',
+    type: 'chart-click',
+    prompt: 'Выбери свечу с самым низким минимумом',
+    explanation: '',
+    tags: [],
+    dataset: 'BTCUSDT-240',
+    from: 2880,
+    to: 2999,
+    target: { kind: 'candle', indices: [2940] },
+  },
+];
+
+function DemoChartQuestion({ question }: { question: ChartClickQuestion }) {
+  const [value, setValue] = useState<unknown>();
+  const [state, setState] = useState<QuestionState>('answering');
+  return (
+    <Card className="flex flex-col gap-3 p-4">
+      <p className="font-bold">{question.prompt}</p>
+      <QuestionView question={question} value={value} onChange={setValue} state={state} />
+      <Button
+        disabled={state === 'answering' && !isAnswered(question, value)}
+        onClick={() =>
+          state === 'answering'
+            ? setState(gradeQuestion(question, value) ? 'correct' : 'wrong')
+            : (setState('answering'), setValue(undefined))
+        }
+      >
+        {state === 'answering'
+          ? 'Проверить'
+          : state === 'correct'
+            ? 'Верно! Ещё раз'
+            : 'Неверно. Ещё раз'}
+      </Button>
+    </Card>
+  );
+}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -102,6 +157,12 @@ export function DevUiPage() {
               : 'ETH 1D: Bollinger, RSI, MACD. Кликни по графику'
           }
         />
+      </Section>
+
+      <Section title="Вопросы с кликом по графику">
+        {DEMO_QUESTIONS.map((q) => (
+          <DemoChartQuestion key={q.id} question={q} />
+        ))}
       </Section>
 
       <Section title="Цвета">

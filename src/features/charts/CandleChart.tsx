@@ -7,6 +7,7 @@ import {
   LineSeries,
   LineStyle,
   type IChartApi,
+  type IPriceLine,
   type ISeriesApi,
   type LineData,
   type MouseEventParams,
@@ -28,11 +29,10 @@ import { INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
 import type { Candle } from '@/types/trading';
 import {
   buildMarkers,
-  candleIndexAt,
   indicatorLabel,
   isPaneIndicator,
-  parseTime,
   pricePrecision,
+  resolveIndex,
   toChartTime,
   visibleRange,
   withAlpha,
@@ -134,16 +134,17 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   const volume = props.volume ?? false;
   const height = props.totalHeight;
 
+  const chartRef = useRef<BuiltChart | null>(null);
+
+  // The chart itself: rebuilt only when data, indicators or theme change.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const annotations = JSON.parse(annotationsKey) as Annotation[];
     const indicators = JSON.parse(indicatorsKey) as IndicatorSpec[];
     const chart = buildChart(el, {
       candles,
       start,
       end,
-      annotations,
       indicators,
       volume,
       interactive,
@@ -161,9 +162,47 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       pick({ index: start + idx, time: candle.t, price });
     };
     chart.api.subscribeClick(handleClick);
+    // A quick second click is reported as a double click only; treat it as a click too
+    // so re-placing an answer never gets lost.
+    chart.api.subscribeDblClick(handleClick);
+    chartRef.current = chart;
+    // autoSize measures the container asynchronously, so fitting at creation can use a
+    // stale width. Refit on size changes; interactive charts only until the first real
+    // size, so the learner's own zoom is kept.
+    let fitted = false;
+    let frame = 0;
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry || entry.contentRect.width === 0 || (interactive && fitted)) return;
+      fitted = true;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => chart.api.timeScale().fitContent());
+    });
+    observer.observe(el);
     return () => {
+      chartRef.current = null;
+      observer.disconnect();
+      cancelAnimationFrame(frame);
       chart.api.unsubscribeClick(handleClick);
+      chart.api.unsubscribeDblClick(handleClick);
       chart.api.remove();
+    };
+  }, [candles, start, end, indicatorsKey, volume, interactive, interval, palette]);
+
+  // Annotations change on every quiz click: redraw them without rebuilding the chart
+  // (no flicker, zoom is kept). Lists the chart deps too, so it re-runs after a rebuild.
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const clear = applyAnnotations(chart, {
+      candles,
+      start,
+      end,
+      annotations: JSON.parse(annotationsKey) as Annotation[],
+      palette,
+    });
+    return () => {
+      // Skip when the chart was already removed by the effect above.
+      if (chartRef.current === chart) clear();
     };
   }, [candles, start, end, annotationsKey, indicatorsKey, volume, interactive, interval, palette]);
 
@@ -194,7 +233,6 @@ interface BuildOptions {
   candles: Candle[];
   start: number;
   end: number;
-  annotations: Annotation[];
   indicators: IndicatorSpec[];
   volume: boolean;
   interactive: boolean;
@@ -373,44 +411,69 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
     for (let i = 1; i < panes.length; i++) panes[i]?.setStretchFactor(1);
   }
 
-  for (const a of o.annotations) {
-    if (a.type !== 'hline') continue;
-    mainSeries.createPriceLine({
-      price: a.price,
-      color: p.tones[a.tone ?? 'info'],
-      lineWidth: 2,
-      lineStyle: a.dashed ? LineStyle.Dashed : LineStyle.Solid,
-      axisLabelVisible: true,
-      title: a.label ?? '',
-    });
-  }
-
-  const markers = buildMarkers(visible, o.annotations);
-  if (markers.length > 0) {
-    createSeriesMarkers(
-      mainSeries,
-      markers.map((m) => ({
-        time: toChartTime(visible[m.index]?.t ?? 0),
-        position: m.position,
-        shape: m.shape,
-        color: p.tones[m.tone],
-        text: m.text,
-      })),
-    );
-  }
-
-  const overlay = overlayItems(visible, o.annotations, p);
-  if (overlay.zones.length + overlay.vlines.length > 0) {
-    mainSeries.attachPrimitive(new OverlayPrimitive(overlay));
-  }
-
   api.timeScale().fitContent();
   return { api, mainSeries };
 }
 
-function overlayItems(visible: Candle[], annotations: Annotation[], p: Palette): OverlayItems {
+interface AnnotationInput {
+  candles: Candle[];
+  start: number;
+  end: number;
+  annotations: Annotation[];
+  palette: Palette;
+}
+
+/** Draws annotations on an existing chart; returns a function that removes them. */
+function applyAnnotations(chart: BuiltChart, o: AnnotationInput): () => void {
+  const { mainSeries } = chart;
+  const p = o.palette;
+  const visible = o.candles.slice(o.start, o.end + 1);
+  const priceLines: IPriceLine[] = [];
+  for (const a of o.annotations) {
+    if (a.type !== 'hline') continue;
+    priceLines.push(
+      mainSeries.createPriceLine({
+        price: a.price,
+        color: p.tones[a.tone ?? 'info'],
+        lineWidth: 2,
+        lineStyle: a.dashed ? LineStyle.Dashed : LineStyle.Solid,
+        axisLabelVisible: true,
+        title: a.label ?? '',
+      }),
+    );
+  }
+  const markers = buildMarkers(visible, o.annotations, o.start);
+  const markersPlugin =
+    markers.length > 0
+      ? createSeriesMarkers(
+          mainSeries,
+          markers.map((m) => ({
+            time: toChartTime(visible[m.index]?.t ?? 0),
+            position: m.position,
+            shape: m.shape,
+            color: p.tones[m.tone],
+            text: m.text,
+          })),
+        )
+      : null;
+  const items = overlayItems(visible, o.start, o.annotations, p);
+  const overlay = items.zones.length + items.vlines.length > 0 ? new OverlayPrimitive(items) : null;
+  if (overlay) mainSeries.attachPrimitive(overlay);
+  return () => {
+    for (const line of priceLines) mainSeries.removePriceLine(line);
+    markersPlugin?.detach();
+    if (overlay) mainSeries.detachPrimitive(overlay);
+  };
+}
+
+function overlayItems(
+  visible: Candle[],
+  start: number,
+  annotations: Annotation[],
+  p: Palette,
+): OverlayItems {
   const items: OverlayItems = { zones: [], vlines: [] };
-  const idx = (t: TimeInput) => candleIndexAt(visible, parseTime(t));
+  const idx = (t: TimeInput) => resolveIndex(visible, t, start);
   for (const a of annotations) {
     if (a.type === 'zone') {
       const color = p.tones[a.tone ?? 'info'];

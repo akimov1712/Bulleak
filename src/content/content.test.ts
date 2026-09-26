@@ -11,6 +11,18 @@ import { courseIndex } from './courseIndex';
 import { getTerm } from './glossary';
 import fs from 'node:fs';
 import path from 'node:path';
+import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
+
+const datasetLengths = new Map<DatasetName, number>();
+function datasetLength(name: DatasetName): number {
+  let length = datasetLengths.get(name);
+  if (length === undefined) {
+    const raw = fs.readFileSync(path.resolve('public/data', `${name}.json`), 'utf8');
+    length = (JSON.parse(raw) as { candles: unknown[] }).candles.length;
+    datasetLengths.set(name, length);
+  }
+  return length;
+}
 
 const STRICT = import.meta.env.VITE_STRICT_CONTENT === '1';
 
@@ -59,7 +71,12 @@ export function questionProblems(q: Question): string[] {
       if (new Set(q.items).size !== q.items.length) p.push('duplicate items');
       break;
     case 'chart-click':
+      if (!isDatasetName(q.dataset)) p.push(`unknown dataset "${q.dataset}"`);
+      else if (q.to >= datasetLength(q.dataset)) p.push('range goes past the end of the dataset');
       if (!(q.from < q.to)) p.push('from must be < to');
+      if (q.to - q.from + 1 > 150) p.push('chart shows more than 150 candles');
+      if (q.target.kind === 'candle' && q.target.indices.some((i) => i < q.from || i > q.to))
+        p.push('target candle outside the shown range');
       if (q.target.kind === 'price' && !(q.target.min < q.target.max)) p.push('price range empty');
       if (q.target.kind === 'candle' && q.target.indices.length === 0) p.push('no target candles');
       break;

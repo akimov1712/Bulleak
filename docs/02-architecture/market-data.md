@@ -23,5 +23,8 @@
 - `features/charts/useDataset(name)` — `fetch('data/<name>.json')` с кэшем в памяти (Map), `Suspense`-friendly.
 - Конвертация в `Candle[]` в `lib/trading/candles.ts`, тесты.
 
+## Заморозка датасетов
+Графики уроков и вопросы `chart-click` ссылаются на свечи **по индексу** (`from`/`to`/`indices`). Датасеты 1H/4H — «последние 3000 свечей», поэтому повторный `npm run data:fetch` сдвигает индексы и ломает вопросы. Датасеты заморожены: тест «datasets are frozen» в `lib/trading/candles.test.ts` сверяет время первой свечи. Перекачивать только осознанно, после чего перепроверить все вопросы chart-click и обновить пины.
+
 ## Индикаторы
 Считаются локально в `lib/indicators/` (SMA, EMA, RSI, MACD, Bollinger, ATR) — чистые функции с тестами на известных значениях. Отображаются через lightweight-charts line/histogram series.

@@ -8,8 +8,11 @@ import type { Candle } from '@/types/trading';
 
 export type Tone = 'bull' | 'bear' | 'info' | 'warn' | 'epic' | 'muted' | 'primary';
 
-/** Times are ms UTC (or a date string like "2024-03-05" / "2024-03-05T08:00Z"). */
-export type TimeInput = number | string;
+/**
+ * A point in time: ms UTC, a date string like "2024-03-05" / "2024-03-05T08:00Z",
+ * or `{ index }` — a candle index in the full dataset (used by quiz questions).
+ */
+export type TimeInput = number | string | { index: number };
 
 export type Annotation =
   | { type: 'hline'; price: number; label?: string; tone?: Tone; dashed?: boolean }
@@ -62,7 +65,7 @@ export function indicatorLabel(spec: IndicatorSpec): string {
   }
 }
 
-export function parseTime(input: TimeInput): number {
+export function parseTime(input: number | string): number {
   if (typeof input === 'number') return input;
   const ms = Date.parse(
     /[zZ]|[+-]\d\d:?\d\d$/.test(input) || !input.includes('T') ? input : `${input}Z`,
@@ -88,6 +91,15 @@ export function candleIndexAt(candles: readonly Candle[], t: number): number {
   return ans;
 }
 
+/**
+ * Index in `candles` for a time input. `offset` is the dataset index of candles[0]
+ * (non-zero when `candles` is the visible slice).
+ */
+export function resolveIndex(candles: readonly Candle[], t: TimeInput, offset = 0): number {
+  if (typeof t === 'object') return Math.min(candles.length - 1, Math.max(0, t.index - offset));
+  return candleIndexAt(candles, parseTime(t));
+}
+
 export interface VisibleRange {
   start: number;
   end: number;
@@ -102,11 +114,11 @@ export function visibleRange(
   opts: { from?: TimeInput; to?: TimeInput; bars?: number },
 ): VisibleRange {
   const last = candles.length - 1;
-  const end = opts.to === undefined ? last : candleIndexAt(candles, parseTime(opts.to));
+  const end = opts.to === undefined ? last : resolveIndex(candles, opts.to);
   const start =
     opts.from === undefined
       ? Math.max(0, end - (opts.bars ?? 120) + 1)
-      : candleIndexAt(candles, parseTime(opts.from));
+      : resolveIndex(candles, opts.from);
   return { start: Math.min(start, end), end };
 }
 
@@ -142,13 +154,14 @@ export interface MarkerSpec {
 export function buildMarkers(
   visible: readonly Candle[],
   annotations: readonly Annotation[],
+  offset = 0,
 ): MarkerSpec[] {
   const out: MarkerSpec[] = [];
   for (const a of annotations) {
     if (a.type === 'marker') {
       const below = (a.position ?? 'below') === 'below';
       out.push({
-        index: candleIndexAt(visible, parseTime(a.time)),
+        index: resolveIndex(visible, a.time, offset),
         position: below ? 'belowBar' : 'aboveBar',
         shape: a.shape ?? (below ? 'arrowUp' : 'arrowDown'),
         text: a.text ?? '',

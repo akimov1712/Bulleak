@@ -11,3 +11,12 @@ vi.mock('canvas-confetti', () => ({ default: vi.fn(() => Promise.resolve()) }));
 afterEach(() => {
   cleanup();
 });
+
+// jsdom has no ResizeObserver (used by charts to refit on layout changes).
+if (!('ResizeObserver' in globalThis)) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}

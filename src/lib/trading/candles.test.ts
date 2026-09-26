@@ -127,3 +127,30 @@ describe('downloaded datasets', () => {
     },
   );
 });
+
+/*
+ * Lesson charts and chart-click questions address candles by index, so the datasets
+ * are frozen once content is written. Re-running `npm run data:fetch` shifts indices
+ * and silently breaks those questions — this test makes that loud. If a refetch is
+ * intended, re-check every chart-click question and update the pins.
+ */
+describe('datasets are frozen', () => {
+  const PINS: Record<DatasetName, [firstOpenTime: number, minLength: number]> = {
+    'BTCUSDT-60': [1779559200000, 3000],
+    'BTCUSDT-240': [1747152000000, 3000],
+    'BTCUSDT-D': [1585094400000, 2375],
+    'ETHUSDT-60': [1779559200000, 3000],
+    'ETHUSDT-240': [1747152000000, 3000],
+    'ETHUSDT-D': [1615766400000, 2020],
+    'SOLUSDT-60': [1779559200000, 3000],
+    'SOLUSDT-240': [1747152000000, 3000],
+    'SOLUSDT-D': [1634256000000, 1806],
+  };
+  it.each(Object.entries(PINS))('%s starts at the pinned candle', (name, [first, length]) => {
+    const raw = JSON.parse(
+      fs.readFileSync(path.resolve('public/data', `${name}.json`), 'utf8'),
+    ) as { candles: number[][] };
+    expect(raw.candles[0]?.[0]).toBe(first);
+    expect(raw.candles.length).toBeGreaterThanOrEqual(length);
+  });
+});

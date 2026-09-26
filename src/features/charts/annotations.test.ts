@@ -9,6 +9,7 @@ import {
   parseTime,
   pricePrecision,
   readPalette,
+  resolveIndex,
   toChartTime,
   visibleRange,
   withAlpha,
@@ -113,5 +114,24 @@ describe('misc', () => {
     expect(p.tones.bear).toBe('#888888');
     expect(p.surface).toBe('#ffffff');
     el.remove();
+  });
+});
+
+describe('index-based times', () => {
+  it('resolveIndex maps dataset indices into a slice and clamps', () => {
+    const slice = candles.slice(3, 7);
+    expect(resolveIndex(slice, { index: 5 }, 3)).toBe(2);
+    expect(resolveIndex(slice, { index: 0 }, 3)).toBe(0);
+    expect(resolveIndex(slice, { index: 99 }, 3)).toBe(3);
+    expect(resolveIndex(slice, 5 * H)).toBe(2);
+  });
+
+  it('visibleRange and markers accept { index }', () => {
+    expect(visibleRange(candles, { from: { index: 2 }, to: { index: 6 } })).toEqual({
+      start: 2,
+      end: 6,
+    });
+    const markers = buildMarkers(candles.slice(2, 7), [{ type: 'marker', time: { index: 4 } }], 2);
+    expect(markers[0]?.index).toBe(2);
   });
 });

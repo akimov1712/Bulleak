@@ -18,7 +18,8 @@ const dataset: Dataset = {
 const mocks = vi.hoisted(() => ({
   useDataset: vi.fn(),
   created: [] as Record<string, unknown>[],
-  markers: vi.fn(),
+  markers: vi.fn(() => ({ detach: mocks.detachMarkers })),
+  detachMarkers: vi.fn(),
 }));
 
 vi.mock('./useDataset', () => ({ useDataset: mocks.useDataset }));
@@ -35,6 +36,13 @@ vi.mock('lightweight-charts', () => {
     },
     createPriceLine(o: unknown) {
       this.priceLines.push(o);
+      return o;
+    },
+    removePriceLine(o: unknown) {
+      this.priceLines = this.priceLines.filter((l) => l !== o);
+    },
+    detachPrimitive(p: unknown) {
+      this.primitives = this.primitives.filter((x) => x !== p);
     },
     attachPrimitive(p: unknown) {
       this.primitives.push(p);
@@ -51,6 +59,7 @@ vi.mock('lightweight-charts', () => {
     createChart: vi.fn((_el: HTMLElement, options: unknown) => {
       const series: ReturnType<typeof makeSeries>[] = [];
       let clickHandler: ((p: unknown) => void) | null = null;
+      let dblHandler: ((p: unknown) => void) | null = null;
       const chart = {
         options,
         series,
@@ -66,6 +75,11 @@ vi.mock('lightweight-charts', () => {
           clickHandler = h;
         },
         unsubscribeClick: vi.fn(),
+        subscribeDblClick: (h: (p: unknown) => void) => {
+          dblHandler = h;
+        },
+        unsubscribeDblClick: vi.fn(),
+        dblClick: (p: unknown) => dblHandler?.(p),
         click: (p: unknown) => clickHandler?.(p),
       };
       mocks.created.push(chart);
@@ -86,12 +100,14 @@ interface FakeChart {
   series: FakeSeries[];
   remove: ReturnType<typeof vi.fn>;
   click: (p: unknown) => void;
+  dblClick: (p: unknown) => void;
 }
 const lastChart = () => mocks.created.at(-1) as unknown as FakeChart;
 
 beforeEach(() => {
   mocks.created.length = 0;
   mocks.markers.mockClear();
+  mocks.detachMarkers.mockClear();
   mocks.useDataset.mockReturnValue(dataset);
 });
 
@@ -155,8 +171,30 @@ describe('CandleChart', () => {
     chart.click({ point: { x: 1, y: 100 }, logical: 3, paneIndex: 1 });
     chart.click({ logical: 3 });
     expect(onPick).toHaveBeenCalledTimes(1);
+    chart.dblClick({ point: { x: 1, y: 200 }, logical: 5, paneIndex: 0 });
+    expect(onPick).toHaveBeenLastCalledWith({ index: 195, time: 195 * H, price: 800 });
     unmount();
     expect(chart.remove).toHaveBeenCalled();
+  });
+
+  it('redraws annotations without rebuilding the chart', () => {
+    const { rerender } = render(
+      <CandleChart
+        dataset="BTCUSDT-60"
+        annotations={[
+          { type: 'hline', price: 1 },
+          { type: 'marker', time: { index: 199 } },
+          { type: 'zone', top: 2, bottom: 1 },
+        ]}
+      />,
+    );
+    const chart = lastChart();
+    const candles = chart.series[0];
+    rerender(<CandleChart dataset="BTCUSDT-60" annotations={[{ type: 'hline', price: 2 }]} />);
+    expect(mocks.created).toHaveLength(1);
+    expect(candles?.priceLines.map((l) => l.price)).toEqual([2]);
+    expect(candles?.primitives).toHaveLength(0);
+    expect(mocks.detachMarkers).toHaveBeenCalledTimes(1);
   });
 
   it('does not rebuild when the parent re-renders with equal props', () => {

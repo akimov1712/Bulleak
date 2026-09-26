@@ -10,6 +10,7 @@ import {
   NumericQuestionView,
   OrderQuestionView,
 } from './questions/InputQuestions';
+import { ChartClickQuestionView } from './questions/ChartClickQuestion';
 import type { QuestionState } from './questions/types';
 
 interface QuestionViewProps {
@@ -77,11 +78,13 @@ export function QuestionView({ question: q, value, onChange, state }: QuestionVi
         />
       );
     case 'chart-click':
-      // Implemented with the chart component in T-405.
       return (
-        <p className="rounded-2xl border-2 border-dashed border-border p-4 text-text-muted">
-          Вопросы с кликом по графику появятся вместе с графиками.
-        </p>
+        <ChartClickQuestionView
+          question={q}
+          value={value as AnswerByType['chart-click'] | undefined}
+          onChange={onChange}
+          state={state}
+        />
       );
   }
 }
