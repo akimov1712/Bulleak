@@ -79,6 +79,11 @@ export interface CandleChartProps {
   typeToggle?: boolean;
   /** O/H/L/C line for the hovered (or last) candle; default on. */
   ohlc?: boolean;
+  /**
+   * Datasets of the same symbol to switch between (e.g. 1D / 4H / 1H). `from`/`to` should be
+   * dates then, so every timeframe shows the same period.
+   */
+  timeframes?: DatasetName[];
 }
 
 export type ChartType = 'candles' | 'bars' | 'line';
@@ -90,12 +95,38 @@ const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
 
 /** Candle chart with annotations; handles loading and errors itself. */
 export function CandleChart(props: CandleChartProps) {
+  const [dataset, setDataset] = useState(props.dataset);
   const paneCount = props.indicators?.filter(isPaneIndicator).length ?? 0;
   const total = (props.height ?? 320) + paneCount * PANE_HEIGHT;
+  const timeframes = props.timeframes ?? [];
   return (
     <figure className={props.className}>
+      {timeframes.length > 1 && (
+        <div role="radiogroup" aria-label="Таймфрейм" className="mb-2 flex gap-1.5">
+          {timeframes.map((tf) => {
+            const interval = tf.split('-')[1] as keyof typeof INTERVAL_LABEL;
+            return (
+              <button
+                key={tf}
+                type="button"
+                role="radio"
+                aria-checked={dataset === tf}
+                onClick={() => setDataset(tf)}
+                className={cn(
+                  'rounded-full border-2 px-3 py-1 text-sm font-extrabold transition-colors',
+                  dataset === tf
+                    ? 'border-info bg-info/15 text-info'
+                    : 'border-border bg-surface text-text-muted hover:border-info',
+                )}
+              >
+                {INTERVAL_LABEL[interval]}
+              </button>
+            );
+          })}
+        </div>
+      )}
       <ErrorBoundary
-        resetKey={props.dataset}
+        resetKey={dataset}
         fallback={(error, reset) => (
           <div
             role="alert"
@@ -116,7 +147,7 @@ export function CandleChart(props: CandleChartProps) {
             </div>
           }
         >
-          <ChartBody {...props} totalHeight={total} />
+          <ChartBody {...props} dataset={dataset} totalHeight={total} />
         </Suspense>
       </ErrorBoundary>
       {props.caption && (

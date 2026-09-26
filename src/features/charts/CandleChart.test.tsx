@@ -120,6 +120,17 @@ beforeEach(() => {
 });
 
 describe('CandleChart', () => {
+  it('switches datasets between timeframes', () => {
+    render(
+      <CandleChart dataset="BTCUSDT-240" timeframes={['BTCUSDT-D', 'BTCUSDT-240', 'BTCUSDT-60']} />,
+    );
+    expect(screen.getByRole('radio', { name: '4H' })).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(screen.getByRole('radio', { name: '1D' }));
+    expect(mocks.useDataset).toHaveBeenLastCalledWith('BTCUSDT-D');
+    fireEvent.click(screen.getByRole('radio', { name: '1H' }));
+    expect(mocks.useDataset).toHaveBeenLastCalledWith('BTCUSDT-60');
+  });
+
   it('switches between candles, bars and line and shows OHLC of the hovered candle', async () => {
     render(<CandleChart dataset="BTCUSDT-60" bars={20} typeToggle />);
     expect(lastChart().series[0]?.kind).toBe('Candlestick');
