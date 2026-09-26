@@ -1,7 +1,7 @@
 # m02-l04 · Спот и деривативы: что выбрать новичку
 
 - **Модуль:** 2   **Время:** ~10 мин   **Практика:** Compare
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понимать разницу между спотом (покупаешь монету) и деривативами (контракт на цену).
@@ -31,7 +31,14 @@
 `spot`, `derivatives`, `perpetual`, `futures`, `leverage`, `short`, `long`, `margin`
 
 ## Источники
-- Bybit Learn: spot vs futures — сверить.
+Сверено 2026-09-26:
+- Bybit Help Center, «Introduction to Funding Rate» — обмен funding между лонгами и шортами каждые 8 часов (00:00, 08:00, 16:00 UTC); положительная ставка — лонги платят шортам: https://www.bybit.com/en/help-center/article/Introduction-to-Funding-Rate
+- Bybit, «Derivatives Overview» / «Contract Details» — бессрочные контракты (USDT, USDC, инверсные) и контракты с экспирацией (неделя, месяц, квартал; расчёт по индексу), опционы на BTC/ETH/SOL: https://www.bybit.com/en/announcement-info/contract-summarize/
+- Bybit Learn, «How to Trade USDT Perpetual Futures on Bybit» — плечо до 100x: https://www.bybit.com/en/learn/trading/trade-usdt-perpetual-futures
+
+## Заметки
+- Интервал funding у части контрактов отличается от 8 ч — в тексте «обычно раз в 8 часов (у части контрактов чаще)».
+- Добавлен пример стоимости funding для свингового удержания (не было в брифе).
 
 ## Связи
 Готовит к: m02-l05, M8.
