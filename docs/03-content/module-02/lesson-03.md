@@ -1,7 +1,7 @@
 # m02-l03 · Интерфейс торгового терминала
 
 - **Модуль:** 2   **Время:** ~12 мин   **Практика:** Figure + разметка
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Ориентироваться в торговом терминале Bybit: выбор пары, график, стакан, лента сделок, панель ордера, позиции/ордера/история.
@@ -34,7 +34,14 @@
 `order-book`, `trade-history`, `position`, `pnl`
 
 ## Источники
-- Bybit Help Center: introduction to trading interface — сверить (дата).
+Сверено 2026-09-26:
+- Bybit Help Center, «How to Get Started With Spot Trading» — список пар с последней ценой и изменением за 24 ч, стакан и вкладка последних сделок, вкладки ордеров (изменить/отменить) и истории: https://www.bybit.com/en/help-center/article/How-to-Get-Started-with-Spot-Trading
+- Bybit Help Center, «Introduction to the Trading Chart» (индикаторы, полноэкранный режим, глубина рынка): https://www.bybit.com/en/help-center/article/Bybit-Trading-Chart-FAQ
+- Bybit Help Center, «How to Get Started With Trading on Bybit From TradingView»: https://www.bybit.com/en/help-center/article/How-to-Get-Started-With-Trading-on-Bybit-From-TradingView
+
+## Заметки
+- Тезис «переключение режима графика TradingView/Original» не подтверждён источником — в тексте только «инструменты как в TradingView» и торговля из TradingView.
+- Макет BybitTerminal: `bybit-ui-terminal` (на телефоне зоны идут столбиком по номерам). Добавлено задание-чек-лист «Экскурсия по терминалу».
 
 ## Связи
 Готовит к: m02-l05.

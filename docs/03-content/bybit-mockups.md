@@ -16,7 +16,7 @@
 | BybitKycLevels | Уровни верификации | m02-l01 | ☑ `bybit-ui-kyc-levels` |
 | BybitAssets | Активы: Funding и Unified Trading счета, перевод | m02-l02 | ☑ `bybit-ui-assets` |
 | BybitDeposit | Депозит USDT: выбор сети, адрес, memo | m02-l02 | ☑ `bybit-ui-deposit` |
-| BybitTerminal | Торговый терминал: зоны 1–6 с hotspots | m02-l03 | ☐ |
+| BybitTerminal | Торговый терминал: зоны 1–6 с hotspots | m02-l03 | ☑ `bybit-ui-terminal` |
 | BybitOrderForm | Форма ордера: лимит/маркет/условный, TP/SL | m02-l05, m08-l03 | ☐ |
 | BybitDemo | Вход в демо-торговлю | m02-l06 | ☐ |
 | BybitLeverage | Выбор плеча и режима маржи | m08-l03 | ☐ |
