@@ -1,7 +1,7 @@
 # T-502 · Симуляция исполнения сделки
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/simulator.md (Логика)
@@ -14,7 +14,7 @@
 - `src/lib/trading/simulate.ts`
 
 ## Критерии приёмки
-- [ ] Все кейсы из simulator.md покрыты
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Все кейсы из simulator.md покрыты
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add trade simulation engine`

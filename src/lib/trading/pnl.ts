@@ -1,6 +1,8 @@
 /** Profit and loss of a linear (USDT) position. */
 
-export type Side = 'long' | 'short';
+import type { Side } from '@/types/trading';
+
+export type { Side };
 
 /** Long: `(exit − entry) × qty`, short: `(entry − exit) × qty`. Null for invalid input. */
 export function pnl(side: Side, entry: number, exit: number, qty: number): number | null {

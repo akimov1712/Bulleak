@@ -24,7 +24,9 @@ simulateTrade(candles, startIndex, order, maxBars) => { exitIndex, exitPrice, ou
 - Гэп через стоп (open за SL) → исполнение по open (проскальзывание).
 - `maxBars` (по умолчанию 150) → `timeout`, закрытие по close.
 - Комиссии: тейкер на вход и выход (значение из `lib/trading/fees.ts`, сверить с Bybit на этапе 5; по умолчанию 0.055% для perpetual).
-- `r = pnl / riskAmount`.
+- `r = pnl / riskAmount`, где `pnl` — после комиссий (грязный результат — `grossPnl`), `riskAmount = qty × |entry − sl|`.
+- Гэп через тейк (open за TP) тоже исполняется по open — как рыночный ордер после срабатывания.
+- Пошаговое воспроизведение: `startTrade` → `stepTrade` по свече → `closeManually` для ручного закрытия по close последней показанной свечи. Если данные кончились раньше `maxBars` — `timeout` по close последней свечи.
 - Валидация: для long `sl < entry < tp`, для short `tp < entry < sl`; размер позиции > 0.
 
 ## Сохранение
