@@ -12,13 +12,16 @@
 | `drawdown` | Просадка и восстановление | просадка % / серия убытков × риск % | нужный рост для восстановления `1/(1-d)-1`; просадка после N убыточных подряд |
 | `compounding` | Сложный процент (реалистичный) | депозит, средний % в месяц, месяцев | кривая роста + предупреждение о нереалистичных ожиданиях |
 
-## Формулы (сверить с Bybit Help Center на этапе 6)
-- Размер позиции (в монетах): `qty = (balance * risk) / |entry - stop|`.
-- Упрощённая ликвидация isolated (linear USDT perp), без учёта комиссий:
-  long: `liq = entry * (1 - 1/lev + mmr)`, short: `liq = entry * (1 + 1/lev - mmr)`.
-  В UI — пометка «приблизительно; точная цена — в интерфейсе Bybit».
-- Безубыточный winrate: `1 / (1 + RR)`.
-- Матожидание: `E = w * avgWinR - (1 - w) * avgLossR`.
+## Формулы (сверено с Bybit Help Center, 2026-09-26; код — `src/lib/trading/`)
+- Размер позиции (в монетах): `qty = (balance × risk) / |entry − stop|`, округляется **вниз** до шага количества (иначе риск больше плана). Маржа = стоимость позиции / плечо (`position.ts`).
+- Ликвидация isolated (линейный USDT-бессрочный контракт), формула Bybit:
+  long `LP = entry − (IM − MM) / size`, short `LP = entry + (IM − MM) / size`, где IM = стоимость / плечо, MM = стоимость × MMR − вычет MM + оценочная комиссия закрытия.
+  Без комиссий это `entry × (1 − 1/lev + mmr)` / `entry × (1 + 1/lev − mmr)`. Считаем для первого уровня лимита риска (вычет MM = 0); комиссию закрытия можно учесть по цене банкротства (`liquidation.ts`).
+  MMR BTCUSDT на первом уровне (позиция до 2 000 000 USDT) — **0,5%**. В UI — пометка «приблизительно; точная цена — в интерфейсе Bybit».
+- Комиссии — процент от стоимости позиции: бессрочные maker 0,02% / taker 0,055%, спот 0,1% (базовый уровень, `fees.ts`). Funding = стоимость × ставка × число периодов (8 ч у BTCUSDT); положительная ставка — платят лонги.
+- P&L: long `(exit − entry) × qty`, short `(entry − exit) × qty`; ROE = изменение цены % × плечо (`pnl.ts`).
+- R:R = |take − entry| / |entry − stop| (уровни должны стоять по правильную сторону); безубыточный winrate `1 / (1 + RR)`; матожидание `E = w × avgWinR − (1 − w) × avgLossR` (`rr.ts`).
+- Источники: [Liquidation Price (isolated, UTA)](https://www.bybit.com/en/help-center/article/Liquidation-Price-Calculation-under-Isolated-Mode-Unified-Trading-Account), [Maintenance Margin (USDT contracts)](https://www.bybit.com/en/help-center/article/Maintenance-Margin-USDT-Contract), [Margin Parameters](https://www.bybit.com/en/announcement-info/margin-parameters/).
 
 ## Валидация
 - Некорректный ввод (стоп = вход, отрицательные, пустые) → результат «—» и подсказка, никакого NaN/Infinity.

@@ -45,3 +45,14 @@ export function roundTripFees(
       : null;
   return { entry, exit, total, shareOfRiskPct };
 }
+
+/**
+ * Funding paid (positive) or received over `periods` funding intervals (8 h on BTCUSDT):
+ * `notional × rate × periods`. The sign of `ratePct` follows Bybit: positive → longs pay.
+ * Null for invalid input.
+ */
+export function fundingFee(notional: number, ratePct: number, periods: number): number | null {
+  if (!Number.isFinite(notional) || notional <= 0 || !Number.isFinite(ratePct)) return null;
+  if (!Number.isInteger(periods) || periods < 0) return null;
+  return (notional * ratePct * periods) / 100;
+}

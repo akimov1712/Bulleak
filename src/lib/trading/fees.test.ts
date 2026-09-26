@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BYBIT_BASE_FEES, feeFor, roundTripFees } from './fees';
+import { BYBIT_BASE_FEES, feeFor, fundingFee, roundTripFees } from './fees';
 
 describe('fees', () => {
   it('fee is a percent of the notional value', () => {
@@ -28,5 +28,20 @@ describe('fees', () => {
   it('rejects invalid notional', () => {
     expect(roundTripFees(0, BYBIT_BASE_FEES.spot, 'maker', 'maker')).toBeNull();
     expect(roundTripFees(Number.NaN, BYBIT_BASE_FEES.spot, 'maker', 'maker')).toBeNull();
+  });
+});
+
+describe('fundingFee', () => {
+  it('m08-l05: $10 000 at 0.01% for 9 periods → $9', () => {
+    expect(fundingFee(10_000, 0.01, 9)).toBeCloseTo(9);
+    expect(fundingFee(10_000, -0.01, 3)).toBeCloseTo(-3);
+    expect(fundingFee(10_000, 0.01, 0)).toBe(0);
+  });
+
+  it('rejects invalid input', () => {
+    expect(fundingFee(0, 0.01, 1)).toBeNull();
+    expect(fundingFee(100, Number.NaN, 1)).toBeNull();
+    expect(fundingFee(100, 0.01, 1.5)).toBeNull();
+    expect(fundingFee(100, 0.01, -1)).toBeNull();
   });
 });

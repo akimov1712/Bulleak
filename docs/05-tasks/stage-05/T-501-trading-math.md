@@ -1,7 +1,7 @@
 # T-501 · Торговая математика
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/calculators.md (Формулы)
@@ -19,7 +19,7 @@
 - `pnl.ts`
 
 ## Критерии приёмки
-- [ ] Нет NaN/Infinity на некорректном вводе — возвращается null
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Нет NaN/Infinity на некорректном вводе — возвращается null
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(trading): add position sizing, fees, liquidation math`
