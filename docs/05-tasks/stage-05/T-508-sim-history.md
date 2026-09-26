@@ -1,7 +1,7 @@
 # T-508 · История сделок тренажёра
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -13,7 +13,7 @@
 - `src/features/simulator/SimHistory.tsx`
 
 ## Критерии приёмки
-- [ ] Пустое состояние с маскотом
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Пустое состояние с маскотом
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add simulator trade history`

@@ -22,6 +22,7 @@ import { SIM_START_BALANCE } from '@/lib/trading/simPlan';
 import { forgetDataset } from '@/features/charts/useDataset';
 import type { SimIndicators } from '@/features/simulator/SimChart';
 import { SimSession } from '@/features/simulator/SimSession';
+import { SimHistory } from '@/features/simulator/SimHistory';
 import { getScenario } from '@/content/scenarios';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { Mascot } from '@/components/mascot/Mascot';
@@ -180,6 +181,7 @@ export function SimulatorPage() {
           />
         </Suspense>
       </ErrorBoundary>
+      <SimHistory />
     </div>
   );
 }
