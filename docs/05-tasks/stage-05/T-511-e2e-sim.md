@@ -1,7 +1,7 @@
 # T-511 · E2E тренажёра
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -12,7 +12,7 @@
 - `e2e/simulator.spec.ts`
 
 ## Критерии приёмки
-- [ ] Зелёный на обоих проектах
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Зелёный на обоих проектах
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `test(e2e): cover simulator trade flow`

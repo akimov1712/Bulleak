@@ -71,6 +71,11 @@ export function SimulatorPage() {
   // ?backtest=tps: a shareable link from lesson m11-l04 ("Начать бэктест TPS").
   const [search, setSearch] = useSearchParams();
   const strategy = scenario ? undefined : getStrategy(search.get('backtest') ?? '');
+  // ?seed=123 reproduces a free-mode start (handy for e2e tests and sharing a moment).
+  const [seed, setSeed] = useState(() => {
+    const fromUrl = Number(search.get('seed'));
+    return Number.isInteger(fromUrl) && fromUrl > 0 ? fromUrl : Date.now();
+  });
   usePageTitle(scenario ? `Сценарий: ${scenario.title}` : 'Тренажёр');
   const [instrument, setInstrument] = useStoredState<Instrument>(
     'tc-sim:instrument',
@@ -82,7 +87,6 @@ export function SimulatorPage() {
     DEFAULT_INDICATORS,
     isIndicators,
   );
-  const [seed, setSeed] = useState(() => Date.now());
   const [balance, setBalance] = useStoredState('tc-sim:balance', SIM_START_BALANCE, isBalance);
   const freeDataset: DatasetName = `${instrument.symbol}-${instrument.interval}`;
   const dataset: DatasetName =
