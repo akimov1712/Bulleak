@@ -22,6 +22,8 @@ import { toast } from '@/store/uiStore';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatUsd } from '@/lib/format';
 import { CandleChart, type ChartPick } from '@/features/charts/CandleChart';
+import { Diagram } from '@/components/diagrams/Diagram';
+import { DIAGRAM_LOADERS } from '@/components/diagrams/registry';
 import { QuestionView } from '@/features/quiz/QuestionView';
 import type { QuestionState } from '@/features/quiz/questions/types';
 import { gradeQuestion } from '@/lib/quiz/grade';
@@ -125,6 +127,14 @@ export function DevUiPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader title="UI-кит" subtitle="Витрина компонентов (только в dev)" />
+
+      <Section title="Схемы">
+        <div className="flex max-w-2xl flex-col gap-6">
+          {Object.keys(DIAGRAM_LOADERS).map((name) => (
+            <Diagram key={name} name={name} caption={name} />
+          ))}
+        </div>
+      </Section>
 
       <Section title="Графики">
         <CandleChart

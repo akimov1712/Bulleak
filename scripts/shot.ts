@@ -3,6 +3,7 @@
  * Usage: npx tsx scripts/shot.ts <hash> [width=1280] [theme=light|dark] [out=shot.png] [height=900]
  * Example: npx tsx scripts/shot.ts "#/dev/ui" 375 dark tmp/ui-mobile-dark.png
  * SHOT_PROGRESS=path/to/state.json preloads localStorage['tc-progress'] (persist format).
+ * SHOT_ELEMENTS=<css selector> saves every matching element as <out>-<n>.png instead.
  */
 import { chromium } from '@playwright/test';
 
@@ -31,9 +32,33 @@ page.on('console', (m) => {
 await page.goto(`${base}${hash}`);
 await page.waitForLoadState('networkidle');
 await page.waitForTimeout(400);
-await page.screenshot({ path: out, fullPage: process.env.SHOT_FULL !== '0' });
+const selector = process.env.SHOT_ELEMENTS;
+const files: string[] = [];
+if (selector) {
+  // Lazy chunks (diagrams, charts) can take a while on a cold dev server.
+  await page.locator(selector).first().waitFor({ timeout: 60_000 });
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(500);
+  // Fixed/sticky bars (header, bottom nav) would cover the element shots.
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll<HTMLElement>('body *')) {
+      const { position } = getComputedStyle(el);
+      if (position === 'fixed' || position === 'sticky') el.style.visibility = 'hidden';
+    }
+  });
+  const elements = await page.locator(selector).all();
+  for (const [i, el] of elements.entries()) {
+    const file = out.replace(/.png$/, `-${i}.png`);
+    await el.scrollIntoViewIfNeeded();
+    await el.screenshot({ path: file });
+    files.push(file);
+  }
+} else {
+  await page.screenshot({ path: out, fullPage: process.env.SHOT_FULL !== '0' });
+  files.push(out);
+}
 const overflow = await page.evaluate(
   () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
 );
 await browser.close();
-console.log(JSON.stringify({ out, overflow, errors }));
+console.log(JSON.stringify({ files, overflow, errors }));

@@ -12,6 +12,7 @@ import { getTerm } from './glossary';
 import fs from 'node:fs';
 import path from 'node:path';
 import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
+import { isDiagramName } from '@/components/diagrams/registry';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -161,6 +162,22 @@ describe('lesson texts and glossary links', () => {
     expect(
       usedInText.filter((t) => !getTerm(t)),
       '<Term id> without glossary entry',
+    ).toEqual([]);
+  });
+
+  it.each(contentInventory.lessons)('%s: diagrams and charts reference real assets', (id) => {
+    const source = mdxSources[id] ?? '';
+    const diagrams = [...source.matchAll(/<Diagrams+name="([^"]+)"/g)].map((m) => m[1] ?? '');
+    expect(
+      diagrams.filter((d) => !isDiagramName(d)),
+      '<Diagram name> not in the registry',
+    ).toEqual([]);
+    const datasets = [...source.matchAll(/<CandleCharts[^>]*dataset="([^"]+)"/g)].map(
+      (m) => m[1] ?? '',
+    );
+    expect(
+      datasets.filter((d) => !isDatasetName(d)),
+      '<CandleChart dataset> unknown',
     ).toEqual([]);
   });
 

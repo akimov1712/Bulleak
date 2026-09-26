@@ -11,7 +11,7 @@ export interface DiagramProps {
 export function Diagram({ name, caption }: DiagramProps) {
   const Component = diagramComponent(name);
   return (
-    <figure className="my-6">
+    <figure className="my-6" data-diagram={name}>
       {Component ? (
         <Suspense fallback={<Skeleton className="h-56 w-full rounded-2xl" />}>
           {/* eslint-disable-next-line react-hooks/static-components -- stable per name, cached in registry */}
