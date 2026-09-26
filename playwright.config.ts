@@ -8,6 +8,8 @@ export default defineConfig({
   // Full lesson + quiz scenarios take ~25 s under parallel load.
   timeout: 60_000,
   fullyParallel: true,
+  // Locally the 8 GB dev machine runs out of memory with several browsers (exit 134).
+  workers: process.env.CI ? undefined : 2,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
