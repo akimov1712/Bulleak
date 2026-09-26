@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterTrades, simSummary, tradeKind } from './simStats';
+import { filterTrades, profitFactor, simSummary, tradeKind } from './simStats';
 
 const t = (r: number, pnl: number, scenarioId: string | null = null, strategyTag?: string) => ({
   r,
@@ -28,5 +28,11 @@ describe('simStats', () => {
     expect(s.winrate).toBeCloseTo(0.5);
     expect(s.avgR).toBeCloseTo(0.4875);
     expect(simSummary([])).toMatchObject({ count: 0, winrate: null, avgR: null, totalR: 0 });
+  });
+
+  it('profit factor divides gross profit by gross loss', () => {
+    expect(profitFactor([t(2, 200), t(-1, -100), t(1, 100), t(-1, -100)])).toBeCloseTo(1.5);
+    expect(profitFactor([t(1, 100)])).toBeNull();
+    expect(profitFactor([])).toBeNull();
   });
 });

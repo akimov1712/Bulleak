@@ -1,7 +1,7 @@
 # T-510 · Режим бэктеста
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/03-content/module-11/lesson-04.md
@@ -15,7 +15,7 @@
 - `src/features/simulator/BacktestPanel.tsx`
 
 ## Критерии приёмки
-- [ ] Сделки бэктеста не смешиваются со свободными в статистике
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Сделки бэктеста не смешиваются со свободными в статистике
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add backtest mode`

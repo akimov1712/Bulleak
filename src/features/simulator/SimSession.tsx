@@ -36,6 +36,8 @@ import { OrderPanel, type OrderDraft } from './OrderPanel';
 import { Playback } from './Playback';
 import { TradeResult } from './TradeResult';
 import { ScenarioBrief, ScenarioDebrief } from './ScenarioBrief';
+import { BacktestPanel } from './BacktestPanel';
+import type { StrategyRules } from '@/content/strategies';
 import { isDecisionCorrect } from '@/content/scenarios';
 import type { SimDecision, SimScenario } from '@/types/trading';
 
@@ -50,6 +52,8 @@ export interface SimSessionProps {
   onNewPoint: () => void;
   /** Lesson scenario: fixed start, task before and debrief after the decision. */
   scenario?: SimScenario;
+  /** Backtest mode: trades are tagged and kept apart from free-mode statistics. */
+  strategy?: StrategyRules;
 }
 
 interface ActiveTrade {
@@ -68,6 +72,7 @@ export function SimSession(props: SimSessionProps) {
   const { candles, symbol } = useDataset(dataset);
   const steps = INSTRUMENT_STEPS[symbol];
   const scenario = props.scenario;
+  const strategy = scenario ? undefined : props.strategy;
   const start = useMemo(
     () => scenario?.startIndex ?? pickStart(candles.length, mulberry32(props.seed)),
     [candles, props.seed, scenario],
@@ -107,11 +112,17 @@ export function SimSession(props: SimSessionProps) {
     bookedRef.current = result;
     onBalance((b) => b + result.pnl);
     // XP (daily cap), counters and sim-* achievements go through the progress pipeline.
-    dispatch({ type: 'simTrade', outcome: result.outcome, r: result.r });
+    dispatch({
+      type: 'simTrade',
+      outcome: result.outcome,
+      r: result.r,
+      ...(strategy ? { backtest: true } : {}),
+    });
     simRepo
       .add({
         at: Date.now(),
         scenarioId: scenario?.id ?? null,
+        ...(strategy ? { strategyTag: strategy.tag } : {}),
         dataset,
         startIndex: trade.start,
         side: trade.order.side,
@@ -135,7 +146,7 @@ export function SimSession(props: SimSessionProps) {
           description: error instanceof Error ? error.message : undefined,
         }),
       );
-  }, [trade, result, dataset, onBalance, scenario, dispatch]);
+  }, [trade, result, dataset, onBalance, scenario, strategy, dispatch]);
 
   if (start === null) {
     return <p role="alert">В этом наборе данных слишком мало свечей для тренажёра.</p>;
@@ -291,64 +302,67 @@ export function SimSession(props: SimSessionProps) {
           }
           height={wide ? 480 : 340}
         />
-        {scenario && skippedTo !== null ? (
-          <ScenarioDebrief scenario={scenario} decision="skip" />
-        ) : result ? (
-          <div className="flex flex-col gap-4">
-            <TradeResult
-              result={result}
-              balance={balance}
-              onNext={nextAfterTrade === null ? null : () => newDecision(nextAfterTrade)}
-              onNewPoint={scenario ? undefined : props.onNewPoint}
-            />
-            {scenario && decision && <ScenarioDebrief scenario={scenario} decision={decision} />}
-          </div>
-        ) : trade ? (
-          <Playback
-            side={trade.order.side}
-            bars={trade.state.index - trade.start}
-            openPnl={openPnl}
-            openR={openPnl / openRisk}
-            speed={speed}
-            onSpeed={setSpeed}
-            paused={paused}
-            onPause={setPaused}
-            onInstant={() =>
-              setTrade((t) => {
-                if (!t) return t;
-                let state = t.state;
-                while (!state.result) state = stepTrade(candles, t.start, t.order, state);
-                return { ...t, state };
-              })
-            }
-            onCloseManually={() =>
-              setTrade((t) => (t ? { ...t, state: closeManually(candles, t.order, t.state) } : t))
-            }
-          />
-        ) : (
-          <OrderPanel
-            draft={draft}
-            onDraft={(patch) => setDraft((d) => ({ ...d, ...patch }))}
-            onSide={chooseSide}
-            plan={plan}
-            entry={entryPrice}
-            coin={symbol.replace('USDT', '')}
-            tick={steps.tick}
-            qtyStep={steps.qty}
-            onOpen={open}
-            onSkip={() => {
-              if (scenario) {
-                // A skip is a decision too: correct skips count towards sim-skip.
-                dispatch({ type: 'simSkip', correct: isDecisionCorrect(scenario, 'skip') });
-                setSkippedTo(Math.min(anchor + SIM_SKIP, candles.length - 1));
-                return;
+        <div className="flex flex-col gap-4">
+          {strategy && <BacktestPanel strategy={strategy} decisionKey={anchor} />}
+          {scenario && skippedTo !== null ? (
+            <ScenarioDebrief scenario={scenario} decision="skip" />
+          ) : result ? (
+            <div className="flex flex-col gap-4">
+              <TradeResult
+                result={result}
+                balance={balance}
+                onNext={nextAfterTrade === null ? null : () => newDecision(nextAfterTrade)}
+                onNewPoint={scenario ? undefined : props.onNewPoint}
+              />
+              {scenario && decision && <ScenarioDebrief scenario={scenario} decision={decision} />}
+            </div>
+          ) : trade ? (
+            <Playback
+              side={trade.order.side}
+              bars={trade.state.index - trade.start}
+              openPnl={openPnl}
+              openR={openPnl / openRisk}
+              speed={speed}
+              onSpeed={setSpeed}
+              paused={paused}
+              onPause={setPaused}
+              onInstant={() =>
+                setTrade((t) => {
+                  if (!t) return t;
+                  let state = t.state;
+                  while (!state.result) state = stepTrade(candles, t.start, t.order, state);
+                  return { ...t, state };
+                })
               }
-              const next = skipAhead(anchor, candles.length);
-              if (next === null) props.onNewPoint();
-              else newDecision(next);
-            }}
-          />
-        )}
+              onCloseManually={() =>
+                setTrade((t) => (t ? { ...t, state: closeManually(candles, t.order, t.state) } : t))
+              }
+            />
+          ) : (
+            <OrderPanel
+              draft={draft}
+              onDraft={(patch) => setDraft((d) => ({ ...d, ...patch }))}
+              onSide={chooseSide}
+              plan={plan}
+              entry={entryPrice}
+              coin={symbol.replace('USDT', '')}
+              tick={steps.tick}
+              qtyStep={steps.qty}
+              onOpen={open}
+              onSkip={() => {
+                if (scenario) {
+                  // A skip is a decision too: correct skips count towards sim-skip.
+                  dispatch({ type: 'simSkip', correct: isDecisionCorrect(scenario, 'skip') });
+                  setSkippedTo(Math.min(anchor + SIM_SKIP, candles.length - 1));
+                  return;
+                }
+                const next = skipAhead(anchor, candles.length);
+                if (next === null) props.onNewPoint();
+                else newDecision(next);
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

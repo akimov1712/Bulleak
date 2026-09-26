@@ -49,14 +49,17 @@ describe('SimHistory', () => {
     await simRepo.add(
       trade({ at: Date.UTC(2026, 8, 26, 13), scenarioId: 'm03-sr-bounce', pnl: -105, r: -1.05 }),
     );
+    await simRepo.add(trade({ strategyTag: 'tps', pnl: 300, r: 3 }));
     renderHistory();
-    expect(await screen.findByText('Отскок от поддержки')).toBeInTheDocument();
-    expect(screen.getByText('BTC 4H')).toBeInTheDocument();
-    expect(screen.getByText('50%')).toBeInTheDocument();
+    // Free trades by default; scenario and backtest trades never mix into its summary.
+    expect(await screen.findByText('BTC 4H')).toBeInTheDocument();
+    expect(screen.queryByText('Отскок от поддержки')).not.toBeInTheDocument();
+    expect(screen.getByText('100%')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Сценарии' }));
+    expect(screen.getByText('Отскок от поддержки')).toBeInTheDocument();
     expect(screen.queryByText('BTC 4H')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('radio', { name: 'Бэктест' }));
-    expect(screen.getByText('Таких сделок нет')).toBeInTheDocument();
+    expect(screen.getByText('Бэктест · tps')).toBeInTheDocument();
   });
 });

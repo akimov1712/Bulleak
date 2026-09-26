@@ -38,3 +38,10 @@ export function simSummary(trades: readonly Pick<SimTrade, 'r' | 'pnl'>[]): SimS
     totalPnl,
   };
 }
+
+/** Gross profit / gross loss (after fees); null without losing trades. */
+export function profitFactor(trades: readonly Pick<SimTrade, 'pnl'>[]): number | null {
+  const profit = trades.filter((t) => t.pnl > 0).reduce((s, t) => s + t.pnl, 0);
+  const loss = -trades.filter((t) => t.pnl < 0).reduce((s, t) => s + t.pnl, 0);
+  return loss > 0 ? profit / loss : null;
+}

@@ -11,17 +11,12 @@ import { getScenario } from '@/content/scenarios';
 import { cn } from '@/lib/cn';
 import { formatPct, formatR, formatUsd } from '@/lib/format';
 import { INTERVAL_LABEL, datasetInterval, isDatasetName } from '@/lib/trading/candles';
-import {
-  filterTrades,
-  simSummary,
-  tradeKind,
-  type SimTradeFilterKind,
-} from '@/lib/trading/simStats';
+import { filterTrades, simSummary, tradeKind, type SimTradeKind } from '@/lib/trading/simStats';
 import type { SimOutcome, SimTrade } from '@/types/trading';
 import { LazyCandleChart } from '../charts/LazyCandleChart';
 
-const FILTERS: { value: SimTradeFilterKind; label: string }[] = [
-  { value: 'all', label: 'Все' },
+// No "all": free, scenario and backtest results are different samples and never share a summary.
+const FILTERS: { value: SimTradeKind; label: string }[] = [
   { value: 'free', label: 'Свободные' },
   { value: 'scenario', label: 'Сценарии' },
   { value: 'backtest', label: 'Бэктест' },
@@ -58,8 +53,8 @@ function tradeTitle(t: SimTrade): string {
 }
 
 /** Simulator trade history with filters, a summary and a replay of any trade on the chart. */
-export function SimHistory() {
-  const [filter, setFilter] = useState<SimTradeFilterKind>('all');
+export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTradeKind }) {
+  const [filter, setFilter] = useState<SimTradeKind>(initialFilter);
   const [review, setReview] = useState<SimTrade | null>(null);
   const loaded = useLiveQuery<Loaded>(async () => {
     try {

@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { RotateCcw, Shuffle, Wallet } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +24,7 @@ import type { SimIndicators } from '@/features/simulator/SimChart';
 import { SimSession } from '@/features/simulator/SimSession';
 import { SimHistory } from '@/features/simulator/SimHistory';
 import { getScenario } from '@/content/scenarios';
+import { getStrategy } from '@/content/strategies';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { Mascot } from '@/components/mascot/Mascot';
 import { buttonClass } from '@/components/ui/styles';
@@ -67,6 +68,9 @@ const INTERVAL_OPTIONS = DATASET_INTERVALS.map((i) => ({ value: i, label: INTERV
 export function SimulatorPage() {
   const { scenarioId } = useParams();
   const scenario = scenarioId ? getScenario(scenarioId) : undefined;
+  // ?backtest=tps: a shareable link from lesson m11-l04 ("Начать бэктест TPS").
+  const [search, setSearch] = useSearchParams();
+  const strategy = scenario ? undefined : getStrategy(search.get('backtest') ?? '');
   usePageTitle(scenario ? `Сценарий: ${scenario.title}` : 'Тренажёр');
   const [instrument, setInstrument] = useStoredState<Instrument>(
     'tc-sim:instrument',
@@ -130,6 +134,15 @@ export function SimulatorPage() {
       ) : (
         <div className="flex flex-wrap items-end gap-4">
           <Segmented
+            label="Режим"
+            value={strategy ? strategy.tag : 'free'}
+            options={[
+              { value: 'free', label: 'Свободный' },
+              { value: 'tps', label: 'Бэктест TPS' },
+            ]}
+            onChange={(mode) => setSearch(mode === 'free' ? {} : { backtest: mode })}
+          />
+          <Segmented
             label="Инструмент"
             value={instrument.symbol}
             options={SYMBOL_OPTIONS}
@@ -171,6 +184,7 @@ export function SimulatorPage() {
           <SimSession
             key={scenario ? `scenario:${scenario.id}` : `${dataset}:${seed}`}
             scenario={scenario}
+            strategy={strategy}
             dataset={dataset}
             seed={seed}
             indicators={indicators}
@@ -181,7 +195,10 @@ export function SimulatorPage() {
           />
         </Suspense>
       </ErrorBoundary>
-      <SimHistory />
+      <SimHistory
+        key={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
+        initialFilter={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
+      />
     </div>
   );
 }
