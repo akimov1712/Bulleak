@@ -5,7 +5,7 @@
 |---|---|---|---|
 | Прогресс, XP, стрик, достижения, попытки | localStorage через `zustand/persist` | `tc-progress` | < 500 кБ |
 | Настройки | localStorage | `tc-settings` | < 1 кБ |
-| Сделки тренажёра | IndexedDB (Dexie) | `tc-db.simTrades` (индексы: `++id, at, scenarioId`) | растёт |
+| Сделки тренажёра | IndexedDB (Dexie) | `tc-db.simTrades` (индексы: `++id, at, scenarioId, strategyTag`) | растёт |
 | Журнал | IndexedDB (Dexie) | `tc-db.journal` (индексы: `++id, openedAt, account, setup`) | растёт |
 | Свечи | статические файлы | `public/data/*.json` | ~200–500 кБ на файл |
 
@@ -20,3 +20,9 @@
 - Экспорт: собрать `ExportFile` → `Blob` → скачивание `trading-course-backup-YYYY-MM-DD.json`.
 - Импорт: выбор файла → `JSON.parse` → zod-валидация → migrate → предпросмотр («уроков пройдено N, XP M, сделок K») → подтверждение → замена данных. Ошибка валидации — понятное сообщение, текущие данные не трогаются.
 - Сброс прогресса: двойное подтверждение (ввести слово «СБРОС»).
+
+## IndexedDB (`src/db/`)
+- `db.ts` — `CourseDb` (Dexie), версия схемы 1. Любое изменение схемы — `version(N+1)` с `upgrade` и тестом.
+- `simRepo` / `journalRepo` — add / list (новые сверху, фильтры) / get / update / remove / clear / count / replaceAll (для импорта).
+- Любая ошибка IndexedDB превращается в `DbError` с русским сообщением (приватный режим, нет места); UI показывает его тостом и продолжает работу — приложение не падает.
+- В тестах IndexedDB эмулирует `fake-indexeddb` (подключён в `src/test/setup.ts`).

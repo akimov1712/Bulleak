@@ -1,7 +1,7 @@
 # T-503 · IndexedDB через Dexie
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/02-architecture/storage.md
@@ -18,7 +18,7 @@
 - `src/db/journalRepo.ts`
 
 ## Критерии приёмки
-- [ ] Ошибка IndexedDB не роняет приложение (сообщение пользователю)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Ошибка IndexedDB не роняет приложение (сообщение пользователю)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(db): add dexie database for trades`
