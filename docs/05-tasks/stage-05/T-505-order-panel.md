@@ -1,7 +1,7 @@
 # T-505 · Панель сделки с живым расчётом
 
 - **Этап:** 05 Тренажёр
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -15,7 +15,7 @@
 - `src/features/simulator/OrderPanel.tsx`
 
 ## Критерии приёмки
-- [ ] Нельзя открыть некорректную сделку
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Нельзя открыть некорректную сделку
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(sim): add order panel with live risk calculation`
