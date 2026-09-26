@@ -49,6 +49,8 @@ if (selector) {
   });
   const elements = await page.locator(selector).all();
   for (const [i, el] of elements.entries()) {
+    // Skip hidden matches (e.g. inside the fixed header/nav hidden above).
+    if (!(await el.isVisible())) continue;
     const file = out.replace(/.png$/, `-${i}.png`);
     await el.scrollIntoViewIfNeeded();
     await el.screenshot({ path: file });

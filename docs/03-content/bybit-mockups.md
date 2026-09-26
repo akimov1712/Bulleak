@@ -18,7 +18,7 @@
 | BybitDeposit | Депозит USDT: выбор сети, адрес, memo | m02-l02 | ☑ `bybit-ui-deposit` |
 | BybitTerminal | Торговый терминал: зоны 1–6 с hotspots | m02-l03 | ☑ `bybit-ui-terminal` |
 | BybitOrderForm | Форма ордера: лимит/маркет/условный, TP/SL | m02-l05, m08-l03 | ☑ `bybit-ui-order-form` |
-| BybitDemo | Вход в демо-торговлю | m02-l06 | ☐ |
+| BybitDemo | Вход в демо-торговлю | m02-l06 | ☑ `bybit-ui-demo` |
 | BybitLeverage | Выбор плеча и режима маржи | m08-l03 | ☐ |
 | BybitPosition | Открытая позиция: цена ликвидации, P&L, TP/SL | m08-l04, m11-l03 | ☐ |
 | BybitContractInfo | Данные контракта: funding, OI | m07-l03, m08-l05 | ☐ |
