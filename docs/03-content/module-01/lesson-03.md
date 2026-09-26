@@ -1,7 +1,7 @@
 # m01-l03 · Капитализация, объём и ликвидность
 
 - **Модуль:** 1   **Время:** ~11 мин   **Практика:** Diagram стакана
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Считать рыночную капитализацию и понимать, что она говорит.
@@ -37,7 +37,15 @@
 `market-cap`, `fdv`, `volume`, `liquidity`, `order-book`, `bid`, `ask`, `spread`, `slippage`
 
 ## Источники
-- Investopedia: market cap, liquidity, slippage; Bybit Learn: order book — сверить.
+Сверено 2026-09-26:
+- CoinGecko API /coins/markets (26.09.2026 08:25 UTC) — цены, монеты в обращении, капитализация, FDV, объём 24ч для BTC, ETH, USDT, SOL, DOGE (в тексте округлены): https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,tether,dogecoin
+- Bybit API v5 /market/orderbook (spot BTCUSDT, 26.09.2026): лучший бид 84 095,5, аск 84 095,6 (спред = шаг 0,1), топ-10 уровней — порядка 0,4–1 BTC с каждой стороны: https://api.bybit.com/v5/market/orderbook?category=spot&symbol=BTCUSDT&limit=10
+- CoinGecko Learn, «What Is Circulating Supply and Why It Matters»: https://www.coingecko.com/learn/what-is-circulating-supply-crypto
+- Средняя цена и проскальзывание в примерах — `lib/trading/orderbook.ts` (тесты).
+
+## Заметки
+- Интерактив: кнопки 0,2 / 1 / 2,5 BTC вместо «5 BTC» — под объём учебного стакана.
+- Первоначальная формулировка «на каждом уровне стакана BTC сотни тысяч долларов» не подтвердилась данными API — заменена наблюдаемыми значениями.
 
 ## Связи
 Готовит к: m02-l05 (ордера), m03-l05 (объём).
