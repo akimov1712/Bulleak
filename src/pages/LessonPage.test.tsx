@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { routes } from '@/app/routes';
+import { courseIndex } from '@/content/courseIndex';
+import { hasLessonContent } from '@/content/loaders';
 import { useProgress } from '@/store/progressStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
 
@@ -65,12 +67,20 @@ describe('LessonPage', () => {
     );
   });
 
-  it('explains that content is not written yet (free mode, lesson without MDX)', async () => {
-    useSettings.getState().update({ freeMode: true });
-    renderAt('/lesson/m05-l03');
-    expect(await screen.findByRole('heading', { level: 1, name: 'RSI' })).toBeInTheDocument();
-    expect(await screen.findByText('Этот урок ещё пишется')).toBeInTheDocument();
-  });
+  // Any lesson that is not written yet; the course is filled in stage by stage.
+  const unwritten = courseIndex.lessons.findLast((l) => !hasLessonContent(l.id));
+
+  it.skipIf(!unwritten)(
+    'explains that content is not written yet (free mode, lesson without MDX)',
+    async () => {
+      useSettings.getState().update({ freeMode: true });
+      renderAt(`/lesson/${unwritten?.id ?? ''}`);
+      expect(
+        await screen.findByRole('heading', { level: 1, name: unwritten?.title }),
+      ).toBeInTheDocument();
+      expect(await screen.findByText('Этот урок ещё пишется')).toBeInTheDocument();
+    },
+  );
 
   it('handles unknown lesson ids', async () => {
     renderAt('/lesson/m99-l99');
