@@ -1,7 +1,7 @@
 # T-604 · Логика журнала: P&L и метрики
 
 - **Этап:** 06 Инструменты: калькуляторы, журнал, глоссарий, статистика, настройки
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/journal.md
@@ -16,7 +16,7 @@
 - `src/lib/journal/metrics.ts`
 
 ## Критерии приёмки
-- [ ] PF без убытков → null (UI «—»)
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] PF без убытков → null (UI «—»)
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(journal): add pnl and metrics calculations`

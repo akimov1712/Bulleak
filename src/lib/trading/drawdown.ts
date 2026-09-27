@@ -36,13 +36,16 @@ export function maxDrawdownPct(curve: readonly number[]): number {
   return worst;
 }
 
-/** Longest run of consecutive losing trades. */
-export function maxLosingStreak(wins: readonly boolean[]): number {
+/** Longest run of consecutive items equal to `value`. */
+export function longestRun(items: readonly boolean[], value: boolean): number {
   let best = 0;
   let run = 0;
-  for (const win of wins) {
-    run = win ? 0 : run + 1;
+  for (const item of items) {
+    run = item === value ? run + 1 : 0;
     best = Math.max(best, run);
   }
   return best;
 }
+
+/** Longest run of consecutive losing trades (`wins`: true = win). */
+export const maxLosingStreak = (wins: readonly boolean[]): number => longestRun(wins, false);
