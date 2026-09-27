@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  drawdownAfterLosses,
-  maxDrawdownPct,
-  maxLosingStreak,
-  recoveryPct,
-  streakProbability,
-} from './drawdown';
+import { drawdownAfterLosses, longestRun, recoveryPct, streakProbability } from './drawdown';
 import { expectancyProjection } from './rr';
 
 describe('drawdown math (m09-l01, m09-l04)', () => {
@@ -28,11 +22,10 @@ describe('drawdown math (m09-l01, m09-l04)', () => {
     expect(streakProbability(1.2, 5)).toBeNull();
   });
 
-  it('max drawdown and losing streak of a curve', () => {
-    expect(maxDrawdownPct([1, 1.2, 0.9, 1.5, 1.35])).toBeCloseTo(25);
-    expect(maxDrawdownPct([1, 1.1, 1.2])).toBe(0);
-    expect(maxLosingStreak([true, false, false, true, false, false, false])).toBe(3);
-    expect(maxLosingStreak([])).toBe(0);
+  it('longest run of equal flags', () => {
+    expect(longestRun([true, false, false, true, false, false, false], false)).toBe(3);
+    expect(longestRun([true, true, false], true)).toBe(2);
+    expect(longestRun([], true)).toBe(0);
   });
 });
 

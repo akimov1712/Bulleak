@@ -13,9 +13,12 @@ export interface SimStats extends SimSummary {
 export function simStats(trades: readonly SimTrade[]): SimStats {
   const sorted = [...trades].sort((a, b) => a.at - b.at);
   const rs = sorted.map((t) => t.r);
+  // Each trade stores the real balance before it: resets and trades of other kinds (which
+  // share the balance) are reflected without chaining P&L.
   const first = sorted[0];
-  const balanceCurve = first ? [first.balanceBefore] : [];
-  for (const t of sorted) balanceCurve.push((balanceCurve.at(-1) ?? t.balanceBefore) + t.pnl);
+  const balanceCurve = first
+    ? [first.balanceBefore, ...sorted.map((t) => t.balanceBefore + t.pnl)]
+    : [];
   return {
     ...simSummary(sorted),
     profitFactor: profitFactor(sorted),

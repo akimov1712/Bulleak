@@ -35,7 +35,15 @@ export function EquitySimulator() {
   const result = useMemo(
     () =>
       winratePct !== null && rr !== null && riskPct !== null && trades !== null
-        ? runMonteCarlo({ winrate: winratePct / 100, rr, riskPct, trades, runs: RUNS, seed })
+        ? runMonteCarlo({
+            winrate: winratePct / 100,
+            rr,
+            riskPct,
+            trades,
+            runs: RUNS,
+            seed,
+            keepCurves: SHOWN_CURVES,
+          })
         : null,
     [winratePct, rr, riskPct, trades, seed],
   );
@@ -53,7 +61,7 @@ export function EquitySimulator() {
         result && (
           <>
             <EquityCurves
-              curves={result.runs.slice(0, SHOWN_CURVES).map((r) => r.curve)}
+              curves={result.curves}
               baseline={1}
               label={`${SHOWN_CURVES} случайных кривых капитала одной и той же стратегии`}
             />

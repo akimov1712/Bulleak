@@ -4,7 +4,6 @@
  */
 
 import { mulberry32 } from '@/lib/random';
-import { maxDrawdownPct, maxLosingStreak } from '@/lib/trading/drawdown';
 
 export interface MonteCarloInput {
   /** Win rate 0–1. */
@@ -16,11 +15,11 @@ export interface MonteCarloInput {
   trades: number;
   runs: number;
   seed: number;
+  /** How many full curves to keep for drawing (the statistics use every run). Default 20. */
+  keepCurves?: number;
 }
 
 export interface MonteCarloRun {
-  /** Balance after each trade, start = 1 (index 0). */
-  curve: number[];
   finalPct: number;
   maxDrawdownPct: number;
   maxLosingStreak: number;
@@ -28,6 +27,8 @@ export interface MonteCarloRun {
 
 export interface MonteCarloResult {
   runs: MonteCarloRun[];
+  /** Balance after each trade (start = 1) for the first `keepCurves` runs. */
+  curves: number[][];
   /** Median final result, %. */
   medianFinalPct: number;
   /** Share of runs that ended below the start (0–1). */
@@ -60,29 +61,35 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult | null {
 
   const rng = mulberry32(seed);
   const risk = riskPct / 100;
+  const keep = input.keepCurves ?? 20;
   const out: MonteCarloRun[] = [];
+  const curves: number[][] = [];
   for (let r = 0; r < runs; r++) {
-    const curve = [1];
-    const wins: boolean[] = [];
+    // Full curves only for the runs that are drawn; the rest keep just their summary.
+    const curve = r < keep ? [1] : null;
     let balance = 1;
+    let peak = 1;
+    let worstDd = 0;
+    let streak = 0;
+    let longest = 0;
     for (let t = 0; t < trades; t++) {
       const win = rng() < winrate;
-      wins.push(win);
       balance *= win ? 1 + risk * rr : 1 - risk;
-      curve.push(balance);
+      curve?.push(balance);
+      peak = Math.max(peak, balance);
+      worstDd = Math.max(worstDd, (1 - balance / peak) * 100);
+      streak = win ? 0 : streak + 1;
+      longest = Math.max(longest, streak);
     }
-    out.push({
-      curve,
-      finalPct: (balance - 1) * 100,
-      maxDrawdownPct: maxDrawdownPct(curve),
-      maxLosingStreak: maxLosingStreak(wins),
-    });
+    if (curve) curves.push(curve);
+    out.push({ finalPct: (balance - 1) * 100, maxDrawdownPct: worstDd, maxLosingStreak: longest });
   }
   const finals = out.map((x) => x.finalPct);
   const dds = out.map((x) => x.maxDrawdownPct);
   const streaks = out.map((x) => x.maxLosingStreak);
   return {
     runs: out,
+    curves,
     medianFinalPct: quantile(finals, 0.5),
     losingShare: finals.filter((f) => f < 0).length / runs,
     drawdownP50: quantile(dds, 0.5),

@@ -9,15 +9,16 @@ describe('runMonteCarlo', () => {
     const b = runMonteCarlo(base);
     const c = runMonteCarlo({ ...base, seed: 8 });
     expect(a).toEqual(b);
-    expect(a?.runs[0]?.curve).not.toEqual(c?.runs[0]?.curve);
+    expect(a?.curves[0]).not.toEqual(c?.curves[0]);
   });
 
   it('produces curves of trades + 1 points that start at 1 and move by the risk', () => {
     const r = runMonteCarlo({ ...base, runs: 3, trades: 10 });
-    for (const run of r?.runs ?? []) {
-      expect(run.curve).toHaveLength(11);
-      expect(run.curve[0]).toBe(1);
-      const step = (run.curve[1] ?? 0) / (run.curve[0] ?? 1);
+    expect(r?.curves).toHaveLength(3);
+    for (const curve of r?.curves ?? []) {
+      expect(curve).toHaveLength(11);
+      expect(curve[0]).toBe(1);
+      const step = (curve[1] ?? 0) / (curve[0] ?? 1);
       expect([1.02, 0.99].some((x) => Math.abs(x - step) < 1e-12)).toBe(true);
     }
   });
@@ -44,5 +45,11 @@ describe('runMonteCarlo', () => {
     expect(quantile([5, 1, 3, 2, 4], 0.5)).toBe(3);
     expect(quantile([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 0.9)).toBe(9);
     expect(quantile([], 0.5)).toBeNaN();
+  });
+
+  it('keeps only the requested curves but summarises every run', () => {
+    const r = runMonteCarlo({ ...base, keepCurves: 5 });
+    expect(r?.curves).toHaveLength(5);
+    expect(r?.runs).toHaveLength(200);
   });
 });

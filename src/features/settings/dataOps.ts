@@ -48,16 +48,24 @@ export async function downloadBackup(now = Date.now()): Promise<void> {
   link.href = url;
   link.download = backupFileName(now);
   link.click();
-  URL.revokeObjectURL(url);
+  // Revoking synchronously can cancel the download in some browsers.
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 /**
- * Replaces everything with the imported data. The trade tables go first: if IndexedDB fails,
- * the progress in localStorage is left untouched.
+ * Replaces everything with the imported data. The trade tables go first, in one transaction:
+ * if IndexedDB fails, nothing at all is changed.
  */
 export async function applyImport(data: ParsedImport): Promise<void> {
-  await simRepo.replaceAll(data.simTrades);
-  await journalRepo.replaceAll(data.journal);
+  // One transaction for both tables: either all trades are replaced or none.
+  await guard('восстановить сделки', () =>
+    db.transaction('rw', db.simTrades, db.journal, async () => {
+      await db.simTrades.clear();
+      await db.simTrades.bulkAdd(data.simTrades);
+      await db.journal.clear();
+      await db.journal.bulkAdd(data.journal);
+    }),
+  );
   useProgress.setState(data.progress);
   useSettings.setState({ ...DEFAULT_SETTINGS, ...data.settings });
   try {

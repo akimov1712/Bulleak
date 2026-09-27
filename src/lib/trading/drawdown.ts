@@ -25,17 +25,6 @@ export function streakProbability(lossProbability: number, n: number): number | 
   return lossProbability ** n;
 }
 
-/** Largest peak-to-trough fall of an equity curve, in % of the peak. */
-export function maxDrawdownPct(curve: readonly number[]): number {
-  let peak = -Infinity;
-  let worst = 0;
-  for (const v of curve) {
-    if (v > peak) peak = v;
-    if (peak > 0) worst = Math.max(worst, (1 - v / peak) * 100);
-  }
-  return worst;
-}
-
 /** Longest run of consecutive items equal to `value`. */
 export function longestRun(items: readonly boolean[], value: boolean): number {
   let best = 0;
@@ -46,6 +35,3 @@ export function longestRun(items: readonly boolean[], value: boolean): number {
   }
   return best;
 }
-
-/** Longest run of consecutive losing trades (`wins`: true = win). */
-export const maxLosingStreak = (wins: readonly boolean[]): number => longestRun(wins, false);
