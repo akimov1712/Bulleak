@@ -16,7 +16,7 @@
 | БД в браузере | `dexie` + `dexie-react-hooks` | Журнал сделок, история тренажёра → IndexedDB |
 | Валидация | `zod` | Импорт JSON, схемы данных |
 | Свечные графики | `lightweight-charts@5` (Apache-2.0, TradingView) | Уроки и тренажёр |
-| Статистика | `recharts` | XP, equity curve, точность |
+| Статистика | собственный SVG (`features/calculators/EquityCurves.tsx`) | кривые капитала, простые графики; Recharts не понадобился (решение 2026-09-27: меньше бандл) |
 | Шрифты | `@fontsource-variable/nunito`, `@fontsource-variable/jetbrains-mono` | Локально, кириллица, офлайн |
 | PWA | `vite-plugin-pwa` (этап 9) | Офлайн |
 | Unit/компоненты | `vitest`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`, `@vitest/coverage-v8` | |
