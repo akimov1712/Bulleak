@@ -34,7 +34,9 @@ export function CalculatorCard(props: CalculatorCardProps) {
       {props.children}
       <div aria-live="polite">
         {props.result === null || props.result === undefined || props.result === false ? (
-          <p className="text-text-muted">— {props.emptyHint}</p>
+          <p className="text-text-muted" data-calc-empty="">
+            — {props.emptyHint}
+          </p>
         ) : (
           props.result
         )}
