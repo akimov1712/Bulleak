@@ -43,6 +43,11 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'indicator-families': () => import('./m05').then((m) => ({ default: m.IndicatorFamilies })),
   'macd-anatomy': () => import('./m05').then((m) => ({ default: m.MacdAnatomy })),
   'clean-vs-cluttered': () => import('./m05').then((m) => ({ default: m.CleanVsCluttered })),
+  // m06
+  'top-down-funnel': () => import('./m06').then((m) => ({ default: m.TopDownFunnel })),
+  'liquidity-pools': () => import('./m06').then((m) => ({ default: m.LiquidityPools })),
+  'breakout-vs-fakeout': () => import('./m06').then((m) => ({ default: m.BreakoutVsFakeout })),
+  'divergence-types': () => import('./m06').then((m) => ({ default: m.DivergenceTypes })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
