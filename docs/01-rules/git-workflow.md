@@ -9,3 +9,8 @@
 - Последняя строка сообщения: `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - Не коммитить: `node_modules`, `dist`, `.env*`, отчёты playwright, временные файлы.
 - В конце этапа — тег `stage-XX-done`.
+
+## Пуши (с 2026-09-27)
+- После каждого коммита — `git push origin main`; теги `stage-XX-done` пушатся (`git push origin <тег>`).
+- Никаких `--force` и переписывания опубликованной истории без явного согласия пользователя.
+- Работа с двух компьютеров: перед началом сессии `git pull --ff-only`.
