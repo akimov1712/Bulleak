@@ -24,8 +24,8 @@
 | [T-511](T-511-e2e-sim.md) | E2E тренажёра | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
-- [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
-- [ ] Тег `stage-05-done`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
+- [x] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
+- [x] Тег `stage-05-done`
