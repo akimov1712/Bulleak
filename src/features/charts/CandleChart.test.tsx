@@ -56,6 +56,7 @@ vi.mock('lightweight-charts', () => {
     LineSeries: 'Line',
     HistogramSeries: 'Histogram',
     LineStyle: { Solid: 0, Dashed: 2 },
+    PriceScaleMode: { Normal: 0, Logarithmic: 1 },
     createSeriesMarkers: mocks.markers,
     createChart: vi.fn((_el: HTMLElement, options: unknown) => {
       const series: ReturnType<typeof makeSeries>[] = [];
@@ -103,7 +104,7 @@ interface FakeSeries {
   primitives: unknown[];
 }
 interface FakeChart {
-  options: { handleScroll: unknown };
+  options: { handleScroll: unknown; rightPriceScale: { mode: number } };
   series: FakeSeries[];
   remove: ReturnType<typeof vi.fn>;
   click: (p: unknown) => void;
@@ -120,6 +121,13 @@ beforeEach(() => {
 });
 
 describe('CandleChart', () => {
+  it('uses a logarithmic price scale on request', () => {
+    render(<CandleChart dataset="BTCUSDT-D" logScale />);
+    expect(lastChart().options.rightPriceScale.mode).toBe(1);
+    render(<CandleChart dataset="BTCUSDT-D" />);
+    expect(lastChart().options.rightPriceScale.mode).toBe(0);
+  });
+
   it('switches datasets between timeframes', () => {
     render(
       <CandleChart dataset="BTCUSDT-240" timeframes={['BTCUSDT-D', 'BTCUSDT-240', 'BTCUSDT-60']} />,

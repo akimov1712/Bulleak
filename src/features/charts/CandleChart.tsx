@@ -7,6 +7,7 @@ import {
   HistogramSeries,
   LineSeries,
   LineStyle,
+  PriceScaleMode,
   type IChartApi,
   type IPriceLine,
   type ISeriesApi,
@@ -88,6 +89,8 @@ export interface CandleChartProps {
    * dates then, so every timeframe shows the same period.
    */
   timeframes?: DatasetName[];
+  /** Logarithmic price scale: equal percentages are equal distances (long BTC history). */
+  logScale?: boolean;
 }
 
 export type ChartType = 'candles' | 'bars' | 'line';
@@ -190,6 +193,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   const interactive = props.interactive ?? false;
   const volume = props.volume ?? false;
   const volumeSpikes = props.volumeSpikes ?? 0;
+  const logScale = props.logScale ?? false;
   const height = props.totalHeight;
   const [chartType, setChartType] = useState<ChartType>(props.chartType ?? 'candles');
   const [chartTypeProp, setChartTypeProp] = useState(props.chartType);
@@ -218,6 +222,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       intraday: interval !== 'D',
       palette,
       chartType,
+      logScale,
     });
     const handleClick = (param: MouseEventParams<Time>) => {
       const pick = onPickRef.current;
@@ -277,6 +282,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     interval,
     palette,
     chartType,
+    logScale,
   ]);
 
   // Annotations change on every quiz click: redraw them without rebuilding the chart
@@ -307,6 +313,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     interval,
     palette,
     chartType,
+    logScale,
   ]);
 
   const legend = [
@@ -377,6 +384,7 @@ interface BuildOptions {
   intraday: boolean;
   palette: Palette;
   chartType: ChartType;
+  logScale: boolean;
 }
 
 interface BuiltChart {
@@ -403,7 +411,10 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
       vertLines: { color: withAlpha(p.border, 0.5) },
       horzLines: { color: withAlpha(p.border, 0.5) },
     },
-    rightPriceScale: { borderColor: p.border },
+    rightPriceScale: {
+      borderColor: p.border,
+      mode: o.logScale ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal,
+    },
     timeScale: {
       borderColor: p.border,
       timeVisible: o.intraday,
