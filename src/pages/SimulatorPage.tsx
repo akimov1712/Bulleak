@@ -18,7 +18,7 @@ import {
   type DatasetSymbol,
 } from '@/lib/trading/candles';
 import { formatUsd } from '@/lib/format';
-import { SIM_START_BALANCE } from '@/lib/trading/simPlan';
+import { SIM_BALANCE_KEY, SIM_START_BALANCE } from '@/lib/trading/simPlan';
 import { forgetDataset } from '@/features/charts/useDataset';
 import type { SimIndicators } from '@/features/simulator/SimChart';
 import { SimSession } from '@/features/simulator/SimSession';
@@ -87,7 +87,7 @@ export function SimulatorPage() {
     DEFAULT_INDICATORS,
     isIndicators,
   );
-  const [balance, setBalance] = useStoredState('tc-sim:balance', SIM_START_BALANCE, isBalance);
+  const [balance, setBalance] = useStoredState(SIM_BALANCE_KEY, SIM_START_BALANCE, isBalance);
   const freeDataset: DatasetName = `${instrument.symbol}-${instrument.interval}`;
   const dataset: DatasetName =
     scenario && isDatasetName(scenario.dataset) ? scenario.dataset : freeDataset;

@@ -20,6 +20,8 @@ export const INSTRUMENT_STEPS: Record<DatasetSymbol, { qty: number; tick: number
 export const RISK_OPTIONS = [0.5, 1, 2] as const;
 export const LEVERAGE_OPTIONS = [1, 2, 3, 5, 10, 20] as const;
 export const SIM_START_BALANCE = 10_000;
+/** localStorage key of the simulator's virtual balance (also part of backups). */
+export const SIM_BALANCE_KEY = 'tc-sim:balance';
 
 export interface PlanInput {
   side: Side;

@@ -117,6 +117,6 @@ interface JournalTrade {
 
 ## Экспорт (`lib/io/exportSchema.ts`)
 ```ts
-interface ExportFile { app: 'trading-course'; schema: 1; exportedAt: number; progress: ProgressState; settings: Settings; simTrades: SimTrade[]; journal: JournalTrade[] }
+interface ExportFile { app: 'trading-course'; schema: 1; exportedAt: number; progressVersion: number; progress: ProgressState; settings: Settings; simTrades: SimTrade[]; journal: JournalTrade[]; simBalance?: number }
 ```
-Валидируется zod-схемой; прогресс проходит `migrate()` до текущей версии.
+Проверяется вручную в `lib/io/backup.ts` (без zod); прогресс проходит `migrateProgress()` до текущей версии, повреждённые записи сделок пропускаются.
