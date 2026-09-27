@@ -1,6 +1,19 @@
 import type { ComponentType } from 'react';
-import { Flame, Receipt, Scale, Target, TrendingUp, type LucideIcon } from 'lucide-react';
+import {
+  Dices,
+  Flame,
+  Receipt,
+  Scale,
+  Sigma,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  type LucideIcon,
+} from 'lucide-react';
 import { CompoundingCalc } from './CompoundingCalc';
+import { DrawdownCalc } from './DrawdownCalc';
+import { EquitySimulator } from './EquitySimulator';
+import { ExpectancyCalc } from './ExpectancyCalc';
 import { FeesCalc } from './FeesCalc';
 import { LiquidationCalc } from './LiquidationCalc';
 import { PositionCalc } from './PositionCalc';
@@ -37,6 +50,27 @@ export const CALCULATOR_LIST: readonly CalculatorInfo[] = [
     description: 'R:R сделки и винрейт, при котором она выходит в ноль.',
     icon: Target,
     component: RiskRewardCalc,
+  },
+  {
+    id: 'expectancy',
+    title: 'Матожидание',
+    description: 'Зарабатывает ли стратегия в среднем и сколько это за месяц.',
+    icon: Sigma,
+    component: ExpectancyCalc,
+  },
+  {
+    id: 'drawdown',
+    title: 'Просадка',
+    description: 'Сколько нужно заработать, чтобы отыграть потерю, и что делает серия убытков.',
+    icon: TrendingDown,
+    component: DrawdownCalc,
+  },
+  {
+    id: 'montecarlo',
+    title: 'Симулятор капитала',
+    description: '20 случайных кривых одной стратегии: просадки и серии, к которым готовиться.',
+    icon: Dices,
+    component: EquitySimulator,
   },
   {
     id: 'fees',

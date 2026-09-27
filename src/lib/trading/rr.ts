@@ -51,3 +51,26 @@ export function expectancy(winrate: number, avgWinR: number, avgLossR: number): 
   }
   return winrate * avgWinR - (1 - winrate) * avgLossR;
 }
+
+export interface ExpectancyProjection {
+  perTradeR: number;
+  monthR: number;
+  /** Rough monthly result in % of the balance (monthR × risk %, without compounding). */
+  monthPct: number;
+}
+
+/** What an expectancy means for a month of trading (calculator `expectancy`). */
+export function expectancyProjection(
+  winrate: number,
+  avgWinR: number,
+  avgLossR: number,
+  tradesPerMonth: number,
+  riskPct: number,
+): ExpectancyProjection | null {
+  const perTradeR = expectancy(winrate, avgWinR, avgLossR);
+  if (perTradeR === null) return null;
+  if (!Number.isInteger(tradesPerMonth) || tradesPerMonth < 0) return null;
+  if (!Number.isFinite(riskPct) || riskPct <= 0 || riskPct > 100) return null;
+  const monthR = perTradeR * tradesPerMonth;
+  return { perTradeR, monthR, monthPct: monthR * riskPct };
+}

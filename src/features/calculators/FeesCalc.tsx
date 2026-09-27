@@ -1,12 +1,11 @@
-import { useId } from 'react';
 import { Receipt } from 'lucide-react';
-import { Card } from '@/components/ui/Card';
-import { NumberInput } from '@/components/ui/NumberInput';
 import { Segmented } from '@/components/ui/Segmented';
-import { BYBIT_BASE_FEES, roundTripFees, type FeeRole } from '@/lib/trading/fees';
+import { BYBIT_BASE_FEES, fundingFee, roundTripFees, type FeeRole } from '@/lib/trading/fees';
 import { formatNumber, formatUsd } from '@/lib/format';
 import { cn } from '@/lib/cn';
-import { useStoredState } from '@/hooks/useStoredState';
+import { CalculatorCard, NumberField, ResultRows, ResultValue } from './CalculatorCard';
+import { useCalculator } from './useCalculator';
+import { isShape } from './validate';
 
 type Market = keyof typeof BYBIT_BASE_FEES;
 
@@ -16,6 +15,9 @@ interface Inputs {
   risk: number | null;
   entry: FeeRole;
   exit: FeeRole;
+  /** Funding rate per 8 h, % (perpetual only). */
+  fundingPct: number | null;
+  fundingPeriods: number | null;
 }
 
 const DEFAULTS: Inputs = {
@@ -24,55 +26,99 @@ const DEFAULTS: Inputs = {
   risk: 50,
   entry: 'taker',
   exit: 'taker',
+  fundingPct: 0.01,
+  fundingPeriods: 0,
 };
 
-const isInputs = (v: unknown): v is Inputs => {
-  if (typeof v !== 'object' || v === null) return false;
-  const r = v as Record<string, unknown>;
-  const num = (x: unknown) => x === null || typeof x === 'number';
-  const role = (x: unknown) => x === 'maker' || x === 'taker';
-  return (
-    (r.market === 'spot' || r.market === 'perpetual') &&
-    num(r.notional) &&
-    num(r.risk) &&
-    role(r.entry) &&
-    role(r.exit)
-  );
-};
+const ROLES = ['maker', 'taker'] as const;
+const isInputs = isShape<Inputs>({
+  market: ['spot', 'perpetual'],
+  notional: 'number',
+  risk: 'number',
+  entry: ROLES,
+  exit: ROLES,
+  fundingPct: 'number',
+  fundingPeriods: 'number',
+});
 
 const MARKET_LABEL: Record<Market, string> = { spot: 'Спот', perpetual: 'Бессрочные' };
 const ROLE_LABEL: Record<FeeRole, string> = { maker: 'Мейкер (лимит)', taker: 'Тейкер (рынок)' };
 
-/** Fee calculator: entry + exit fees on the notional and their share of the planned risk. */
-export function FeesCalc({ storageKey = 'tc-calc:fees' }: { storageKey?: string }) {
-  const id = useId();
-  const [inputs, setInputs] = useStoredState<Inputs>(storageKey, DEFAULTS, isInputs);
-  const set = (patch: Partial<Inputs>) => setInputs({ ...inputs, ...patch });
+/** Fee calculator: entry + exit fees (+ funding) and their share of the planned risk. */
+export function FeesCalc() {
+  const { inputs, set, reset } = useCalculator('fees', DEFAULTS, isInputs);
+  const perpetual = inputs.market === 'perpetual';
   const schedule = BYBIT_BASE_FEES[inputs.market];
-  const result =
+  const fees =
     inputs.notional === null
       ? null
-      : roundTripFees(
-          inputs.notional,
-          schedule,
-          inputs.entry,
-          inputs.exit,
-          inputs.risk ?? undefined,
-        );
-  const roles = (['maker', 'taker'] as const).map((r) => ({
+      : roundTripFees(inputs.notional, schedule, inputs.entry, inputs.exit);
+  const funding =
+    perpetual && inputs.notional !== null && inputs.fundingPct !== null && inputs.fundingPeriods
+      ? fundingFee(inputs.notional, inputs.fundingPct, inputs.fundingPeriods)
+      : 0;
+  const total = fees && funding !== null ? fees.total + funding : null;
+  const riskShare =
+    total !== null && inputs.risk !== null && inputs.risk > 0 ? (total / inputs.risk) * 100 : null;
+  const roles = ROLES.map((r) => ({
     value: r,
     label: `${ROLE_LABEL[r]} ${formatNumber(schedule[r], 3)}%`,
   }));
 
   return (
-    <Card className="flex flex-col gap-4" role="group" aria-labelledby={`${id}-title`}>
-      <div className="flex items-center gap-2">
-        <Receipt className="size-5 text-primary-shade" aria-hidden="true" />
-        <h3 id={`${id}-title`} className="text-lg font-extrabold">
-          Комиссии сделки
-        </h3>
-      </div>
-
+    <CalculatorCard
+      icon={Receipt}
+      title="Комиссии сделки"
+      onReset={reset}
+      emptyHint="Введи размер позиции больше 0 и целое число периодов funding."
+      result={
+        fees &&
+        total !== null && (
+          <>
+            <ResultValue
+              label={funding ? 'Комиссии и funding за сделку' : 'Комиссия за вход и выход'}
+              value={formatUsd(total)}
+              sub={`вход ${formatUsd(fees.entry)} · выход ${formatUsd(fees.exit)}`}
+            />
+            {funding !== null && funding !== 0 && (
+              <ResultRows
+                rows={[
+                  [
+                    `Funding за ${formatNumber(inputs.fundingPeriods, 0)} периодов`,
+                    funding < 0 ? `получишь ${formatUsd(-funding)}` : formatUsd(funding),
+                  ],
+                ]}
+              />
+            )}
+            {riskShare !== null && (
+              <p
+                className={cn(
+                  'mt-3 rounded-2xl border-2 p-3 text-sm',
+                  riskShare > 20 ? 'border-warn bg-warn-soft' : 'border-border bg-surface-2',
+                )}
+              >
+                Комиссии съедают <b>{formatNumber(riskShare, 1)}%</b> от запланированного риска.
+                {riskShare > 20 &&
+                  ' Это много: стоп слишком близко или позиция слишком большая для такого риска.'}
+              </p>
+            )}
+          </>
+        )
+      }
+      howTo={
+        <>
+          <p>
+            <b>Комиссия = стоимость позиции × ставка</b> — отдельно за вход и за выход. Считается от
+            всей позиции, а не от маржи: плечо комиссию не уменьшает.
+          </p>
+          <p>
+            <b>Funding = стоимость × ставка × число периодов</b> (у BTCUSDT период — 8 часов). При
+            положительной ставке платят лонги, при отрицательной — шорты.
+          </p>
+        </>
+      }
+      note="Базовые ставки Bybit на сентябрь 2026 года (без VIP-скидок). Ставки твоего аккаунта — на странице комиссий Bybit."
+    >
       <Segmented
         label="Рынок"
         value={inputs.market}
@@ -82,34 +128,22 @@ export function FeesCalc({ storageKey = 'tc-calc:fees' }: { storageKey?: string 
         }))}
         onChange={(market) => set({ market })}
       />
-
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor={`${id}-notional`} className="text-sm font-bold text-text-muted">
-            Размер позиции (номинал)
-          </label>
-          <NumberInput
-            id={`${id}-notional`}
-            value={inputs.notional}
-            onValueChange={(notional) => set({ notional })}
-            unit="$"
-            min={0}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor={`${id}-risk`} className="text-sm font-bold text-text-muted">
-            Риск сделки до стопа (необязательно)
-          </label>
-          <NumberInput
-            id={`${id}-risk`}
-            value={inputs.risk}
-            onValueChange={(risk) => set({ risk })}
-            unit="$"
-            min={0}
-          />
-        </div>
+        <NumberField
+          label="Размер позиции (номинал)"
+          value={inputs.notional}
+          onChange={(notional) => set({ notional })}
+          unit="$"
+          min={0}
+        />
+        <NumberField
+          label="Риск сделки до стопа (необязательно)"
+          value={inputs.risk}
+          onChange={(risk) => set({ risk })}
+          unit="$"
+          min={0}
+        />
       </div>
-
       <Segmented
         label="Вход"
         value={inputs.entry}
@@ -122,47 +156,22 @@ export function FeesCalc({ storageKey = 'tc-calc:fees' }: { storageKey?: string 
         options={roles}
         onChange={(exit) => set({ exit })}
       />
-
-      {result ? (
-        <div className="flex flex-col gap-1" aria-live="polite">
-          <p className="text-sm font-bold text-text-muted">Комиссия за вход и выход</p>
-          <p className="text-3xl font-extrabold tabular-nums">{formatUsd(result.total)}</p>
-          <p className="text-sm text-text-muted">
-            вход {formatUsd(result.entry)} · выход {formatUsd(result.exit)}
-          </p>
-          {result.shareOfRiskPct !== null && (
-            <p
-              className={cn(
-                'mt-2 rounded-2xl border-2 p-3 text-sm',
-                result.shareOfRiskPct > 20
-                  ? 'border-warn bg-warn-soft'
-                  : 'border-border bg-surface-2',
-              )}
-            >
-              Комиссии съедают <b>{formatNumber(result.shareOfRiskPct, 1)}%</b> от запланированного
-              риска.
-              {result.shareOfRiskPct > 20 &&
-                ' Это много: стоп слишком близко или позиция слишком большая для такого риска.'}
-            </p>
-          )}
+      {perpetual && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <NumberField
+            label="Ставка funding (за 8 ч)"
+            value={inputs.fundingPct}
+            onChange={(fundingPct) => set({ fundingPct })}
+            unit="%"
+          />
+          <NumberField
+            label="Периодов funding в сделке"
+            value={inputs.fundingPeriods}
+            onChange={(fundingPeriods) => set({ fundingPeriods })}
+            min={0}
+          />
         </div>
-      ) : (
-        <p className="text-text-muted" aria-live="polite">
-          — Введи размер позиции больше 0.
-        </p>
       )}
-
-      <p className="text-xs text-text-muted">
-        Базовые ставки Bybit на сентябрь 2026 года (без VIP-скидок). Ставки твоего аккаунта — на
-        странице комиссий Bybit.
-      </p>
-      <button
-        type="button"
-        onClick={() => setInputs(DEFAULTS)}
-        className="self-start text-sm font-bold text-info underline"
-      >
-        Сбросить
-      </button>
-    </Card>
+    </CalculatorCard>
   );
 }
