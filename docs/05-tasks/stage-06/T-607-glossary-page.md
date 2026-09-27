@@ -1,7 +1,7 @@
 # T-607 · Страница глоссария
 
 - **Этап:** 06 Инструменты: калькуляторы, журнал, глоссарий, статистика, настройки
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/glossary.md
@@ -16,7 +16,7 @@
 - `src/lib/glossary/search.ts`
 
 ## Критерии приёмки
-- [ ] Поиск покрыт тестами
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Поиск покрыт тестами
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(glossary): add glossary page with search`

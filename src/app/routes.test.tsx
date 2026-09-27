@@ -26,7 +26,7 @@ describe('routes', () => {
     [paths.journal(), 'Журнал сделок'],
     [paths.journalNew(), 'Новая сделка'],
     [paths.glossary(), 'Глоссарий'],
-    [paths.glossary('leverage'), 'Глоссарий'],
+    [paths.glossary('leverage'), 'Кредитное плечо'],
     [paths.cheatsheets(), 'Шпаргалки'],
     [paths.stats(), 'Статистика'],
     [paths.achievements(), 'Достижения'],
