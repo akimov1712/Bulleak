@@ -64,6 +64,11 @@ describe('ChartClickQuestionView', () => {
     expect(screen.getByLabelText('Цена')).toHaveValue('64320');
   });
 
+  it('passes the question indicators to the chart', () => {
+    render(<Harness q={{ ...candleQ, indicators: [{ type: 'rsi' }] }} />);
+    expect(chartProps.last?.indicators).toEqual([{ type: 'rsi' }]);
+  });
+
   it('accepts a typed price and clears the answer on empty input', () => {
     render(<Harness q={priceQ} />);
     const input = screen.getByLabelText('Цена');

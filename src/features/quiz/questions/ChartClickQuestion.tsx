@@ -91,6 +91,7 @@ export function ChartClickQuestionView({
         from={{ index: q.from }}
         to={{ index: q.to }}
         volume={q.volume}
+        indicators={q.indicators}
         annotations={annotations}
         height={300}
         onPick={answering ? pick : undefined}

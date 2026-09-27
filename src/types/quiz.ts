@@ -1,4 +1,5 @@
 /** Quizzes and exams. Source of truth: docs/02-architecture/data-model.md, docs/03-content/quiz-spec.md */
+import type { IndicatorSpec } from '@/features/charts/annotations';
 
 export interface QuizOption {
   id: string;
@@ -54,6 +55,8 @@ export interface ChartClickQuestion extends BaseQuestion {
   target: ChartClickTarget;
   /** Show the volume histogram under the candles. */
   volume?: boolean;
+  /** Indicators drawn on the chart (overlays or panes), e.g. RSI for «где RSI ушёл ниже 30». */
+  indicators?: IndicatorSpec[];
 }
 
 export interface MatchQuestion extends BaseQuestion {
