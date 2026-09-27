@@ -78,6 +78,28 @@ describe('swings and markers', () => {
       { index: 8, position: 'belowBar', shape: 'arrowUp', text: 'Вход', tone: 'info' },
     ]);
   });
+
+  it('marks auto-detected candle patterns', () => {
+    const k = (o: number, h: number, l: number, c: number, i: number) => ({
+      t: i * H,
+      o,
+      h,
+      l,
+      c,
+      v: 1,
+    });
+    const candles = [k(10, 10.5, 9, 9.2, 0), k(9, 11, 8.8, 10.8, 1), k(10, 10.6, 9.5, 10.2, 2)];
+    expect(buildMarkers(candles, [{ type: 'patterns', kind: 'engulfing' }])).toEqual([
+      { index: 1, position: 'belowBar', shape: 'arrowUp', text: 'поглощение', tone: 'bull' },
+    ]);
+    expect(buildMarkers(candles, [{ type: 'patterns', kind: 'insidebar' }])).toEqual([
+      { index: 2, position: 'aboveBar', shape: 'arrowDown', text: 'inside bar', tone: 'info' },
+    ]);
+    const pin = [k(10, 10.1, 7, 9.9, 0)];
+    expect(buildMarkers(pin, [{ type: 'patterns', kind: 'pinbar' }])).toEqual([
+      { index: 0, position: 'belowBar', shape: 'arrowUp', text: 'пин-бар', tone: 'bull' },
+    ]);
+  });
 });
 
 describe('misc', () => {

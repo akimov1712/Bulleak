@@ -3,7 +3,14 @@
  * that turn it into lightweight-charts markers / price lines. See content-pipeline.md.
  */
 import type { UTCTimestamp } from 'lightweight-charts';
-import { findSwings, type Swing } from '@/lib/indicators/patterns';
+import {
+  detectEngulfing,
+  detectInsideBars,
+  detectPinBars,
+  findSwings,
+  type PatternHit,
+  type Swing,
+} from '@/lib/indicators/patterns';
 import type { Candle } from '@/types/trading';
 
 export type Tone = 'bull' | 'bear' | 'info' | 'warn' | 'epic' | 'muted' | 'primary';
@@ -35,7 +42,11 @@ export type Annotation =
     }
   | { type: 'vline'; time: TimeInput; label?: string; tone?: Tone }
   /** Auto-detected swing points labelled HH / HL / LH / LL. */
-  | { type: 'swings'; n?: number };
+  | { type: 'swings'; n?: number }
+  /** Auto-detected candle patterns in the visible range (lib/indicators/patterns). */
+  | { type: 'patterns'; kind: CandlePatternKind };
+
+export type CandlePatternKind = 'pinbar' | 'engulfing' | 'insidebar';
 
 export type IndicatorSpec =
   | { type: 'sma' | 'ema'; period: number; tone?: Tone }
@@ -150,7 +161,33 @@ export interface MarkerSpec {
   tone: Tone;
 }
 
-/** Explicit markers + auto swing labels, sorted by time (lightweight-charts requires it). */
+const PATTERN_TEXT: Record<CandlePatternKind, string> = {
+  pinbar: 'пин-бар',
+  engulfing: 'поглощение',
+  insidebar: 'inside bar',
+};
+
+function patternMarkers(visible: readonly Candle[], kind: CandlePatternKind): MarkerSpec[] {
+  const hits: PatternHit[] =
+    kind === 'pinbar'
+      ? detectPinBars(visible)
+      : kind === 'engulfing'
+        ? detectEngulfing(visible)
+        : // an inside bar has no direction: mark it above, neutral
+          detectInsideBars(visible).map((index) => ({ index, direction: 'bearish' as const }));
+  return hits.map(({ index, direction }) => {
+    const bull = direction === 'bullish';
+    return {
+      index,
+      position: bull ? 'belowBar' : 'aboveBar',
+      shape: bull ? 'arrowUp' : 'arrowDown',
+      text: PATTERN_TEXT[kind],
+      tone: kind === 'insidebar' ? 'info' : bull ? 'bull' : 'bear',
+    };
+  });
+}
+
+/** Explicit markers + auto swing and pattern labels, sorted by time (lightweight-charts requires it). */
 export function buildMarkers(
   visible: readonly Candle[],
   annotations: readonly Annotation[],
@@ -179,6 +216,8 @@ export function buildMarkers(
           tone: s.label === 'HH' || s.label === 'HL' ? 'bull' : 'bear',
         });
       }
+    } else if (a.type === 'patterns') {
+      out.push(...patternMarkers(visible, a.kind));
     }
   }
   return out.sort((x, y) => x.index - y.index);
