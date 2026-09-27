@@ -31,6 +31,14 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'support-resistance': () => import('./m03').then((m) => ({ default: m.SupportResistance })),
   'role-reversal': () => import('./m03').then((m) => ({ default: m.RoleReversal })),
   'volume-confirmation': () => import('./m03').then((m) => ({ default: m.VolumeConfirmation })),
+  // m04
+  'single-candle-patterns': () =>
+    import('./m04').then((m) => ({ default: m.SingleCandlePatterns })),
+  'two-three-candle-patterns': () =>
+    import('./m04').then((m) => ({ default: m.TwoThreeCandlePatterns })),
+  'reversal-patterns': () => import('./m04').then((m) => ({ default: m.ReversalPatterns })),
+  'continuation-patterns': () => import('./m04').then((m) => ({ default: m.ContinuationPatterns })),
+  'trendline-rules': () => import('./m04').then((m) => ({ default: m.TrendlineRules })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
