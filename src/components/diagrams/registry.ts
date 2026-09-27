@@ -39,6 +39,10 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'reversal-patterns': () => import('./m04').then((m) => ({ default: m.ReversalPatterns })),
   'continuation-patterns': () => import('./m04').then((m) => ({ default: m.ContinuationPatterns })),
   'trendline-rules': () => import('./m04').then((m) => ({ default: m.TrendlineRules })),
+  // m05
+  'indicator-families': () => import('./m05').then((m) => ({ default: m.IndicatorFamilies })),
+  'macd-anatomy': () => import('./m05').then((m) => ({ default: m.MacdAnatomy })),
+  'clean-vs-cluttered': () => import('./m05').then((m) => ({ default: m.CleanVsCluttered })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
