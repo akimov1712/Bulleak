@@ -48,6 +48,11 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'liquidity-pools': () => import('./m06').then((m) => ({ default: m.LiquidityPools })),
   'breakout-vs-fakeout': () => import('./m06').then((m) => ({ default: m.BreakoutVsFakeout })),
   'divergence-types': () => import('./m06').then((m) => ({ default: m.DivergenceTypes })),
+  // m07
+  'btc-dominance': () => import('./m07').then((m) => ({ default: m.BtcDominance })),
+  'oi-price-matrix': () => import('./m07').then((m) => ({ default: m.OiPriceMatrix })),
+  'fear-greed-scale': () => import('./m07').then((m) => ({ default: m.FearGreedScale })),
+  'macro-events': () => import('./m07').then((m) => ({ default: m.MacroEvents })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
