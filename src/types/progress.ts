@@ -64,7 +64,6 @@ export interface Counters {
   calculatorsUsed: string[];
   glossaryViewed: string[];
   dailyGoalsMet: number;
-  /** Correct "no trade" decisions in simulator scenarios. */
   /** Scenarios where skipping was the textbook decision and the learner skipped (distinct). */
   simSkippedScenarios: string[];
   backtestTrades: number;

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { Clock, ClipboardCheck, Target, Trophy } from 'lucide-react';
 import { courseIndex } from '@/content/courseIndex';
 import { ContentMissingError } from '@/content/loaders';
-import { getTerm } from '@/content/glossary';
+import { termLessonId } from '@/content/glossary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EmptyState, PageSkeleton } from '@/components/ui/Skeleton';
 import { Button } from '@/components/ui/Button';
@@ -24,14 +24,12 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useNow } from '@/hooks/useNow';
 import { useProgress } from '@/store/progressStore';
 import { paths } from '@/app/paths';
-import type { CourseModule, LessonId } from '@/types/course';
+import type { CourseModule } from '@/types/course';
 
 type Phase =
   | { kind: 'intro' }
   | { kind: 'running'; prepared: PreparedQuiz }
   | { kind: 'result'; prepared: PreparedQuiz; finish: QuizFinish };
-
-const glossaryLesson = (tag: string) => getTerm(tag)?.lessonId as LessonId | undefined;
 
 function ModuleExam({ module }: { module: CourseModule }) {
   const quiz = use(examPromise(module.id));
@@ -69,7 +67,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
       : weakLessons(
           result,
           phase.prepared.questions,
-          moduleLessonOfTag(module.lessons, glossaryLesson),
+          moduleLessonOfTag(module.lessons, termLessonId),
           module.lessons.map((l) => l.id),
         );
     return (

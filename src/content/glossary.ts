@@ -1108,6 +1108,9 @@ export function getTerm(id: string): GlossaryTerm | undefined {
   return byId.get(id);
 }
 
+/** Lesson that introduces a term (used to map question tags to lessons). */
+export const termLessonId = (id: string) => getTerm(id)?.lessonId;
+
 export const GLOSSARY_CATEGORIES: Record<GlossaryCategory, string> = {
   basics: 'Основы',
   exchange: 'Биржа и ордера',
