@@ -24,7 +24,7 @@ describe('routes', () => {
     [paths.tools(), 'Инструменты'],
     [paths.tools('position'), 'Размер позиции'],
     [paths.journal(), 'Журнал сделок'],
-    [paths.journalNew(), 'Сделка'],
+    [paths.journalNew(), 'Новая сделка'],
     [paths.glossary(), 'Глоссарий'],
     [paths.glossary('leverage'), 'Глоссарий'],
     [paths.cheatsheets(), 'Шпаргалки'],

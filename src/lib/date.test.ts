@@ -5,10 +5,12 @@ import {
   dayPart,
   diffDays,
   fromDateKey,
+  fromDateTimeLocal,
   isDateKey,
   isSameDay,
   startOfWeek,
   toDateKey,
+  toDateTimeLocal,
   type DateKey,
 } from './date';
 
@@ -122,5 +124,19 @@ describe('dayPart', () => {
     vi.setSystemTime(local(2026, 9, 25, 7));
     expect(dayPart(Date.now())).toBe('morning');
     vi.useRealTimers();
+  });
+});
+
+describe('datetime-local', () => {
+  it('round-trips local minutes', () => {
+    const t = local(2026, 9, 5, 7, 3);
+    expect(toDateTimeLocal(t)).toBe('2026-09-05T07:03');
+    expect(fromDateTimeLocal('2026-09-05T07:03')).toBe(t);
+  });
+
+  it('rejects empty and impossible values', () => {
+    expect(fromDateTimeLocal('')).toBeNull();
+    expect(fromDateTimeLocal('2026-02-30T10:00')).toBeNull();
+    expect(fromDateTimeLocal('2026-09-05')).toBeNull();
   });
 });

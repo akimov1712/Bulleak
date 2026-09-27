@@ -67,3 +67,20 @@ export function dayPart(timestamp: number): DayPart {
   if (h < 18) return 'day';
   return 'evening';
 }
+
+/** Value for <input type="datetime-local">: local 'YYYY-MM-DDTHH:mm'. */
+export function toDateTimeLocal(timestamp: number): string {
+  const d = new Date(timestamp);
+  return `${toDateKey(timestamp)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Parses a datetime-local value; null when empty or invalid. */
+export function fromDateTimeLocal(value: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!m) return null;
+  const [y, mo, d, h, mi] = m.slice(1).map(Number) as [number, number, number, number, number];
+  const date = new Date(y, mo - 1, d, h, mi);
+  return date.getFullYear() === y && date.getMonth() === mo - 1 && date.getDate() === d
+    ? date.getTime()
+    : null;
+}
