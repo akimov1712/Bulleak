@@ -77,3 +77,34 @@ export async function dismissLevelUp(page: Page) {
     await expect(dialog).toBeHidden();
   }
 }
+
+export interface JournalInput {
+  entry: string;
+  stop: string;
+  qty: string;
+  openedAt: string;
+  exit?: string;
+  closedAt?: string;
+  side?: 'Long' | 'Short';
+}
+
+/** Adds a trade through the journal form and waits for the journal list. */
+export async function addJournalTrade(page: Page, t: JournalInput) {
+  await page.goto('/#/journal/new');
+  await expect(page.getByRole('heading', { level: 1, name: 'Новая сделка' })).toBeVisible();
+  if (t.side === 'Short') await page.getByRole('radio', { name: 'Short' }).click();
+  await page.getByLabel('Цена входа').fill(t.entry);
+  await page.getByLabel('Стоп-лосс').fill(t.stop);
+  await page.getByLabel('Объём (в монетах)').fill(t.qty);
+  await page.getByLabel('Дата и время входа').fill(t.openedAt);
+  if (t.exit) await page.getByLabel('Цена выхода').fill(t.exit);
+  if (t.closedAt) await page.getByLabel('Дата и время выхода').fill(t.closedAt);
+  await page.getByRole('button', { name: 'Сохранить' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Журнал сделок' })).toBeVisible();
+}
+
+/** Value of a KPI tile (<dt>label</dt><dd>value</dd>). */
+export const kpi = (page: Page, label: string) =>
+  page
+    .locator('dt', { hasText: new RegExp(`^${label}$`) })
+    .locator('xpath=following-sibling::dd[1]');
