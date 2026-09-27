@@ -10,6 +10,7 @@ import {
   type IPriceLine,
   type ISeriesApi,
   type ISeriesMarkersPluginApi,
+  type LogicalRange,
   type MouseEventParams,
   type Time,
 } from 'lightweight-charts';
@@ -89,6 +90,8 @@ export function SimChart(props: SimChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const builtRef = useRef<Built | null>(null);
   const shownRef = useRef<{ from: number; to: number } | null>(null);
+  // Zoom/pan to restore after a rebuild (indicator toggle, theme) of the same window.
+  const savedRangeRef = useRef<{ from: number; range: LogicalRange } | null>(null);
   const levelsRef = useRef(props.levels);
   const dragRef = useRef(props.onLevelDrag);
   const clickRef = useRef(props.onPriceClick);
@@ -178,12 +181,24 @@ export function SimChart(props: SimChartProps) {
     el.addEventListener('pointermove', onMove);
     el.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onUp);
+    // On touch screens the page would start scrolling (pan-y) and cancel the drag: claim the
+    // gesture when it starts on a draggable line. Needs a non-passive listener.
+    const onTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch || !dragRef.current) return;
+      if (grabbable(touch.clientY - el.getBoundingClientRect().top)) e.preventDefault();
+    };
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
 
     return () => {
       el.removeEventListener('pointerdown', onDown, true);
       el.removeEventListener('pointermove', onMove);
       el.removeEventListener('pointerup', onUp);
       el.removeEventListener('pointercancel', onUp);
+      el.removeEventListener('touchstart', onTouchStart);
+      const shown = shownRef.current;
+      const range = built.api.timeScale().getVisibleLogicalRange();
+      savedRangeRef.current = shown && range ? { from: shown.from, range } : null;
       built.api.unsubscribeClick(handleClick);
       built.api.remove();
       builtRef.current = null;
@@ -201,7 +216,10 @@ export function SimChart(props: SimChartProps) {
       for (let i = shown.to + 1; i <= to; i++) appendCandle(built, candles, i, palette);
     } else {
       setWindow(built, candles, anchor, to, palette);
-      built.api.timeScale().fitContent();
+      const saved = savedRangeRef.current;
+      savedRangeRef.current = null;
+      if (saved && saved.from === from) built.api.timeScale().setVisibleLogicalRange(saved.range);
+      else built.api.timeScale().fitContent();
     }
     shownRef.current = { from, to };
   }, [candles, anchor, cursor, indicatorsKey, palette, intraday]);

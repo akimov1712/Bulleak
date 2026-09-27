@@ -143,6 +143,16 @@ describe('migrateProgress', () => {
     expect(roundTrip).toEqual(JSON.parse(JSON.stringify(s)));
   });
 
+  it('v1 → v2: the repeat-counting skip counter becomes a list of distinct scenarios', () => {
+    const v1 = { ...createInitialProgress(T0), version: 1 } as Record<string, unknown>;
+    v1.counters = { ...(v1.counters as object), simCorrectSkips: 4 };
+    delete (v1.counters as Record<string, unknown>).simSkippedScenarios;
+    const migrated = migrateProgress(v1, 1, T0);
+    expect(migrated.version).toBe(PROGRESS_VERSION);
+    expect(migrated.counters.simSkippedScenarios).toEqual([]);
+    expect(migrated.counters).not.toHaveProperty('simCorrectSkips');
+  });
+
   it('normalizes every field of quiz attempts', () => {
     const migrated = migrateProgress(
       {

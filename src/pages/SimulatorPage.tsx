@@ -186,7 +186,9 @@ export function SimulatorPage() {
       >
         <Suspense fallback={<Skeleton className="h-[420px] w-full rounded-2xl" />}>
           <SimSession
-            key={scenario ? `scenario:${scenario.id}` : `${dataset}:${seed}`}
+            key={
+              scenario ? `scenario:${scenario.id}` : `${strategy?.tag ?? 'free'}:${dataset}:${seed}`
+            }
             scenario={scenario}
             strategy={strategy}
             dataset={dataset}

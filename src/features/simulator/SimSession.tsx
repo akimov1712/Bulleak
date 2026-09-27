@@ -352,7 +352,11 @@ export function SimSession(props: SimSessionProps) {
               onSkip={() => {
                 if (scenario) {
                   // A skip is a decision too: correct skips count towards sim-skip.
-                  dispatch({ type: 'simSkip', correct: isDecisionCorrect(scenario, 'skip') });
+                  dispatch({
+                    type: 'simSkip',
+                    scenarioId: scenario.id,
+                    correct: isDecisionCorrect(scenario, 'skip'),
+                  });
                   setSkippedTo(Math.min(anchor + SIM_SKIP, candles.length - 1));
                   return;
                 }

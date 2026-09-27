@@ -6,7 +6,7 @@ import type {
   Streak,
 } from '@/types/progress';
 
-export const PROGRESS_VERSION = 1;
+export const PROGRESS_VERSION = 2;
 export const MAX_QUIZ_ATTEMPTS = 500;
 
 export function emptyCounters(): Counters {
@@ -18,7 +18,7 @@ export function emptyCounters(): Counters {
     calculatorsUsed: [],
     glossaryViewed: [],
     dailyGoalsMet: 0,
-    simCorrectSkips: 0,
+    simSkippedScenarios: [],
     backtestTrades: 0,
     forwardTrades: 0,
     planStreak: 0,

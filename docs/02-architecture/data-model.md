@@ -79,7 +79,7 @@ interface LessonProgress { readAt?: number; quizBest: number; quizAttempts: numb
 interface ExamProgress   { best: number; attempts: number; passedAt?: number; lastAttemptAt?: number } // lastAttemptAt — для паузы перед пересдачей
 interface DayActivity    { xp: number; minutes: number; lessonsCompleted: number; quizzes: number; simTrades: number; simXp: number; journalXp: number; goalMet: boolean } // simXp/journalXp — для дневных лимитов XP
 interface QuizAttempt    { quizId: string; at: number; ratio: number; passed: boolean; tags: Record<string, [number, number]>; durationSec?: number } // тег → [верно, всего]
-interface Counters { perfectQuizzes: number; simTrades: number; simWins: number; journalEntries: number; calculatorsUsed: string[]; glossaryViewed: string[]; dailyGoalsMet: number; simCorrectSkips: number; backtestTrades: number; forwardTrades: number; planStreak: number; planWritten: boolean } // glossaryViewed — уникальные id
+interface Counters { perfectQuizzes: number; simTrades: number; simWins: number; journalEntries: number; calculatorsUsed: string[]; glossaryViewed: string[]; dailyGoalsMet: number; simSkippedScenarios: string[]; backtestTrades: number; forwardTrades: number; planStreak: number; planWritten: boolean } // glossaryViewed, simSkippedScenarios — уникальные id (v2)
 ```
 Статус урока вычисляется, не хранится: `locked | available | read | completed` — `lib/progress/unlock.ts`.
 

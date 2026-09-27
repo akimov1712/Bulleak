@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { PROGRESS_STORAGE_KEY, subscribeToOtherTabs, useProgress } from './progressStore';
-import { createInitialProgress } from '@/lib/progress/initial';
+import { createInitialProgress, PROGRESS_VERSION } from '@/lib/progress/initial';
 import { StorageBanner } from '@/app/layout/StorageBanner';
 import { __resetSafeStorage, safeStorage } from './safeStorage';
 import { useUi } from './uiStore';
@@ -27,7 +27,7 @@ describe('progressStore', () => {
     useProgress.getState().markRead('m00-l01');
     useProgress.getState().recordQuiz('m00-l01', pass, 60);
     const saved = JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? '{}');
-    expect(saved.version).toBe(1);
+    expect(saved.version).toBe(PROGRESS_VERSION);
     expect(saved.state.lessons['m00-l01'].completedAt).toBeTypeOf('number');
     expect(saved.state.markRead).toBeUndefined();
   });

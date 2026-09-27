@@ -40,6 +40,7 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
   const raw = persisted;
 
   // v0 → v1: no structural changes yet (v0 = pre-release data); normalization below covers it.
+  // v1 → v2: counters.simCorrectSkips → simSkippedScenarios (see counters below).
 
   const lessons = record(raw.lessons, (v) => {
     if (!isObject(v)) return null;
@@ -104,7 +105,9 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
     calculatorsUsed: strArray(counterRaw.calculatorsUsed),
     glossaryViewed: strArray(counterRaw.glossaryViewed),
     dailyGoalsMet: num(counterRaw.dailyGoalsMet),
-    simCorrectSkips: num(counterRaw.simCorrectSkips),
+    // v1 → v2: a plain counter of correct skips (repeats included) became the list of distinct
+    // scenarios; old counts can't be mapped to scenarios, so they start over.
+    simSkippedScenarios: strArray(counterRaw.simSkippedScenarios),
     backtestTrades: num(counterRaw.backtestTrades),
     forwardTrades: num(counterRaw.forwardTrades),
     planStreak: num(counterRaw.planStreak),

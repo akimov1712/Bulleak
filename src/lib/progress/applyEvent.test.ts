@@ -153,19 +153,21 @@ describe('applyEvent', () => {
 
   it('counter events: skips, glossary, backup, plan', () => {
     const { state, rewards } = run(createInitialProgress(0), [
-      { type: 'simSkip', correct: true },
-      { type: 'simSkip', correct: false },
+      { type: 'simSkip', scenarioId: 'a', correct: true },
+      { type: 'simSkip', scenarioId: 'a', correct: true },
+      { type: 'simSkip', scenarioId: 'b', correct: false },
       { type: 'glossaryViewed', termId: 'edge' },
       { type: 'glossaryViewed', termId: 'edge' },
       { type: 'backupMade' },
       { type: 'planSaved' },
     ]);
-    expect(state.counters.simCorrectSkips).toBe(1);
+    // Repeating the same scenario does not count twice.
+    expect(state.counters.simSkippedScenarios).toEqual(['a']);
     expect(state.counters.glossaryViewed).toEqual(['edge']);
     expect(state.profile.lastBackupAt).toBe(at(25));
     expect(state.counters.planWritten).toBe(true);
-    expect(rewards[4]?.newAchievements).toEqual(['backup']);
-    expect(rewards[5]?.newAchievements).toEqual(['plan-written']);
+    expect(rewards[5]?.newAchievements).toEqual(['backup']);
+    expect(rewards[6]?.newAchievements).toEqual(['plan-written']);
   });
 
   it('exam events record the exam and pay once', () => {

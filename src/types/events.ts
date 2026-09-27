@@ -12,7 +12,7 @@ export type ProgressEvent =
   | { type: 'quizCompleted'; lessonId: LessonId; result: QuizResult; durationSec?: number }
   | { type: 'examCompleted'; key: ModuleId | 'final'; result: QuizResult; durationSec?: number }
   | { type: 'simTrade'; outcome: SimOutcome; r: number; backtest?: boolean }
-  | { type: 'simSkip'; correct: boolean }
+  | { type: 'simSkip'; scenarioId: string; correct: boolean }
   | { type: 'backtestEvaluated'; trades: number; expectancyR: number }
   | { type: 'journalEntry'; closed: boolean; forward: boolean; followedPlan: boolean }
   | { type: 'calculatorUsed'; calcId: string }

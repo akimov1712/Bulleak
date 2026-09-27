@@ -368,7 +368,7 @@ export const achievements: AchievementDef[] = [
     rarity: 'rare',
     xp: 30,
     secret: true,
-    ...count(5, (s) => s.counters.simCorrectSkips),
+    ...count(5, (s) => s.counters.simSkippedScenarios.length),
   },
   {
     id: 'backtester',

@@ -157,8 +157,8 @@ const cases: Record<string, Case> = {
     almostEvent: { type: 'simTrade', outcome: 'tp', r: 2.9 },
   },
   'sim-skip': {
-    unlock: counters({ simCorrectSkips: 5 }),
-    almost: counters({ simCorrectSkips: 4 }),
+    unlock: counters({ simSkippedScenarios: ['s1', 's2', 's3', 's4', 's5'] }),
+    almost: counters({ simSkippedScenarios: ['s1', 's2', 's3', 's4'] }),
   },
   backtester: {
     unlock: counters({ backtestTrades: 30 }),

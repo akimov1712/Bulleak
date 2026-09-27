@@ -50,6 +50,7 @@ import {
 import { OverlayPrimitive, type OverlayItems } from './overlayPrimitive';
 import { useDataset } from './useDataset';
 import { usePalette } from './usePalette';
+import { chartCardHeight } from './chartLayout';
 
 export interface ChartPick {
   /** Index in the full dataset. */
@@ -94,9 +95,6 @@ export type ChartType = 'candles' | 'bars' | 'line';
 const TYPE_LABEL: Record<ChartType, string> = { candles: 'Свечи', bars: 'Бары', line: 'Линия' };
 
 const PANE_HEIGHT = 110;
-/** Chart chrome above/around the plot: header row(s) plus borders, measured in the browser. */
-const HEADER_HEIGHT = 35;
-const HEADER_OHLC_HEIGHT = 54;
 const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
 
 /** Candle chart with annotations; handles loading and errors itself. */
@@ -111,7 +109,7 @@ export function CandleChart(props: CandleChartProps) {
   const paneCount = props.indicators?.filter(isPaneIndicator).length ?? 0;
   const total = (props.height ?? 320) + paneCount * PANE_HEIGHT;
   // Placeholders cover the header and borders too, so nothing jumps when the chart loads.
-  const placeholderHeight = total + (props.ohlc === false ? HEADER_HEIGHT : HEADER_OHLC_HEIGHT);
+  const placeholderHeight = chartCardHeight(total, props.ohlc !== false);
   const timeframes = props.timeframes ?? [];
   return (
     <figure className={props.className}>

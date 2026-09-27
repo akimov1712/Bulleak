@@ -45,8 +45,11 @@ function transition(state: ProgressState, event: ProgressEvent, now: number): Pr
       };
     }
     case 'simSkip':
-      return event.correct
-        ? { ...state, counters: { ...c, simCorrectSkips: c.simCorrectSkips + 1 } }
+      return event.correct && !c.simSkippedScenarios.includes(event.scenarioId)
+        ? {
+            ...state,
+            counters: { ...c, simSkippedScenarios: [...c.simSkippedScenarios, event.scenarioId] },
+          }
         : state;
     case 'journalEntry':
       return {

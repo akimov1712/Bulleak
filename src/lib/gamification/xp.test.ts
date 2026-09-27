@@ -120,7 +120,7 @@ describe('calculators', () => {
 describe('events without direct XP', () => {
   it.each([
     { type: 'lessonTime', lessonId: 'm00-l01', seconds: 10 },
-    { type: 'simSkip', correct: true },
+    { type: 'simSkip', scenarioId: 'a', correct: true },
     { type: 'backtestEvaluated', trades: 30, expectancyR: 0.3 },
     { type: 'glossaryViewed', termId: 'edge' },
     { type: 'backupMade' },
