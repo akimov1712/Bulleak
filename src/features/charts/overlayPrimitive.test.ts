@@ -2,9 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import type { SeriesAttachedParameter, Time } from 'lightweight-charts';
 import { OverlayPrimitive } from './overlayPrimitive';
 
-// 10 px per bar, price 100 at y=0 and 0 at y=100
+// 10 px per bar, price 100 at y=0 and 0 at y=100. Like lightweight-charts, a fractional
+// logical index is not mapped (returns 0) — zones must not rely on it.
 const chart = {
-  timeScale: () => ({ logicalToCoordinate: (l: number) => (l < -100 ? null : l * 10) }),
+  timeScale: () => ({
+    logicalToCoordinate: (l: number) => (l < -100 ? null : Number.isInteger(l) ? l * 10 : 0),
+  }),
 };
 const series = { priceToCoordinate: (p: number) => (p < 0 ? null : 100 - p) };
 

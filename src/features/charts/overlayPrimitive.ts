@@ -166,9 +166,15 @@ export class OverlayPrimitive implements ISeriesPrimitive<Time> {
     const series = this.series;
     if (!chart || !series) return { zones: [], vlines: [] };
     const ts = chart.timeScale();
-    // Half a bar of padding so a zone covers its first and last candles entirely.
-    const x = (index: number, edge: -0.5 | 0.5) =>
-      ts.logicalToCoordinate((index + edge) as Logical);
+    // Half a bar of padding so a zone covers its first and last candles entirely. The chart
+    // does not map fractional logical indices (it returns 0), so shift the candle centre by
+    // half of the real bar spacing instead.
+    const x = (index: number, edge: -0.5 | 0.5) => {
+      const centre = ts.logicalToCoordinate(index as Logical);
+      const next = ts.logicalToCoordinate((index + 1) as Logical);
+      if (centre === null || next === null) return null;
+      return centre + edge * (next - centre);
+    };
     const zones: Resolved['zones'] = [];
     for (const zone of this.items.zones) {
       const y1 = series.priceToCoordinate(zone.top);
