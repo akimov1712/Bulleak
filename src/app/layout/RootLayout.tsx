@@ -23,10 +23,15 @@ export function RootLayout() {
         Перейти к содержимому
       </a>
       <ScrollToTop />
-      <Sidebar />
+      {/* Navigation chrome is not printed (cheat sheets, certificate). */}
+      <div className="contents print:hidden">
+        <Sidebar />
+      </div>
       <div className="flex min-w-0 flex-1 flex-col">
-        <StorageBanner />
-        <TopBar />
+        <div className="contents print:hidden">
+          <StorageBanner />
+          <TopBar />
+        </div>
         <main
           id="main"
           tabIndex={-1}
@@ -34,14 +39,18 @@ export function RootLayout() {
         >
           <Outlet />
         </main>
-        <Footer />
+        <div className="contents print:hidden">
+          <Footer />
+        </div>
         {/* space for the fixed bottom nav on mobile */}
         <div
-          className="h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:hidden"
+          className="h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:hidden print:hidden"
           aria-hidden="true"
         />
       </div>
-      <BottomNav />
+      <div className="contents print:hidden">
+        <BottomNav />
+      </div>
       <Toaster />
       <RewardsPresenter />
     </div>
