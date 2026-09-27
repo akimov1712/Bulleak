@@ -420,6 +420,8 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
       timeVisible: o.intraday,
       secondsVisible: false,
       rightOffset: 2,
+      // Lets fitContent show years of daily candles (the default minimum is 0.5 px per bar).
+      minBarSpacing: 0.1,
     },
     crosshair: { mode: 0 },
     localization: { locale: 'ru-RU' },
