@@ -36,5 +36,5 @@
 
 ## Источники
 Сверено 2026-09-28:
-- Дивергенции регулярные и скрытые (цена vs RSI/MACD) — https://en.wikipedia.org/wiki/Divergence_(technical_analysis)
+- Дивергенции регулярные и скрытые (цена vs RSI/MACD) — https://tastytrade.com/learn/platforms-and-tools/charts/rsi-divergence/ , https://www.kraken.com/learn/rsi-divergences-what-they-how-they-work
 - Расчёт RSI(14) по данным Bybit: BTCUSDT 1D — 17.12.2024 максимум 108 421,6 (RSI 69,7), 20.01.2025 максимум 109 951,7 (RSI 58,6); 25.02.2025 закрытие 88 665,3 ниже минимума 13.01 (89 100); минимум 07.04.2025 74 456,2. Бычья: 11.03.2025 минимум 76 545 (RSI 10.03 — 32,2), 07.04 минимум 74 456,2 (RSI 38,5, 08.04 — 34,0); закрытие 22.04 93 400 выше максимума 24.03 (88 740). ETHUSDT 1D: 06.12.2024 4 091,98 (RSI 72,6), 16.12 4 111,26 (RSI 64,0).
