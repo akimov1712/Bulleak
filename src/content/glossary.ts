@@ -1705,6 +1705,26 @@ export const glossary: GlossaryTerm[] = [
     related: ['liquidity-sweep', 'stop-hunt'],
     lessonId: 'm06-l03',
   },
+  {
+    id: 'fakeout',
+    term: 'Ложный пробой',
+    aliases: ['fakeout', 'fake breakout', 'ложняк'],
+    short: 'Цена закрылась за уровнем, но быстро вернулась обратно.',
+    full: 'Купившие пробой оказываются в убытке, а их стопы становятся топливом для движения в обратную сторону. Частые признаки: слабый объём на пробое, пробой против тренда старшего ТФ.',
+    category: 'chart',
+    related: ['failed-breakout', 'breakout', 'liquidity-sweep'],
+    lessonId: 'm06-l04',
+  },
+  {
+    id: 'failed-breakout',
+    term: 'Несостоявшийся пробой',
+    aliases: ['failed breakout'],
+    short: 'Сетап: после пробоя цена в 1–3 свечи закрывается обратно — вход в обратную сторону.',
+    full: 'Вход на закрытии обратно в диапазон, стоп — за экстремумом ложного пробоя, цель — середина или противоположная граница диапазона. Сетап не срабатывает всегда: стоп и расчёт риска обязательны.',
+    category: 'strategy',
+    related: ['fakeout', 'breakout'],
+    lessonId: 'm06-l04',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
