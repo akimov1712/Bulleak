@@ -39,4 +39,10 @@ describe('glossary data', () => {
       for (const r of t.related) expect(ids.has(r), `${t.id} → ${r}`).toBe(true);
     }
   });
+
+  it('has no escaped line breaks shown as text (a paragraph break is a real newline)', () => {
+    const backslash = String.fromCharCode(92);
+    const broken = glossary.filter((t) => `${t.short}${t.full}`.includes(backslash));
+    expect(broken.map((t) => t.id)).toEqual([]);
+  });
 });
