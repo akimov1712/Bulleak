@@ -28,7 +28,7 @@ src/content/scenarios.ts              SimScenario[]
 | `<Summary items={[...]}/>` | Итоги |
 | `<Tip>`, `<Warning>`, `<Example>`, `<BybitNote>` | Callout-блоки |
 | `<Term id="leverage">плечо</Term>` | Термин с поповером из глоссария |
-| `<CandleChart dataset="BTCUSDT-240" from={..} to={..} annotations={[...]}/>` | Живой график с разметкой: `hline`, `zone`, `marker`, `vline`, авто-`swings` и авто-`patterns` (`kind`: `pinbar` / `engulfing` / `insidebar`) |
+| `<CandleChart dataset="BTCUSDT-240" from={..} to={..} annotations={[...]}/>` | Живой график с разметкой: `hline`, `zone`, `marker`, `vline`, наклонная `line` (две точки, `extend`), авто-`swings` и авто-`patterns` (`kind`: `pinbar` / `engulfing` / `insidebar`) |
 | `<Diagram name="candle-anatomy"/>` | SVG-схема из `components/diagrams` |
 | `<Figure src alt caption credit/>` | Фото/скриншот |
 | `<MiniQuiz question={...}/>` | Вопрос посреди урока (без XP, для закрепления) |

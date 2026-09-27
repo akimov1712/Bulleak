@@ -34,14 +34,28 @@ export interface OverlayVLine {
   color: string;
 }
 
+/** A sloped segment between two candles (trendline, channel border). */
+export interface OverlayLine {
+  /** Indices within the visible slice. */
+  from: { index: number; price: number };
+  to: { index: number; price: number };
+  /** Continue the line to the right edge of the chart. */
+  extend: boolean;
+  dashed: boolean;
+  label?: string;
+  color: string;
+}
+
 export interface OverlayItems {
   zones: OverlayZone[];
   vlines: OverlayVLine[];
+  lines?: OverlayLine[];
 }
 
 interface Resolved {
   zones: { x1: number; x2: number | null; y1: number; y2: number; zone: OverlayZone }[];
   vlines: { x: number; line: OverlayVLine }[];
+  lines: { x1: number; y1: number; x2: number; y2: number; line: OverlayLine }[];
 }
 
 type Layer = 'shapes' | 'labels';
@@ -100,6 +114,28 @@ class OverlayRenderer implements IPrimitivePaneRenderer {
         ctx.beginPath();
         ctx.moveTo(Math.round(x) + 0.5, 0);
         ctx.lineTo(Math.round(x) + 0.5, mediaSize.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      for (const { x1, y1, x2, y2, line } of this.data.lines) {
+        // Extended lines run to the right edge along the same slope.
+        const extend = line.extend && x2 > x1 && x2 < mediaSize.width;
+        const xEnd = extend ? mediaSize.width : x2;
+        const yEnd = extend ? y1 + ((y2 - y1) * (xEnd - x1)) / (x2 - x1) : y2;
+        if (this.layer === 'labels') {
+          if (!line.label) continue;
+          const w = ctx.measureText(line.label).width;
+          const lx = Math.min(Math.max(x1, xEnd - w - 12), mediaSize.width - w - 6);
+          const ly = y1 + ((yEnd - y1) * (lx - x1)) / (xEnd - x1 || 1);
+          this.label(ctx, line.label, lx, ly - 20, line.color);
+          continue;
+        }
+        ctx.strokeStyle = line.color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash(line.dashed ? [6, 4] : []);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(xEnd, yEnd);
         ctx.stroke();
         ctx.setLineDash([]);
       }
@@ -164,7 +200,7 @@ export class OverlayPrimitive implements ISeriesPrimitive<Time> {
   resolve(): Resolved {
     const chart = this.chart;
     const series = this.series;
-    if (!chart || !series) return { zones: [], vlines: [] };
+    if (!chart || !series) return { zones: [], vlines: [], lines: [] };
     const ts = chart.timeScale();
     // Half a bar of padding so a zone covers its first and last candles entirely. The chart
     // does not map fractional logical indices (it returns 0), so shift the candle centre by
@@ -190,6 +226,15 @@ export class OverlayPrimitive implements ISeriesPrimitive<Time> {
       const cx = ts.logicalToCoordinate(line.index as Logical);
       if (cx !== null) vlines.push({ x: cx, line });
     }
-    return { zones, vlines };
+    const lines: Resolved['lines'] = [];
+    for (const line of this.items.lines ?? []) {
+      const x1 = ts.logicalToCoordinate(line.from.index as Logical);
+      const x2 = ts.logicalToCoordinate(line.to.index as Logical);
+      const y1 = series.priceToCoordinate(line.from.price);
+      const y2 = series.priceToCoordinate(line.to.price);
+      if (x1 === null || x2 === null || y1 === null || y2 === null) continue;
+      lines.push({ x1, y1, x2, y2, line });
+    }
+    return { zones, vlines, lines };
   }
 }

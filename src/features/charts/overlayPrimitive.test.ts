@@ -25,7 +25,7 @@ describe('OverlayPrimitive', () => {
       zones: [{ ...zone, from: 2, to: 4, label: 'Z' }, { ...zone }, { ...zone, bottom: -1 }],
       vlines: [{ index: 5, color: '#000', label: 'V' }],
     });
-    expect(p.resolve()).toEqual({ zones: [], vlines: [] });
+    expect(p.resolve()).toEqual({ zones: [], vlines: [], lines: [] });
     attach(p);
     const r = p.resolve();
     expect(r.zones.map(({ x1, x2, y1, y2 }) => [x1, x2, y1, y2])).toEqual([
@@ -82,6 +82,43 @@ describe('OverlayPrimitive', () => {
     expect(ctx.moveTo).toHaveBeenCalledTimes(1);
 
     p.detached();
-    expect(p.resolve()).toEqual({ zones: [], vlines: [] });
+    expect(p.resolve()).toEqual({ zones: [], vlines: [], lines: [] });
+  });
+
+  it('draws sloped lines and extends them to the right edge', () => {
+    const line = { color: '#0a0', dashed: false, label: 'L' };
+    const p = new OverlayPrimitive({
+      zones: [],
+      vlines: [],
+      lines: [
+        { ...line, from: { index: 1, price: 50 }, to: { index: 3, price: 70 }, extend: true },
+        { ...line, from: { index: 1, price: 50 }, to: { index: 3, price: -5 }, extend: false },
+      ],
+    });
+    attach(p);
+    // the second line has an off-scale price and is skipped
+    expect(p.resolve().lines.map(({ x1, y1, x2, y2 }) => [x1, y1, x2, y2])).toEqual([
+      [10, 50, 30, 30],
+    ]);
+    const ctx = {
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      beginPath: vi.fn(),
+      stroke: vi.fn(),
+      setLineDash: vi.fn(),
+      fillRect: vi.fn(),
+      fillText: vi.fn(),
+      measureText: vi.fn(() => ({ width: 10 })),
+    };
+    const target = {
+      useMediaCoordinateSpace: (
+        fn: (s: { context: typeof ctx; mediaSize: { width: number; height: number } }) => void,
+      ) => fn({ context: ctx, mediaSize: { width: 110, height: 100 } }),
+    };
+    const [shapes] = p.paneViews();
+    shapes?.renderer().draw(target as never);
+    expect(ctx.moveTo).toHaveBeenCalledWith(10, 50);
+    // slope −1 px per px: from (10, 50) to the edge x=110 → y=−50
+    expect(ctx.lineTo).toHaveBeenCalledWith(110, -50);
   });
 });

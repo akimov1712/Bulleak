@@ -624,7 +624,7 @@ function applyAnnotations(chart: BuiltChart, o: AnnotationInput): () => void {
       : null;
   const items = overlayItems(visible, o.start, o.annotations, p);
   const overlay =
-    items.zones.length + items.vlines.length > 0
+    items.zones.length + items.vlines.length + (items.lines?.length ?? 0) > 0
       ? new OverlayPrimitive(items, withAlpha(p.surface, 0.85))
       : null;
   if (overlay) mainSeries.attachPrimitive(overlay);
@@ -641,7 +641,7 @@ function overlayItems(
   annotations: Annotation[],
   p: Palette,
 ): OverlayItems {
-  const items: OverlayItems = { zones: [], vlines: [] };
+  const items: OverlayItems = { zones: [], vlines: [], lines: [] };
   const idx = (t: TimeInput) => resolveIndex(visible, t, start);
   for (const a of annotations) {
     if (a.type === 'zone') {
@@ -657,6 +657,15 @@ function overlayItems(
       });
     } else if (a.type === 'vline') {
       items.vlines.push({ index: idx(a.time), label: a.label, color: p.tones[a.tone ?? 'muted'] });
+    } else if (a.type === 'line') {
+      items.lines?.push({
+        from: { index: idx(a.from.time), price: a.from.price },
+        to: { index: idx(a.to.time), price: a.to.price },
+        extend: a.extend ?? false,
+        dashed: a.dashed ?? false,
+        label: a.label,
+        color: p.tones[a.tone ?? 'info'],
+      });
     }
   }
   return items;

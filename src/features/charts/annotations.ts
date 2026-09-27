@@ -41,6 +41,16 @@ export type Annotation =
       tone?: Tone;
     }
   | { type: 'vline'; time: TimeInput; label?: string; tone?: Tone }
+  /** Sloped line through two points (trendline, channel border); `extend` continues it right. */
+  | {
+      type: 'line';
+      from: { time: TimeInput; price: number };
+      to: { time: TimeInput; price: number };
+      label?: string;
+      tone?: Tone;
+      dashed?: boolean;
+      extend?: boolean;
+    }
   /** Auto-detected swing points labelled HH / HL / LH / LL. */
   | { type: 'swings'; n?: number }
   /** Auto-detected candle patterns in the visible range (lib/indicators/patterns). */
