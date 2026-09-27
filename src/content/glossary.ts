@@ -1503,6 +1503,36 @@ export const glossary: GlossaryTerm[] = [
     related: ['rsi', 'oscillator'],
     lessonId: 'm05-l03',
   },
+  {
+    id: 'macd',
+    term: 'MACD',
+    aliases: ['moving average convergence divergence', 'схождение-расхождение скользящих'],
+    short: 'Осциллятор импульса: разница EMA 12 и EMA 26, сигнальная линия и гистограмма.',
+    full: 'Стандартные параметры — 12, 26, 9. Выше нуля быстрая EMA выше медленной — импульс бычий. Сокращение гистограммы после пика — импульс слабеет, но это не разворот.\n\nMACD запаздывает, во флэте даёт серию ложных пересечений и дублирует пересечения EMA.',
+    category: 'indicators',
+    related: ['signal-line', 'histogram', 'ema', 'momentum'],
+    lessonId: 'm05-l04',
+  },
+  {
+    id: 'signal-line',
+    term: 'Сигнальная линия',
+    aliases: ['signal line', 'сигнальная'],
+    short: 'EMA 9 от линии MACD — её сглаженная копия.',
+    full: 'Пересечение линии MACD и сигнальной снизу вверх — импульс разворачивается вверх, сверху вниз — вниз. Сигнал запаздывает и во флэте часто ложный.',
+    category: 'indicators',
+    related: ['macd', 'histogram'],
+    lessonId: 'm05-l04',
+  },
+  {
+    id: 'histogram',
+    term: 'Гистограмма MACD',
+    aliases: ['histogram', 'гистограмма'],
+    short: 'Разница между линией MACD и сигнальной линией, показанная столбиками.',
+    full: 'Рост столбиков — импульс набирает силу, сокращение после пика — слабеет. В ноябре 2024 года после пика гистограммы BTC вырос ещё почти на 10 %, так что сокращение — предупреждение, а не сигнал продавать.',
+    category: 'indicators',
+    related: ['macd', 'signal-line'],
+    lessonId: 'm05-l04',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
