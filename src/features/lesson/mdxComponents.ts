@@ -9,6 +9,7 @@ import { Diagram } from '@/components/diagrams/Diagram';
 import { MascotSay } from '@/components/mascot/MascotSay';
 import { CalcEmbed } from '@/features/calculators/CalcEmbed';
 import { SimScenario } from './blocks/SimScenario';
+import { FibExplorer } from '@/features/charts/FibExplorer';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
 export const mdxComponents: MDXComponents = {
@@ -46,4 +47,5 @@ export const mdxComponents: MDXComponents = {
   MascotSay,
   CalcEmbed,
   SimScenario,
+  FibExplorer,
 };

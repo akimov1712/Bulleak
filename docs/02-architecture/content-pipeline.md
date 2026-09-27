@@ -35,6 +35,7 @@ src/content/scenarios.ts              SimScenario[]
 | `<Reveal title="...">` | Раскрывающийся блок «проверь себя» |
 | `<CalcEmbed id="position"/>` | Встроенный калькулятор |
 | `<SimScenario id="..."/>` | Кнопка/превью сценария тренажёра |
+| `<FibExplorer dataset from to caption/>` | Интерактив: два клика по графику → сетка откатов Фибоначчи и «золотой карман» (`lib/trading/fibonacci`) |
 | `<Steps>` / `<Step>` | Пошаговая инструкция (например, в Bybit) |
 | `<Compare left right/>` | Сравнение двух понятий (спот vs фьючерсы) |
 | `<Checklist items/>` | Чек-лист с галочками (локально) |
