@@ -22,7 +22,7 @@ describe('routes', () => {
     [paths.simulator(), 'Тренажёр'],
     [paths.simulator('m03-sr-bounce'), 'Отскок от поддержки'],
     [paths.tools(), 'Инструменты'],
-    [paths.tools('position'), 'Инструменты'],
+    [paths.tools('position'), 'Размер позиции'],
     [paths.journal(), 'Журнал сделок'],
     [paths.journalNew(), 'Сделка'],
     [paths.glossary(), 'Глоссарий'],

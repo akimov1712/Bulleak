@@ -1,7 +1,7 @@
 # T-601 · Калькуляторы: позиция, ликвидация, R:R
 
 - **Этап:** 06 Инструменты: калькуляторы, журнал, глоссарий, статистика, настройки
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/calculators.md
@@ -17,7 +17,7 @@
 - `src/features/calculators/*`
 
 ## Критерии приёмки
-- [ ] Некорректный ввод → «—» и подсказка
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Некорректный ввод → «—» и подсказка
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(tools): add position, liquidation and rr calculators`
