@@ -74,15 +74,15 @@ describe('simRepo', () => {
     expect((await simRepo.list({ limit: 1 })).map((t) => t.at)).toEqual([3]);
   });
 
-  it('updates, removes, clears and replaces', async () => {
+  it('updates, removes and clears', async () => {
     const id = await simRepo.add(sim(1));
     expect(await simRepo.update(id, { notes: 'ретест' })).toBe(true);
     expect((await simRepo.get(id))?.notes).toBe('ретест');
     expect(await simRepo.update(9999, { notes: 'x' })).toBe(false);
     await simRepo.remove(id);
     expect(await simRepo.count()).toBe(0);
-    await simRepo.add(sim(5));
-    await simRepo.replaceAll([sim(7), sim(8)]);
+    await simRepo.add(sim(7));
+    await simRepo.add(sim(8));
     expect((await simRepo.list()).map((t) => t.at)).toEqual([8, 7]);
     await simRepo.clear();
     expect(await simRepo.count()).toBe(0);
@@ -108,8 +108,6 @@ describe('journalRepo', () => {
     expect(await journalRepo.update(id, { exit: 61_000, closedAt: 30 })).toBe(true);
     expect(await journalRepo.get(id)).toMatchObject({ exit: 61_000, closedAt: 30 });
     await journalRepo.remove(id);
-    expect(await journalRepo.count()).toBe(1);
-    await journalRepo.replaceAll([journal(1)]);
     expect(await journalRepo.count()).toBe(1);
     await journalRepo.clear();
     expect(await journalRepo.count()).toBe(0);

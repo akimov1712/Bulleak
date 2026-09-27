@@ -37,13 +37,4 @@ export const journalRepo = {
   clear: () => guard('очистить журнал', () => db.journal.clear()),
 
   count: () => guard('посчитать записи журнала', () => db.journal.count()),
-
-  /** Replaces everything (import from a backup file). */
-  replaceAll: (trades: JournalTrade[]) =>
-    guard('восстановить журнал', () =>
-      db.transaction('rw', db.journal, async () => {
-        await db.journal.clear();
-        await db.journal.bulkAdd(trades);
-      }),
-    ),
 };

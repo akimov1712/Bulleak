@@ -43,13 +43,4 @@ export const simRepo = {
   clear: () => guard('очистить историю сделок', () => db.simTrades.clear()),
 
   count: () => guard('посчитать сделки', () => db.simTrades.count()),
-
-  /** Replaces everything (import from a backup file). */
-  replaceAll: (trades: SimTrade[]) =>
-    guard('восстановить сделки', () =>
-      db.transaction('rw', db.simTrades, async () => {
-        await db.simTrades.clear();
-        await db.simTrades.bulkAdd(trades);
-      }),
-    ),
 };
