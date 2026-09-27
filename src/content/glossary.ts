@@ -1604,6 +1604,37 @@ export const glossary: GlossaryTerm[] = [
     related: ['support', 'break-of-structure', 'indicator'],
     lessonId: 'm05-l06',
   },
+  {
+    id: 'multi-timeframe-analysis',
+    term: 'Мультитаймфреймовый анализ',
+    aliases: ['multi-timeframe analysis', 'MTF', 'анализ нескольких таймфреймов'],
+    short: 'Анализ рынка на нескольких таймфреймах перед решением о сделке.',
+    full: 'В курсе набор фиксирован: 1D — контекст и зоны, 4H — сетап, 1H — триггер. Соседние таймфреймы отличаются в 4–6 раз. При конфликте главнее старший.',
+    category: 'strategy',
+    related: ['top-down', 'trigger', 'timeframe'],
+    lessonId: 'm06-l01',
+  },
+  {
+    id: 'top-down',
+    term: 'Анализ сверху вниз',
+    aliases: ['top-down', 'топ-даун'],
+    short: 'Порядок анализа от старшего таймфрейма к младшему.',
+    full: 'Сначала сторона (1D), потом место (4H), потом момент входа (1H). Коррекцию на младшем ТФ против старшего тренда не торгуют, а ждут её окончания у зоны старшего ТФ.',
+    category: 'strategy',
+    related: ['multi-timeframe-analysis', 'higher-timeframe'],
+    lessonId: 'm06-l01',
+  },
+  {
+    id: 'trigger',
+    term: 'Триггер',
+    aliases: ['trigger', 'триггер входа'],
+    short:
+      'Событие на младшем таймфрейме, которое подтверждает вход: разворот структуры, паттерн у зоны.',
+    full: 'Триггер даёт подтверждение, что на зоне появились покупатели (или продавцы), и позволяет поставить стоп за локальный экстремум — короче, чем на рабочем таймфрейме. Цена за это — иногда вход позже или вовсе без сделки.',
+    category: 'strategy',
+    related: ['multi-timeframe-analysis', 'confirmation'],
+    lessonId: 'm06-l01',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
