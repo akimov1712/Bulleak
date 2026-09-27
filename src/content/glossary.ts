@@ -1725,6 +1725,36 @@ export const glossary: GlossaryTerm[] = [
     related: ['fakeout', 'breakout'],
     lessonId: 'm06-l04',
   },
+  {
+    id: 'divergence',
+    term: 'Дивергенция',
+    aliases: ['divergence', 'расхождение'],
+    short: 'Расхождение между ценой и осциллятором импульса (RSI, MACD).',
+    full: 'Регулярные дивергенции предупреждают о возможном развороте, скрытые — сигнал продолжения тренда. Дивергенции могут накапливаться долго, поэтому для входа нужен триггер — например, слом структуры.',
+    category: 'indicators',
+    related: ['regular-divergence', 'hidden-divergence', 'rsi', 'macd'],
+    lessonId: 'm06-l05',
+  },
+  {
+    id: 'regular-divergence',
+    term: 'Регулярная дивергенция',
+    aliases: ['regular divergence', 'классическая дивергенция'],
+    short: 'Медвежья: цена HH, RSI LH. Бычья: цена LL, RSI HL.',
+    full: 'Появляется в конце движения и предупреждает, что импульс слабеет. У BTC 20 января 2025 года цена обновила максимум, а RSI — нет; разворот подтвердился сломом структуры только 25 февраля.',
+    category: 'indicators',
+    related: ['divergence', 'hidden-divergence'],
+    lessonId: 'm06-l05',
+  },
+  {
+    id: 'hidden-divergence',
+    term: 'Скрытая дивергенция',
+    aliases: ['hidden divergence'],
+    short: 'Скрытая бычья: цена HL, RSI LL. Скрытая медвежья: цена LH, RSI HH.',
+    full: 'Сигнал продолжения тренда: откат был глубоким по импульсу, но мелким по цене. Торговля по тренду со скрытой дивергенцией считается надёжнее, чем против тренда по регулярной.',
+    category: 'indicators',
+    related: ['divergence', 'regular-divergence'],
+    lessonId: 'm06-l05',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
