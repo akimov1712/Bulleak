@@ -64,7 +64,7 @@ interface QuizResult { quizId: string; correct: number; total: number; ratio: nu
 ## Прогресс (`types/progress.ts`) — localStorage, ключ `tc-progress`
 ```ts
 interface ProgressState {
-  version: number;                                   // для миграций, сейчас 1
+  version: number;                                   // для миграций, сейчас 3 (v2 — simSkippedScenarios, v3 — план и стратегия)
   lessons: Record<LessonId, LessonProgress>;
   exams: Record<ModuleId | 'final', ExamProgress>;
   xp: number;                                        // суммарный
@@ -74,6 +74,8 @@ interface ProgressState {
   quizAttempts: QuizAttempt[];                       // последние 500
   counters: Counters;                                // для достижений
   profile: { name: string; startedAt: number; lastBackupAt?: number };
+  tradingPlan: { sections: Partial<Record<PlanSectionId, string>>; updatedAt: number } | null; // /plan, 9 разделов m10-l03
+  strategy: { name: string; rules: string[]; updatedAt: number } | null;   // своя версия TPS; null = правила курса
 }
 interface LessonProgress { readAt?: number; quizBest: number; quizAttempts: number; completedAt?: number; timeSpentSec: number; xpEarned: number; improvements: number } // improvements — сколько раз пересдача улучшила результат (лимит XP)
 interface ExamProgress   { best: number; attempts: number; passedAt?: number; lastAttemptAt?: number } // lastAttemptAt — для паузы перед пересдачей

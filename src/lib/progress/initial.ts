@@ -6,7 +6,7 @@ import type {
   Streak,
 } from '@/types/progress';
 
-export const PROGRESS_VERSION = 2;
+export const PROGRESS_VERSION = 3;
 export const MAX_QUIZ_ATTEMPTS = 500;
 
 export function emptyCounters(): Counters {
@@ -46,6 +46,8 @@ export function createInitialProgress(now: number): ProgressState {
     quizAttempts: [],
     counters: emptyCounters(),
     profile: { name: '', startedAt: now },
+    tradingPlan: null,
+    strategy: null,
   };
 }
 

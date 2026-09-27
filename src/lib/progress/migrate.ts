@@ -1,5 +1,6 @@
 import type { ProgressState } from '@/types/progress';
 import { isDateKey } from '@/lib/date';
+import { sanitizePlan, sanitizeStrategy } from '@/lib/plan/plan';
 import {
   createInitialProgress,
   emptyCounters,
@@ -41,6 +42,7 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
 
   // v0 → v1: no structural changes yet (v0 = pre-release data); normalization below covers it.
   // v1 → v2: counters.simCorrectSkips → simSkippedScenarios (see counters below).
+  // v2 → v3: tradingPlan and strategy added (see the end).
 
   const lessons = record(raw.lessons, (v) => {
     if (!isObject(v)) return null;
@@ -151,5 +153,8 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
       startedAt: num(profileRaw.startedAt, now),
       lastBackupAt: optNum(profileRaw.lastBackupAt),
     },
+    // v2 → v3: trading plan and custom strategy (absent in older data → null).
+    tradingPlan: sanitizePlan(raw.tradingPlan),
+    strategy: sanitizeStrategy(raw.strategy),
   };
 }

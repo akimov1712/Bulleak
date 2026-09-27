@@ -93,6 +93,34 @@ export interface ProgressState {
   quizAttempts: QuizAttempt[];
   counters: Counters;
   profile: Profile;
+  /** null until the learner saves a plan (v3). */
+  tradingPlan: TradingPlan | null;
+  /** null = the course default (TPS) (v3). */
+  strategy: CustomStrategy | null;
+}
+
+export type PlanSectionId =
+  | 'goals'
+  | 'markets'
+  | 'routine'
+  | 'risk'
+  | 'strategy'
+  | 'news'
+  | 'emotions'
+  | 'review'
+  | 'changes';
+
+/** The learner's written trading plan (m10-l03), edited on /plan. */
+export interface TradingPlan {
+  sections: Partial<Record<PlanSectionId, string>>;
+  updatedAt: number;
+}
+
+/** The learner's own version of the course strategy (m11-l02, StrategyEditor). */
+export interface CustomStrategy {
+  name: string;
+  rules: string[];
+  updatedAt: number;
 }
 
 /** Derived, never stored. */

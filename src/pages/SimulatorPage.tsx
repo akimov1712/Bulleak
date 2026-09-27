@@ -25,6 +25,7 @@ import { SimSession } from '@/features/simulator/SimSession';
 import { SimHistory } from '@/features/simulator/SimHistory';
 import { getScenario } from '@/content/scenarios';
 import { getStrategy } from '@/content/strategies';
+import { useProgress } from '@/store/progressStore';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { Mascot } from '@/components/mascot/Mascot';
 import { buttonClass } from '@/components/ui/styles';
@@ -70,7 +71,13 @@ export function SimulatorPage() {
   const scenario = scenarioId ? getScenario(scenarioId) : undefined;
   // ?backtest=tps: a shareable link from lesson m11-l04 ("Начать бэктест TPS").
   const [search, setSearch] = useSearchParams();
-  const strategy = scenario ? undefined : getStrategy(search.get('backtest') ?? '');
+  const customStrategy = useProgress((st) => st.strategy);
+  const baseStrategy = scenario ? undefined : getStrategy(search.get('backtest') ?? '');
+  // The learner's own rules (StrategyEditor on /plan) replace the course defaults in the checklist.
+  const strategy =
+    baseStrategy && customStrategy
+      ? { ...baseStrategy, title: customStrategy.name, rules: customStrategy.rules }
+      : baseStrategy;
   // ?seed=123 reproduces a free-mode start (handy for e2e tests and sharing a moment).
   const [seed, setSeed] = useState(() => {
     const fromUrl = Number(search.get('seed'));
