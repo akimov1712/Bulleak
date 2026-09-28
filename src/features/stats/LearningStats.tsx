@@ -7,17 +7,17 @@ import { Segmented } from '@/components/ui/Segmented';
 import { EmptyState } from '@/components/ui/Skeleton';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { courseIndex } from '@/content/courseIndex';
-import { getTerm, termLessonId } from '@/content/glossary';
+import { getTerm } from '@/content/glossary';
 import { useToday } from '@/hooks/useToday';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { fromDateKey } from '@/lib/date';
 import { formatDuration, formatNumber, formatPct } from '@/lib/format';
 import { levelFromXp } from '@/lib/gamification/levels';
-import { moduleLessonOfTag } from '@/lib/quiz/exam';
 import { moduleCompletion } from '@/lib/progress/unlock';
-import { heatmap, learningSummary, tagAccuracy, weakTopics, xpByDay } from '@/lib/stats/learning';
+import { heatmap, learningSummary, tagAccuracy, xpByDay } from '@/lib/stats/learning';
 import { useProgress } from '@/store/progressStore';
 import { Bars, HBar, Heatmap } from './charts';
+import { WeakTopics } from './WeakTopics';
 
 const dayFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
 const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', {
@@ -26,8 +26,6 @@ const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', {
   hour: '2-digit',
   minute: '2-digit',
 });
-
-const lessonOfTag = moduleLessonOfTag(courseIndex.lessons, termLessonId);
 
 /** Human name of a quiz attempt: lesson title, module exam or the final exam. */
 function quizName(quizId: string): string {
@@ -65,7 +63,6 @@ export function LearningStats() {
 
   const xpDays = xpByDay(progress.activity, today, Number(days));
   const accuracy = tagAccuracy(progress.quizAttempts);
-  const weak = weakTopics(accuracy);
   const tiles: [string, string][] = [
     ['Опыт', `${formatNumber(summary.xp, 0)} XP`],
     ['Уровень', `${level.level} · ${level.rank}`],
@@ -135,32 +132,7 @@ export function LearningStats() {
           <p className="text-text-muted">Появится после первых тестов.</p>
         ) : (
           <>
-            {weak.length > 0 && (
-              <div className="rounded-2xl border-2 border-warn bg-warn-soft p-3 text-sm">
-                <p className="font-extrabold">Стоит повторить</p>
-                <ul className="mt-1 flex flex-col gap-1">
-                  {weak.map((w) => {
-                    const lesson = lessonOfTag(w.tag);
-                    return (
-                      <li key={w.tag}>
-                        {getTerm(w.tag)?.term ?? w.tag} — {formatPct(w.ratio, 0)}
-                        {lesson && (
-                          <>
-                            {' · '}
-                            <Link
-                              to={paths.lesson(lesson)}
-                              className="font-bold text-info underline"
-                            >
-                              урок «{courseIndex.getLesson(lesson)?.title}»
-                            </Link>
-                          </>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+            <WeakTopics />
             {accuracy.slice(0, 15).map((a) => (
               <HBar
                 key={a.tag}

@@ -1,7 +1,7 @@
 # m12-l04 · Что дальше: развитие трейдера
 
 - **Модуль:** 12   **Время:** ~9 мин   **Практика:** —
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Иметь план развития на 6–12 месяцев после курса.
@@ -27,6 +27,12 @@
 - [single] Красный флаг у «гуру».
 - [order] Ежемесячный цикл улучшения.
 - [single] Что делать перед финальным экзаменом.
+
+## Источники
+Сверено 2026-09-29:
+- Красные флаги мошенничества («гарантированная прибыль», «без риска», групповые чаты, давление, авансовые платежи): https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/social-media-and-investment-fraud-investor-alert , https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/gateway-to-investment-scams , https://www.cftc.gov/LearnAndProtect/AdvisoriesAndArticles/watch_out_for_digital_fraud.html
+- Тестнет для проверки программ через API — урок m02-l06.
+- Блок «Твои слабые темы» — `<WeakTopics/>` (вынесен со страницы статистики, данные — точность ответов по тегам вопросов).
 
 ## Связи
 Готовит к: финальному экзамену.
