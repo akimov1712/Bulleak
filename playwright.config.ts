@@ -3,6 +3,15 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = 4173;
 const externalBaseUrl = process.env.PLAYWRIGHT_BASE_URL;
 
+/**
+ * A time zone where it is now about noon. Hour-based achievements («Ночная сова», «Ранняя
+ * пташка») add extra toasts that cover buttons, so a run at night would fail; real time keeps
+ * flowing (reading timers need it), only the local hour moves. Etc/GMT signs are inverted.
+ */
+const noonOffset = ((12 - new Date().getUTCHours() + 36) % 24) - 12;
+const timezoneId =
+  noonOffset === 0 ? 'Etc/GMT' : `Etc/GMT${noonOffset > 0 ? '-' : '+'}${Math.abs(noonOffset)}`;
+
 export default defineConfig({
   testDir: './e2e',
   // Full lesson + quiz scenarios take ~25 s under parallel load.
@@ -17,6 +26,7 @@ export default defineConfig({
     baseURL: externalBaseUrl ?? `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
     locale: 'ru-RU',
+    timezoneId,
     // Endless decorative animations (bouncing map node) never become "stable" for clicks;
     // reduced motion also exercises the app's motion setting.
     reducedMotion: 'reduce',
