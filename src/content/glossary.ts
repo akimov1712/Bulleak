@@ -2341,6 +2341,47 @@ export const glossary: GlossaryTerm[] = [
     related: ['confluence', 'trigger', 'trading-strategy', 'invalidation'],
     lessonId: 'm11-l02',
   },
+  {
+    id: 'breakeven',
+    term: 'Безубыток',
+    aliases: ['breakeven', 'BE', 'б/у', 'стоп в ноль'],
+    short:
+      'Перенос стопа на цену входа: сделка больше не может закончиться убытком (кроме комиссий).',
+    full: 'Безубыток защищает от убытка, но слишком ранний перенос выбивает сделки обычными откатами, и цена идёт к цели уже без тебя.\n\nПравило TPS: безубыток после +1,5R или после нового HH на 4H (для шорта — нового LL).',
+    category: 'strategy',
+    related: ['trade-management', 'trailing-stop', 'stop-loss'],
+    lessonId: 'm11-l03',
+  },
+  {
+    id: 'partial-take-profit',
+    term: 'Частичная фиксация',
+    aliases: ['partial take profit', 'частичный тейк', 'partial TP'],
+    short: 'Закрытие части позиции на первой цели; остаток держат дальше.',
+    full: 'Например, 50 % на 2R и остаток трейлингом: если остаток выбит в безубыток — итог +1R, если закрыт на 4R — +3R.\n\nНа Bybit частичная фиксация делается несколькими TP/SL с разным объёмом в режиме частичной позиции.',
+    category: 'strategy',
+    related: ['trade-management', 'take-profit', 'trailing-stop'],
+    lessonId: 'm11-l03',
+  },
+  {
+    id: 'trailing-stop',
+    term: 'Трейлинг-стоп',
+    aliases: ['trailing stop', 'трейлинг', 'скользящий стоп'],
+    short: 'Стоп, который двигается за ценой в сторону прибыли.',
+    full: 'Трейлинг по структуре переносит стоп под каждый новый HL (для лонга) — туда, где ломается тренд. Трейлинг на фиксированном расстоянии идёт за ценой на заданную величину: так работает трейлинг-стоп Bybit, в том числе с ценой активации.\n\nТрейлинг ловит крупные движения, но часть прибыли всегда отдаётся на развороте.',
+    category: 'strategy',
+    related: ['trade-management', 'breakeven', 'partial-take-profit'],
+    lessonId: 'm11-l03',
+  },
+  {
+    id: 'trade-management',
+    term: 'Сопровождение сделки',
+    aliases: ['trade management', 'управление позицией', 'ведение сделки'],
+    short: 'Правила изменения стопа и закрытия позиции после входа.',
+    full: 'Варианты: фиксированный тейк, перенос в безубыток, частичная фиксация, трейлинг. Они по-разному меняют винрейт и средний R, и лучший зависит от стратегии — его выбирают бэктестом.\n\nГлавное правило: стоп никогда не отодвигают дальше от входа.',
+    category: 'strategy',
+    related: ['breakeven', 'partial-take-profit', 'trailing-stop'],
+    lessonId: 'm11-l03',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
