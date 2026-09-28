@@ -171,3 +171,47 @@ export function Candle({ x, open, close, high, low, w = 16, tone }: CandleProps)
     </g>
   );
 }
+
+export type Pt = readonly [number, number];
+
+interface PolylineProps {
+  pts: readonly Pt[];
+  tone?: DiagramTone;
+  width?: number;
+  dashed?: boolean;
+}
+
+/** An open line through points (price paths, equity curves). */
+export function Polyline({ pts, tone = 'text', width = 2.5, dashed }: PolylineProps) {
+  return (
+    <polyline
+      points={pts.map(([x, y]) => `${x},${y}`).join(' ')}
+      fill="none"
+      strokeWidth={width}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      strokeDasharray={dashed ? '6 4' : undefined}
+      className={strokeOf[tone]}
+    />
+  );
+}
+
+interface NoteProps {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  children: ReactNode;
+  className?: string;
+}
+
+/** Wrapped HTML text inside the drawing (for sentences that must reflow). */
+export function Note({ x, y, w, h, children, className }: NoteProps) {
+  return (
+    <foreignObject x={x} y={y} width={w} height={h}>
+      <div className={cn('text-[13px] leading-snug font-semibold text-text', className)}>
+        {children}
+      </div>
+    </foreignObject>
+  );
+}

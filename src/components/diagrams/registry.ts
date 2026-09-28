@@ -59,6 +59,24 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'leverage-margin': () => import('./m08').then((m) => ({ default: m.LeverageMargin })),
   'liquidation-ladder': () => import('./m08').then((m) => ({ default: m.LiquidationLadder })),
   'funding-flow': () => import('./m08').then((m) => ({ default: m.FundingFlow })),
+  // m09
+  'drawdown-recovery': () => import('./m09').then((m) => ({ default: m.DrawdownRecovery })),
+  'position-sizing': () => import('./m09').then((m) => ({ default: m.PositionSizing })),
+  'rr-winrate-matrix': () => import('./m09').then((m) => ({ default: m.RrWinrateMatrix })),
+  'correlated-risk': () => import('./m09').then((m) => ({ default: m.CorrelatedRisk })),
+  // m10
+  'emotion-cycle': () => import('./m10').then((m) => ({ default: m.EmotionCycle })),
+  'daily-routine': () => import('./m10').then((m) => ({ default: m.DailyRoutine })),
+  'process-outcome-matrix': () =>
+    import('./m10').then((m) => ({ default: m.ProcessOutcomeMatrix })),
+  // m11
+  'strategy-anatomy': () => import('./m11').then((m) => ({ default: m.StrategyAnatomy })),
+  'tps-flow': () => import('./m11').then((m) => ({ default: m.TpsFlow })),
+  'trade-management': () => import('./m11').then((m) => ({ default: m.TradeManagement })),
+  overfitting: () => import('./m11').then((m) => ({ default: m.Overfitting })),
+  // m12
+  'scaling-ladder': () => import('./m12').then((m) => ({ default: m.ScalingLadder })),
+  'growth-roadmap': () => import('./m12').then((m) => ({ default: m.GrowthRoadmap })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
