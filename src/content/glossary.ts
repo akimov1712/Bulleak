@@ -2268,6 +2268,17 @@ export const glossary: GlossaryTerm[] = [
     related: ['trading-routine', 'tilt'],
     lessonId: 'm10-l02',
   },
+  {
+    id: 'trading-plan',
+    term: 'Торговый план',
+    aliases: ['trading plan', 'план торговли'],
+    short:
+      'Письменный документ со всеми правилами торговли: риск, лимиты, рутина, стратегия, эмоции, журнал.',
+    full: 'Торговый план отвечает на вопросы «что, когда, сколько и как» заранее, пока голова холодная. Стратегия (правила входа и выхода) — лишь один из его разделов.\n\nПлан меняют не чаще раза в месяц и только по данным журнала.',
+    category: 'strategy',
+    related: ['trading-routine', 'daily-loss-limit', 'process-over-outcome'],
+    lessonId: 'm10-l03',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));

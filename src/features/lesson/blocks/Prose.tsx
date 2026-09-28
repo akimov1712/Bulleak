@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react';
+import { Link } from 'react-router';
 import { cn } from '@/lib/cn';
 import { slugify, textOf } from '@/lib/slug';
 
@@ -63,16 +64,25 @@ export function Strong({ className, ...rest }: ComponentProps<'strong'>) {
 }
 
 export function A({ className, href, children, ...rest }: ComponentProps<'a'>) {
+  const cls = cn(
+    'font-bold text-info underline decoration-2 underline-offset-2 hover:decoration-info/40',
+    className,
+  );
+  // App routes ("/plan") go through the router: under the hash router a plain href would miss.
+  if (href?.startsWith('/')) {
+    return (
+      <Link to={href} className={cls} {...rest}>
+        {children}
+      </Link>
+    );
+  }
   const external = href?.startsWith('http');
   return (
     <a
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noreferrer' : undefined}
-      className={cn(
-        'font-bold text-info underline decoration-2 underline-offset-2 hover:decoration-info/40',
-        className,
-      )}
+      className={cls}
       {...rest}
     >
       {children}
