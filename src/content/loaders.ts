@@ -67,6 +67,9 @@ export async function loadExam(id: ModuleId): Promise<Quiz> {
   return (await load()).exam;
 }
 
+/** Final exam: the pooled theory part and the practical scenarios (its own chunk). */
+export const loadFinalExam = () => import('./final-exam');
+
 /** For content validation tests: every discovered content file. */
 export const contentInventory = {
   lessons: [...lessonLoaders.keys()],

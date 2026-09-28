@@ -11,13 +11,13 @@ import { Card } from '@/components/ui/Card';
 import { buttonClass } from '@/components/ui/styles';
 import { Mascot } from '@/components/mascot/Mascot';
 import { MascotSay } from '@/components/mascot/MascotSay';
-import { PagePlaceholder } from '@/app/layout/PagePlaceholder';
+import { FinalExam } from '@/features/quiz/FinalExam';
 import { examPromise, forgetQuiz } from '@/features/quiz/quizContent';
 import { QuizRunner, type QuizFinish } from '@/features/quiz/QuizRunner';
 import { QuizResultView } from '@/features/quiz/QuizResultView';
 import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
 import { examRetakeWaitMs, moduleLessonOfTag, weakLessons } from '@/lib/quiz/exam';
-import { isExamAvailable, isExamPassed } from '@/lib/progress/unlock';
+import { isExamAvailable, isExamPassed, isFinalAvailable } from '@/lib/progress/unlock';
 import { formatPct, plural } from '@/lib/format';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -225,12 +225,37 @@ export function ExamPage() {
   const ctx = useUnlockContext();
 
   if (moduleId === 'final') {
+    if (!isFinalAvailable(ctx)) {
+      return (
+        <EmptyState
+          headingLevel={1}
+          art={<Mascot mood="thinking" size={130} />}
+          title="Финальный экзамен пока закрыт"
+          description="Он открывается, когда сданы экзамены всех модулей."
+          action={
+            <Link to={paths.path()} className={buttonClass()}>
+              К карте курса
+            </Link>
+          }
+        />
+      );
+    }
     return (
-      <PagePlaceholder
-        title="Финальный экзамен"
-        description="Появится на этапе 08, когда будут готовы все модули."
-        mood="thinking"
-      />
+      <ErrorBoundary
+        resetKey="final"
+        fallback={(_error, reset) => (
+          <EmptyState
+            headingLevel={1}
+            art={<Mascot mood="shocked" size={130} />}
+            title="Не удалось загрузить экзамен"
+            action={<Button onClick={reset}>Повторить</Button>}
+          />
+        )}
+      >
+        <Suspense fallback={<PageSkeleton />}>
+          <FinalExam />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
   if (!module?.hasExam) {

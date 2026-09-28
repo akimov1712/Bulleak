@@ -94,4 +94,20 @@ describe('ExamPage', () => {
       '/module/m02',
     );
   }, 60_000);
+  it('final exam: locked until every module exam is passed, then shows both parts', async () => {
+    renderAt('/exam/final');
+    expect(await screen.findByText('Финальный экзамен пока закрыт')).toBeInTheDocument();
+    cleanup();
+    const exams = Object.fromEntries(
+      courseIndex.modules
+        .filter((m) => m.hasExam)
+        .map((m) => [m.id, { best: 1, attempts: 1, passedAt: 1 }]),
+    );
+    useProgress.setState({ exams });
+    renderAt('/exam/final');
+    expect(await screen.findByRole('heading', { name: 'Финальный экзамен' })).toBeInTheDocument();
+    expect(screen.getByText(/Теория: 40 вопросов по всем модулям/)).toBeInTheDocument();
+    expect(screen.getByText(/Практика: 3 ситуации/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Начать экзамен' })).toBeInTheDocument();
+  });
 });

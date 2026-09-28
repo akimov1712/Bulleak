@@ -1,7 +1,7 @@
 # T-826 · Финальный экзамен
 
 - **Этап:** 08 Контент: модули 9–12, финал, сертификат
-- **Статус:** ☐ не начата
+- **Статус:** ☑ готово
 
 ## Контекст (прочитать перед началом)
 - docs/04-features/exams-certificate.md
@@ -16,7 +16,7 @@
 - `src/lib/quiz/practical.ts`
 
 ## Критерии приёмки
-- [ ] Оценивается решение, а не исход сделки
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Оценивается решение, а не исход сделки
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `content: add final exam with practical part`
