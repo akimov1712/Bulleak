@@ -10,6 +10,7 @@ import { MascotSay } from '@/components/mascot/MascotSay';
 import { CalcEmbed } from '@/features/calculators/CalcEmbed';
 import { SimScenario } from './blocks/SimScenario';
 import { FibExplorer } from '@/features/charts/FibExplorer';
+import { ReadinessChecklist } from '@/features/plan/ReadinessChecklist';
 import { StrategyEditor } from '@/features/plan/StrategyEditor';
 import { BacktestProgress } from '@/features/simulator/BacktestProgress';
 import { ForwardTestProgress } from '@/features/journal/ForwardTestProgress';
@@ -56,4 +57,5 @@ export const mdxComponents: MDXComponents = {
   StrategyEditor,
   BacktestProgress,
   ForwardTestProgress,
+  ReadinessChecklist,
 };

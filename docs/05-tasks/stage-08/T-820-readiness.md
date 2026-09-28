@@ -1,7 +1,7 @@
 # T-820 · Автоматическая проверка готовности
 
 - **Этап:** 08 Контент: модули 9–12, финал, сертификат
-- **Статус:** ☐ не начата
+- **Статус:** ☑ готово
 
 ## Контекст (прочитать перед началом)
 - docs/03-content/module-12/lesson-01.md
@@ -15,7 +15,7 @@
 - `src/features/plan/ReadinessChecklist.tsx`
 
 ## Критерии приёмки
-- [ ] Каждый критерий покрыт тестом
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Каждый критерий покрыт тестом
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(plan): add real trading readiness check`
