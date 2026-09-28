@@ -671,9 +671,13 @@ function overlayItems(
     } else if (a.type === 'vline') {
       items.vlines.push({ index: idx(a.time), label: a.label, color: p.tones[a.tone ?? 'muted'] });
     } else if (a.type === 'line') {
+      // Unlike zones, a line endpoint must not be clamped to the window edge: that would keep
+      // its price but move its time and change the slope. Candle indices map to logical
+      // positions even outside the visible slice.
+      const lineIdx = (t: TimeInput) => (typeof t === 'object' ? t.index - start : idx(t));
       items.lines?.push({
-        from: { index: idx(a.from.time), price: a.from.price },
-        to: { index: idx(a.to.time), price: a.to.price },
+        from: { index: lineIdx(a.from.time), price: a.from.price },
+        to: { index: lineIdx(a.to.time), price: a.to.price },
         extend: a.extend ?? false,
         dashed: a.dashed ?? false,
         label: a.label,

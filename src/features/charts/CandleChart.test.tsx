@@ -200,6 +200,28 @@ describe('CandleChart', () => {
     expect(chart.options.handleScroll).toBe(false);
   });
 
+  it('keeps sloped line endpoints outside the window instead of clamping them', () => {
+    render(
+      <CandleChart
+        dataset="BTCUSDT-60"
+        from={{ index: 150 }}
+        to={{ index: 199 }}
+        annotations={[
+          {
+            type: 'line',
+            from: { time: { index: 140 }, price: 60000 },
+            to: { time: { index: 160 }, price: 61000 },
+          },
+        ]}
+      />,
+    );
+    const overlay = lastChart().series[0]?.primitives[0] as {
+      items: { lines: { from: { index: number }; to: { index: number } }[] };
+    };
+    expect(overlay.items.lines[0]?.from.index).toBe(-10);
+    expect(overlay.items.lines[0]?.to.index).toBe(10);
+  });
+
   it('reports clicks on the candle pane and cleans up on unmount', () => {
     const onPick = vi.fn();
     const { unmount } = render(
