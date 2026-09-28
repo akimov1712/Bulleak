@@ -12,7 +12,7 @@ import { buttonClass } from '@/components/ui/styles';
 import { Mascot } from '@/components/mascot/Mascot';
 import { MascotSay } from '@/components/mascot/MascotSay';
 import { FinalExam } from '@/features/quiz/FinalExam';
-import { examPromise, forgetQuiz } from '@/features/quiz/quizContent';
+import { examPromise, forgetFinalExam, forgetQuiz } from '@/features/quiz/quizContent';
 import { QuizRunner, type QuizFinish } from '@/features/quiz/QuizRunner';
 import { QuizResultView } from '@/features/quiz/QuizResultView';
 import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
@@ -248,7 +248,16 @@ export function ExamPage() {
             headingLevel={1}
             art={<Mascot mood="shocked" size={130} />}
             title="Не удалось загрузить экзамен"
-            action={<Button onClick={reset}>Повторить</Button>}
+            action={
+              <Button
+                onClick={() => {
+                  forgetFinalExam();
+                  reset();
+                }}
+              >
+                Повторить
+              </Button>
+            }
           />
         )}
       >

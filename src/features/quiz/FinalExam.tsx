@@ -14,10 +14,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { buttonClass } from '@/components/ui/styles';
 import { MascotSay } from '@/components/mascot/MascotSay';
-import { loadFinalExam } from '@/content/loaders';
 import { useNow } from '@/hooks/useNow';
 import { formatNumber, formatPct } from '@/lib/format';
-import { createPromiseCache } from '@/lib/promiseCache';
 import { examRetakeWaitMs } from '@/lib/quiz/exam';
 import {
   gradePractical,
@@ -29,11 +27,9 @@ import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
 import { useProgress } from '@/store/progressStore';
 import type { QuizResult } from '@/types/quiz';
 import { PracticalTask } from './PracticalTask';
+import { finalExamPromise } from './quizContent';
 import { QuizResultView } from './QuizResultView';
 import { QuizRunner, type QuizFinish } from './QuizRunner';
-
-const cache = createPromiseCache<'final', Awaited<ReturnType<typeof loadFinalExam>>>();
-const finalPromise = () => cache.get('final', loadFinalExam);
 
 const DECISION_LABEL = { long: 'лонг', short: 'шорт', skip: 'пропуск' } as const;
 
@@ -54,7 +50,7 @@ type Phase =
  * practical scenarios graded on the decision, risk ≤ 1 % and R:R ≥ 1.5. Both parts must pass.
  */
 export function FinalExam() {
-  const { finalExam, PRACTICAL_SCENARIOS: scenarios } = use(finalPromise());
+  const { finalExam, PRACTICAL_SCENARIOS: scenarios } = use(finalExamPromise());
   const navigate = useNavigate();
   const progress = useProgress((s) => s.exams.final);
   const recordExam = useProgress((s) => s.recordExam);
@@ -115,6 +111,11 @@ export function FinalExam() {
         result={phase.result}
         questions={phase.prepared.questions}
         passRatio={finalExam.passRatio}
+        failVerdict={
+          phase.theoryPassed
+            ? 'Теория сдана, но практическая часть — нет. Разбор задач ниже.'
+            : `Для сдачи теории нужно ${formatPct(finalExam.passRatio, 0)}. Слабые темы — на странице статистики.`
+        }
         note={
           <section className="flex w-full flex-col gap-3 text-left" aria-label="Итоги частей">
             <p className="font-bold">

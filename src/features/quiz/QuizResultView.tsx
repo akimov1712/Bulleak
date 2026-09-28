@@ -21,6 +21,8 @@ interface QuizResultViewProps {
   note?: ReactNode;
   /** Wording: lesson test (default) or module exam. */
   kind?: 'lesson' | 'exam';
+  /** Replaces the default line under the score when the attempt failed. */
+  failVerdict?: string;
 }
 
 export function QuizResultView({
@@ -30,6 +32,7 @@ export function QuizResultView({
   actions,
   note,
   kind = 'lesson',
+  failVerdict,
 }: QuizResultViewProps) {
   const exam = kind === 'exam';
   const stars = starsForScore(result.ratio, result.passed);
@@ -73,9 +76,11 @@ export function QuizResultView({
           ? mistakes.length === 0
             ? 'Ни одной ошибки — так держать!'
             : `Ошибок: ${mistakes.length}. Разбор — ниже.`
-          : exam
-            ? `Для сдачи нужно ${formatPct(passRatio, 0)}. Повтори уроки с ошибками — они ниже — и попробуй снова.`
-            : `Для сдачи нужно ${formatPct(passRatio, 0)}. Посмотри разбор ошибок, повтори урок и попробуй снова.`}
+          : failVerdict !== undefined
+            ? failVerdict
+            : exam
+              ? `Для сдачи нужно ${formatPct(passRatio, 0)}. Повтори уроки с ошибками — они ниже — и попробуй снова.`
+              : `Для сдачи нужно ${formatPct(passRatio, 0)}. Посмотри разбор ошибок, повтори урок и попробуй снова.`}
       </p>
       {note}
       <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">{actions}</div>
