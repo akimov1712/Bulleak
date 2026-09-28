@@ -2025,6 +2025,26 @@ export const glossary: GlossaryTerm[] = [
     related: ['liquidation', 'stop-hunt'],
     lessonId: 'm08-l04',
   },
+  {
+    id: 'funding-interval',
+    term: 'Интервал финансирования',
+    aliases: ['funding interval', 'период финансирования'],
+    short: 'Периодичность расчёта ставки финансирования; на Bybit обычно 8 часов.',
+    full: 'Расчёт в 00:00, 08:00 и 16:00 UTC; у некоторых контрактов интервал другой — он виден на странице фьючерса. Платят или получают только те, у кого позиция открыта в момент расчёта.',
+    category: 'futures',
+    related: ['funding-rate', 'holding-cost'],
+    lessonId: 'm08-l05',
+  },
+  {
+    id: 'holding-cost',
+    term: 'Стоимость удержания',
+    aliases: ['holding cost', 'стоимость удержания позиции'],
+    short: 'Сколько стоит держать позицию: прежде всего funding за все периоды.',
+    full: 'Позиция 10 000 $ при funding +0,01 % стоит 1 $ за период, 9 $ за три дня. В перегретом рынке в разы больше. Полная стоимость сделки = комиссии + funding + проскальзывание.',
+    category: 'futures',
+    related: ['funding-rate', 'funding-interval'],
+    lessonId: 'm08-l05',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));
