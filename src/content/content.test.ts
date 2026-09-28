@@ -1,14 +1,14 @@
 /**
  * Content validation (docs/02-architecture/content-pipeline.md → «Валидация»).
- * Validates every lesson/quiz/exam that exists. Completeness (all 62 lessons, all exams)
- * is enforced only in strict mode — switched on permanently in T-828 when the course is full.
+ * Strict since T-828: the course is complete, so every lesson, quiz, module exam, the final
+ * exam and the glossary are checked for completeness and cross-references.
  */
 import { describe, expect, it } from 'vitest';
 import type { Question, Quiz } from '@/types/quiz';
 import type { LessonId, ModuleId } from '@/types/course';
 import { contentInventory } from './loaders';
 import { courseIndex } from './courseIndex';
-import { getTerm } from './glossary';
+import { getTerm, glossary } from './glossary';
 import { moduleLessonOfTag, questionLesson } from '@/lib/quiz/exam';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,6 +16,9 @@ import { isDatasetName, type DatasetName } from '@/lib/trading/candles';
 import { isDiagramName } from '@/components/diagrams/registry';
 import { isCalculatorId } from '@/features/calculators/registry';
 import { getScenario } from './scenarios';
+import { finalExam } from './final-exam';
+import { mdxComponents } from '@/features/lesson/mdxComponents';
+import { MOODS } from '@/components/mascot/moods';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -27,8 +30,6 @@ function datasetLength(name: DatasetName): number {
   }
   return length;
 }
-
-const STRICT = import.meta.env.VITE_STRICT_CONTENT === '1';
 
 // Raw MDX text (the Vite MDX plugin compiles even ?raw imports, so read from disk).
 const mdxSources = Object.fromEntries(
@@ -123,7 +124,7 @@ describe('content inventory', () => {
     expect([...contentInventory.lessons].sort()).toEqual([...contentInventory.quizzes].sort());
   });
 
-  it.skipIf(!STRICT)('STRICT: all 62 lessons and all module exams exist', () => {
+  it('all 62 lessons and all module exams exist', () => {
     expect(contentInventory.lessons).toHaveLength(courseIndex.lessons.length);
     const withExam = courseIndex.modules.filter((m) => m.hasExam).map((m) => m.id);
     expect([...contentInventory.exams].sort()).toEqual(withExam.sort());
@@ -145,9 +146,6 @@ describe('lesson quizzes', () => {
 });
 
 describe('module exams', () => {
-  if (contentInventory.exams.length === 0) {
-    it('no exams written yet', () => expect(contentInventory.exams).toEqual([]));
-  }
   it.each(contentInventory.exams)('%s exam is valid', async (id: ModuleId) => {
     const exam = await contentInventory.loadExam(id);
     expect(quizProblems(exam, id, 'exam')).toEqual([]);
@@ -176,6 +174,34 @@ describe('module exams', () => {
       }
     },
   );
+});
+
+describe('final exam', () => {
+  it('is a valid exam pooled from unique questions', () => {
+    expect(quizProblems(finalExam, 'final', 'exam')).toEqual([]);
+    const ids = finalExam.questions.map((q) => q.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe('question tags', () => {
+  it('every tag of every lesson quiz and exam is a glossary term', async () => {
+    const quizzes = [
+      ...(await Promise.all(contentInventory.quizzes.map((id) => contentInventory.loadQuiz(id)))),
+      ...(await Promise.all(contentInventory.exams.map((id) => contentInventory.loadExam(id)))),
+    ];
+    const unknown = quizzes.flatMap((quiz) =>
+      quiz.questions.flatMap((q) => q.tags.filter((t) => !getTerm(t)).map((t) => `${q.id}: ${t}`)),
+    );
+    expect(unknown).toEqual([]);
+  });
+});
+
+describe('glossary', () => {
+  it('every term points at a real lesson', () => {
+    const bad = glossary.filter((t) => !courseIndex.getLesson(t.lessonId)).map((t) => t.id);
+    expect(bad).toEqual([]);
+  });
 });
 
 describe('lesson texts and glossary links', () => {
@@ -224,6 +250,30 @@ describe('lesson texts and glossary links', () => {
     expect(all).toMatch(/<CandleChart\s[^>]*dataset="/);
     expect(all).toMatch(/<CalcEmbed\s+id="/);
     expect(all).toMatch(/<SimScenario\s+id="/);
+    expect(all).toMatch(/mood="/);
+    expect(all).toMatch(/<Checklist\s[^>]*id="/);
+  });
+
+  it.each(contentInventory.lessons)('%s: components and mascot moods exist', (id) => {
+    const source = mdxSources[id] ?? '';
+    const components = [...source.matchAll(/<([A-Z][A-Za-z]+)[\s/>]/g)].map((m) => m[1] ?? '');
+    expect(
+      components.filter((c) => !(c in mdxComponents)),
+      'unknown MDX component',
+    ).toEqual([]);
+    const moods = [...source.matchAll(/mood="([^"]+)"/g)].map((m) => m[1] ?? '');
+    expect(
+      moods.filter((m) => !(m in MOODS)),
+      'unknown mascot mood',
+    ).toEqual([]);
+  });
+
+  it('checklist ids are unique across lessons (they key saved ticks)', () => {
+    const ids = Object.values(mdxSources).flatMap((src) =>
+      [...src.matchAll(/<Checklist\s[^>]*id="([^"]+)"/g)].map((m) => m[1] ?? ''),
+    );
+    expect(ids.length).toBeGreaterThan(0);
+    expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
   });
 
   it.each(contentInventory.lessons)('%s: has Goals and Summary blocks', (id) => {
