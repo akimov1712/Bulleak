@@ -12,6 +12,7 @@ import { SimScenario } from './blocks/SimScenario';
 import { FibExplorer } from '@/features/charts/FibExplorer';
 import { StrategyEditor } from '@/features/plan/StrategyEditor';
 import { BacktestProgress } from '@/features/simulator/BacktestProgress';
+import { ForwardTestProgress } from '@/features/journal/ForwardTestProgress';
 import { TradingPlanEditor } from '@/features/plan/TradingPlanEditor';
 
 /** Everything a lesson MDX file can use. See docs/02-architecture/content-pipeline.md. */
@@ -54,4 +55,5 @@ export const mdxComponents: MDXComponents = {
   TradingPlanEditor,
   StrategyEditor,
   BacktestProgress,
+  ForwardTestProgress,
 };

@@ -23,6 +23,7 @@ import type { JournalAccount, SimTrade } from '@/types/trading';
 import { EquityCurves } from '../calculators/EquityCurves';
 import { JournalBreakdowns, JournalKpis } from '../journal/JournalOverview';
 import { ACCOUNT_LABEL, ACCOUNTS } from '../journal/labels';
+import { BacktestVsForward } from './BacktestVsForward';
 import { Bars } from './charts';
 
 const toError = (e: unknown) => (e instanceof Error ? e : new Error(String(e)));
@@ -209,6 +210,7 @@ export function JournalStats() {
         ]}
         onChange={setAccount}
       />
+      <BacktestVsForward />
       <JournalKpis metrics={journalMetrics(trades)} />
       <JournalBreakdowns trades={trades} />
     </div>
