@@ -1,7 +1,7 @@
 # m10-l01 · Эмоции трейдера: FOMO, страх, жадность, отыгрыш
 
 - **Модуль:** 10 Психология   **Время:** ~12 мин   **Практика:** MiniQuiz-ситуации
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Узнавать у себя FOMO, страх, жадность, отыгрыш (revenge trading), эйфорию после серии побед.
@@ -36,6 +36,13 @@
 
 ## Термины
 `fomo`, `revenge-trading`, `tilt`, `overconfidence`
+
+## Источники
+Сверено 2026-09-28:
+- Отыгрыш, тильт (в т. ч. «win tilt» — самоуверенность после серии побед), FOMO: https://www.tradezella.com/blog/trading-tilt , https://beyondcandlesticks.substack.com/p/handling-fomo-and-revenge-trading
+- «Потеря ощущается примерно вдвое сильнее прибыли» — неприятие потерь, теория перспектив (Kahneman, Tversky 1979; коэффициент ≈ 2,25 в Tversky, Kahneman 1992): https://en.wikipedia.org/wiki/Loss_aversion
+- Цикл эмоций рынка — собственная схема emotion-cycle по мотивам известной «Psychology of a Market Cycle» (без копирования).
+- Карточки эмоций — MascotSay с настроениями shocked / sad / happy / cheering.
 
 ## Связи
 Готовит к: m10-l02…l04.
