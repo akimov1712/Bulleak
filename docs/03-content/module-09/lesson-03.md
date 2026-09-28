@@ -1,7 +1,7 @@
 # m09-l03 · R:R, винрейт и матожидание
 
 - **Модуль:** 9   **Время:** ~13 мин   **Практика:** CalcEmbed rr, expectancy
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Выражать результаты в R (единица риска).
@@ -31,6 +31,12 @@
 
 ## Термины
 `risk-reward`, `r-multiple`, `winrate`, `expectancy`, `breakeven-winrate`
+
+## Источники
+Сверено 2026-09-28:
+- Матожидание в R (E = W × средняя прибыль − (1 − W) × средний убыток), R-множитель как результат ÷ риск: https://www.pnlledger.com/expectancy-r-multiples-the-plain-english-guide/
+- Безубыточный винрейт (L + C) ÷ (W + L), при 2:1 — 33,3 %: https://traderssecondbrain.com/guides/expectancy-formula , https://www.luxalgo.com/blog/win-rate-and-riskreward-connection-explained/
+- Формулы совпадают с lib/trading/rr.ts (breakevenWinrate, expectancy — покрыты unit-тестами).
 
 ## Связи
 Готовит к: m11-l05.
