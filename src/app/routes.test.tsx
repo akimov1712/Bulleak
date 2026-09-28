@@ -31,7 +31,7 @@ describe('routes', () => {
     [paths.stats(), 'Статистика'],
     [paths.achievements(), 'Достижения'],
     [paths.settings(), 'Настройки'],
-    [paths.certificate(), 'Сертификат'],
+    [paths.certificate(), 'Сертификат пока не получен'],
     [paths.plan(), 'Торговый план'],
     [paths.about(), 'О курсе'],
   ])('%s renders "%s"', async (url, heading) => {

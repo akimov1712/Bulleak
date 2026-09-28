@@ -29,6 +29,7 @@
     "clsx": "^2.1.1",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
+    "html-to-image": "^1.11.13",
     "lightweight-charts": "^5.2.1",
     "lucide-react": "^1.48.0",
     "motion": "^13.4.4",

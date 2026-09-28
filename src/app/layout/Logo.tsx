@@ -15,7 +15,7 @@ export function Logo({ className, compact = false }: { className?: string; compa
         <span
           className={cn(
             'text-lg font-black tracking-tight text-bull',
-            compact && 'hidden min-[360px]:inline',
+            compact && 'hidden min-[420px]:inline',
           )}
         >
           Трейдинг
