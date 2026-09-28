@@ -18,7 +18,7 @@ describe('routes', () => {
     [paths.lesson('m03-l02'), 'Таймфреймы'],
     [paths.lessonQuiz('m03-l02'), 'Таймфреймы'],
     [paths.exam('m03'), 'Экзамен пока закрыт'],
-    [paths.finalExam(), 'Финальный экзамен'],
+    [paths.finalExam(), 'Финальный экзамен пока закрыт'],
     [paths.simulator(), 'Тренажёр'],
     [paths.simulator('m03-sr-bounce'), 'Отскок от поддержки'],
     [paths.tools(), 'Инструменты'],
