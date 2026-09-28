@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { Mascot } from '@/components/mascot/Mascot';
 import { Card } from '@/components/ui/Card';
@@ -11,8 +12,14 @@ import { simRepo } from '@/db/simRepo';
 import { formatNumber, formatPct, formatR, formatUsd } from '@/lib/format';
 import { journalMetrics } from '@/lib/journal/metrics';
 import { rHistogram, simStats } from '@/lib/stats/simulator';
+import { getStrategy } from '@/content/strategies';
+import {
+  backtestReport,
+  FORWARD_TEST_THRESHOLDS,
+  type BacktestCheck,
+} from '@/lib/trading/backtestReport';
 import { filterTrades, type SimTradeKind } from '@/lib/trading/simStats';
-import type { JournalAccount } from '@/types/trading';
+import type { JournalAccount, SimTrade } from '@/types/trading';
 import { EquityCurves } from '../calculators/EquityCurves';
 import { JournalBreakdowns, JournalKpis } from '../journal/JournalOverview';
 import { ACCOUNT_LABEL, ACCOUNTS } from '../journal/labels';
@@ -52,6 +59,7 @@ export function SimulatorStats() {
   }
   const trades = filterTrades(loaded, kind);
   const s = simStats(trades);
+  const tags = [...new Set(trades.map((t) => t.strategyTag ?? ''))].filter(Boolean).sort();
   const bins = rHistogram(trades.map((t) => t.r));
   const tiles: [string, string][] = [
     ['Сделок', String(s.count)],
@@ -82,6 +90,14 @@ export function SimulatorStats() {
               </Card>
             ))}
           </dl>
+          {kind === 'backtest' &&
+            tags.map((tag) => (
+              <BacktestReportCard
+                key={tag}
+                tag={tag}
+                trades={trades.filter((t) => t.strategyTag === tag)}
+              />
+            ))}
           {s.balanceCurve.length > 2 && (
             <Card className="flex flex-col gap-2">
               <h2 className="font-extrabold">Виртуальный баланс</h2>
@@ -109,6 +125,54 @@ export function SimulatorStats() {
         </>
       )}
     </div>
+  );
+}
+
+const CHECK_LABEL: Record<BacktestCheck['id'], string> = {
+  trades: `Сделок не меньше ${FORWARD_TEST_THRESHOLDS.minTrades}`,
+  expectancy: `Матожидание не ниже +${formatNumber(FORWARD_TEST_THRESHOLDS.minExpectancyR, 1)}R после комиссий`,
+  profitFactor: `Профит-фактор не ниже ${formatNumber(FORWARD_TEST_THRESHOLDS.minProfitFactor, 1)}`,
+  drawdown: `Макс. просадка не больше ${FORWARD_TEST_THRESHOLDS.maxDrawdownPct} % при риске 1 %`,
+};
+
+/** Backtest report of one strategy (m11-l05): metrics and the course forward-test thresholds. */
+function BacktestReportCard({ tag, trades }: { tag: string; trades: SimTrade[] }) {
+  const report = backtestReport(trades);
+  const title = getStrategy(tag)?.title ?? tag;
+  const tiles: [string, string][] = [
+    ['Матожидание', formatR(report.expectancyR)],
+    ['Макс. просадка при риске 1 %', `${formatNumber(report.maxDrawdownPct, 1)} %`],
+    ['Макс. серия убытков', String(report.maxLosingStreak)],
+  ];
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="font-extrabold">Отчёт бэктеста: {title}</h2>
+      <dl className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {tiles.map(([label, value]) => (
+          <div key={label}>
+            <dt className="text-sm font-bold text-text-muted">{label}</dt>
+            <dd className="text-lg font-extrabold tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <ul className="flex flex-col gap-1" aria-label="Пороги курса для форвард-теста">
+        {report.checks.map((c) => (
+          <li key={c.id} className="flex items-center gap-2">
+            {c.passed ? (
+              <CheckCircle2 className="size-5 shrink-0 text-bull" aria-label="выполнено" />
+            ) : (
+              <XCircle className="size-5 shrink-0 text-bear" aria-label="не выполнено" />
+            )}
+            {CHECK_LABEL[c.id]}
+          </li>
+        ))}
+      </ul>
+      <p className={report.ready ? 'font-bold text-bull' : 'text-text-muted'}>
+        {report.ready
+          ? 'Пороги пройдены — можно переходить к форвард-тесту на демо или тестнете (урок 11.6).'
+          : 'Пороги пока не пройдены. Меняй одно правило за раз и проверяй на новых данных (урок 11.5).'}
+      </p>
+    </Card>
   );
 }
 
