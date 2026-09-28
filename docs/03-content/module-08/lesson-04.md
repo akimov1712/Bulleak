@@ -1,7 +1,7 @@
 # m08-l04 · Ликвидация
 
 - **Модуль:** 8   **Время:** ~12 мин   **Практика:** CalcEmbed liquidation
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понимать, что такое ликвидация и когда она происходит (маржа < поддерживающей).
@@ -33,7 +33,10 @@
 `liquidation`, `liquidation-price`, `maintenance-margin-rate`, `liquidation-cascade`
 
 ## Источники
-- Bybit Help Center: liquidation price calculation (USDT perpetual) — сверить формулу и mmr.
+Сверено 2026-09-28:
+- Формула цены ликвидации (изолированная маржа, UTA) и MMR BTCUSDT 0,5 % — lib/trading/liquidation.ts; https://www.bybit.com/en/help-center/article/Liquidation-Price-Calculation-under-Isolated-Mode-Unified-Trading-Account
+- Закрытие по цене банкротства, остаток в страховой фонд: https://www.bybit.com/en/help-center/article/Bankruptcy-Price-Perpetual-and-Expiry-Contracts , https://www.bybit.com/en/help-center/article/Insurance-Fund
+- Пример по данным Bybit BTCUSDT 4H: 10.10.2025 20:00 UTC — O 116 606,5, L 101 045,9, C 112 732,5, объём ×9,7; ликвидация лонга от 116 000: 10x ≈ 104 980, 5x ≈ 93 380 (без комиссии).
 
 ## Связи
 Готовит к: M9.
