@@ -86,4 +86,6 @@ export interface SimScenario {
   expected: SimDecision;
   /** Textbook levels for a trade scenario. */
   ideal?: { sl: number; tp: number };
+  /** How the textbook trade actually ended (default 'tp'): a rule-following trade can lose. */
+  idealOutcome?: 'tp' | 'sl';
 }

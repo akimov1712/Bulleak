@@ -2331,6 +2331,16 @@ export const glossary: GlossaryTerm[] = [
     related: ['setup', 'trading-strategy'],
     lessonId: 'm11-l01',
   },
+  {
+    id: 'trend-pullback',
+    term: 'Вход на откате по тренду',
+    aliases: ['trend pullback', 'TPS', 'Trend Pullback Swing', 'откат по тренду'],
+    short: 'Вход по направлению тренда старшего ТФ, когда цена откатилась в зону и дала триггер.',
+    full: 'Стратегия курса TPS: контекст 1D (выше EMA 200, HH/HL) → откат в зону 4H, где совпадают 2 из 3 (флип-уровень, EMA 50, Фибо 0,5–0,618) → триггер 1H → стоп за откатом + 0,5 ATR → цель у сопротивления, не меньше 2R.\n\nОткат даёт лучшую цену и близкий стоп, чем вход на продолжении движения. Шорт — зеркально.',
+    category: 'strategy',
+    related: ['confluence', 'trigger', 'trading-strategy', 'invalidation'],
+    lessonId: 'm11-l02',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));

@@ -28,7 +28,7 @@ describe('simulator scenarios', () => {
     }
   });
 
-  it('textbook trades are valid and play out as the debrief says (take profit)', () => {
+  it('textbook trades are valid and play out as the debrief says', () => {
     for (const s of SCENARIOS) {
       if (s.expected === 'skip' || !s.ideal) continue;
       const candles = load(s.dataset);
@@ -40,7 +40,7 @@ describe('simulator scenarios', () => {
         tp: s.ideal.tp,
         qty: 1,
       });
-      expect(result?.outcome, s.id).toBe('tp');
+      expect(result?.outcome, s.id).toBe(s.idealOutcome ?? 'tp');
     }
   });
 
