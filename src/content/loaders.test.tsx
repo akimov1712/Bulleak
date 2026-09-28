@@ -39,7 +39,7 @@ describe('content loaders', () => {
     expect(contentInventory.lessons).toContain('m00-l01');
     expect(contentInventory.quizzes).toContain('m00-l01');
     expect(hasLessonContent('m00-l01')).toBe(true);
-    expect(hasLessonContent('m12-l04')).toBe(false);
+    expect(hasLessonContent('m99-l01')).toBe(false);
   });
 
   it('compiles and renders a lesson MDX file', async () => {
@@ -61,8 +61,8 @@ describe('content loaders', () => {
   });
 
   it('throws a typed error for missing content', async () => {
-    await expect(loadLesson('m12-l04')).rejects.toBeInstanceOf(ContentMissingError);
-    await expect(loadQuiz('m12-l04')).rejects.toBeInstanceOf(ContentMissingError);
-    await expect(loadExam('m12')).rejects.toBeInstanceOf(ContentMissingError);
+    await expect(loadLesson('m99-l01')).rejects.toBeInstanceOf(ContentMissingError);
+    await expect(loadQuiz('m99-l01')).rejects.toBeInstanceOf(ContentMissingError);
+    await expect(loadExam('m99')).rejects.toBeInstanceOf(ContentMissingError);
   });
 });
