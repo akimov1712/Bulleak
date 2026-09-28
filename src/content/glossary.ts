@@ -1925,6 +1925,26 @@ export const glossary: GlossaryTerm[] = [
     related: ['linear-contract'],
     lessonId: 'm08-l01',
   },
+  {
+    id: 'one-way-mode',
+    term: 'One-Way Mode',
+    aliases: ['one-way mode', 'односторонний режим'],
+    short: 'Режим позиции, в котором по контракту открыта одна позиция: лонг или шорт.',
+    full: 'Ордер в обратную сторону сначала уменьшает или закрывает текущую позицию. Рекомендуемый режим для новичка: одна позиция — одно понятное решение.',
+    category: 'futures',
+    related: ['hedge-mode', 'long', 'short'],
+    lessonId: 'm08-l02',
+  },
+  {
+    id: 'hedge-mode',
+    term: 'Hedge Mode',
+    aliases: ['hedge mode', 'режим хеджирования'],
+    short: 'Режим позиции, в котором по одному контракту можно держать лонг и шорт одновременно.',
+    full: 'Позиции независимы. Новичку режим не нужен: он провоцирует «подстраховывать» убыточную позицию встречной вместо закрытия по стопу. Режим переключается, только когда нет открытых позиций и ордеров по контракту.',
+    category: 'futures',
+    related: ['one-way-mode'],
+    lessonId: 'm08-l02',
+  },
 ];
 
 const byId = new Map(glossary.map((t) => [t.id, t]));

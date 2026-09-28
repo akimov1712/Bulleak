@@ -1,7 +1,7 @@
 # m08-l02 · Лонг и шорт
 
 - **Модуль:** 8   **Время:** ~10 мин   **Практика:** Diagram, MiniQuiz
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Считать P&L лонга и шорта в USDT.
@@ -34,3 +34,8 @@
 
 ## Связи
 Готовит к: m08-l03.
+
+## Источники
+Сверено 2026-09-28:
+- Режимы позиции One-Way / Hedge и условие переключения: https://www.bybit.com/en/help-center/article/Difference-Between-Position-Modes-One-Way-Mode-and-Hedge-Mode
+- P&L линейного контракта: https://www.bybit.com/en/help-center/article/Profit-Loss-calculations-USDT-Contract
