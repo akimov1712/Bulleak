@@ -53,6 +53,12 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'oi-price-matrix': () => import('./m07').then((m) => ({ default: m.OiPriceMatrix })),
   'fear-greed-scale': () => import('./m07').then((m) => ({ default: m.FearGreedScale })),
   'macro-events': () => import('./m07').then((m) => ({ default: m.MacroEvents })),
+  // m08
+  'price-types': () => import('./m08').then((m) => ({ default: m.PriceTypes })),
+  'long-short-pnl': () => import('./m08').then((m) => ({ default: m.LongShortPnl })),
+  'leverage-margin': () => import('./m08').then((m) => ({ default: m.LeverageMargin })),
+  'liquidation-ladder': () => import('./m08').then((m) => ({ default: m.LiquidationLadder })),
+  'funding-flow': () => import('./m08').then((m) => ({ default: m.FundingFlow })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
   'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
   'bybit-ui-kyc-levels': () =>
