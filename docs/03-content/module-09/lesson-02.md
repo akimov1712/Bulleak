@@ -1,7 +1,7 @@
 # m09-l02 · Расчёт размера позиции
 
 - **Модуль:** 9   **Время:** ~13 мин   **Практика:** CalcEmbed position
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Считать размер позиции по формуле `qty = риск$ / |вход − стоп|`.
@@ -33,6 +33,13 @@
 
 ## Термины
 `position-size`, `stop-distance`, `lot-size`
+
+## Источники
+Сверено 2026-09-28:
+- Шаг объёма и минимум (Bybit API v5 instruments-info, category=linear): BTCUSDT qtyStep 0.001, minOrderQty 0.001, minNotionalValue 5; ETHUSDT 0.01; SOLUSDT 0.1 — https://api.bybit.com/v5/market/instruments-info?category=linear&symbol=BTCUSDT (совпадает с INSTRUMENT_STEPS в lib/trading/simPlan.ts).
+- Комиссии бессрочных без VIP: мейкер 0,02 %, тейкер 0,055 % — как в lib/trading/fees.ts (сверено на этапе 04).
+- Формула размера позиции: https://crosstrade.io/learn/risk-management/one-percent-rule
+- Ввод объёма в монетах или USDT — как в SVG-макете формы ордера (bybit-ui-order-form, сверено в сентябре 2026).
 
 ## Связи
 Опирается на: m05-l05, m08-l03.
