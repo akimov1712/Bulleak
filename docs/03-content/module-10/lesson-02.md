@@ -1,7 +1,7 @@
 # m10-l02 · Дисциплина и привычки
 
 - **Модуль:** 10   **Время:** ~10 мин   **Практика:** Checklist
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Построить торговую рутину свинг-трейдера (анализ 1–2 раза в день по закрытиям 4H/1D).
@@ -34,6 +34,12 @@
 
 ## Термины
 `trading-routine`, `price-alert`, `process-over-outcome`
+
+## Источники
+Сверено 2026-09-28:
+- Ценовые оповещения в приложении Bybit и алерты TradingView с доставкой в аккаунт Bybit: https://www.bybit.com/en/help-center/article/How-to-Set-Up-Strategy-Alert-using-Trading-View , https://www.techloy.com/how-to-set-up-price-alerts-on-bybit/ — расположение кнопок в уроке описано осторожно (меняется от версии).
+- Недосып ухудшает принятие решений и оценку риска: Harrison, Horne (2000), «The impact of sleep deprivation on decision making: a review», J. Exp. Psychol. Appl. — https://pubmed.ncbi.nlm.nih.gov/11014055/
+- Матрица «процесс × результат» — общеизвестная идея разделения качества решения и исхода (Annie Duke, «Thinking in Bets»); схема собственная.
 
 ## Связи
 Готовит к: m10-l03.
