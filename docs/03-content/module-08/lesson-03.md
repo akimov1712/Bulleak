@@ -1,7 +1,7 @@
 # m08-l03 · Плечо и маржа: изолированная и кросс
 
 - **Модуль:** 8   **Время:** ~13 мин   **Практика:** CalcEmbed position
-- **Статус:** ☑ бриф ☐ текст ☐ визуалы ☐ тест ☐ проверен в браузере
+- **Статус:** ☑ бриф ☑ текст ☑ визуалы ☑ тест ☑ проверен в браузере
 
 ## Цели
 1. Понимать плечо как отношение размера позиции к марже.
@@ -33,7 +33,9 @@
 `leverage`, `margin`, `isolated-margin`, `cross-margin`, `initial-margin`, `maintenance-margin`
 
 ## Источники
-- Bybit Help Center: margin modes, UTA — сверить.
+Сверено 2026-09-28:
+- Режимы маржи UTA (изолированная, кросс, портфельная), кросс по умолчанию, режим на весь аккаунт, условия ликвидации: https://www.bybit.com/en/help-center/article/Differences-Between-the-Margin-Modes-Under-the-Unified-Trading-Account
+- MMR BTCUSDT 0,5 % на первом уровне лимита риска — как в lib/trading/liquidation.ts (этап 05).
 
 ## Связи
 Готовит к: m08-l04, m09-l02.
