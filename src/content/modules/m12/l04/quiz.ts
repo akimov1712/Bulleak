@@ -17,7 +17,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Одно проверенное изменение в месяц — понятный эффект и стабильная статистика.',
-      tags: ['trade-review', 'trading-plan'],
+      tags: ['improvement-cycle', 'trading-plan'],
     },
     {
       id: 'm12-l04-q2',
@@ -26,7 +26,7 @@ export const quiz: Quiz = {
       correct: false,
       explanation:
         'Ты не знаешь правил автора, его риска и стопов и не учишься сам. Обмен разборами полезен, копирование — нет.',
-      tags: ['trading-strategy'],
+      tags: ['scam-red-flags'],
     },
     {
       id: 'm12-l04-q3',
@@ -40,7 +40,7 @@ export const quiz: Quiz = {
       ],
       correct: ['a', 'b', 'c'],
       explanation: 'Ещё опционы. Платные сигналы — красный флаг, а не направление развития.',
-      tags: ['trading-strategy'],
+      tags: ['improvement-cycle'],
     },
     {
       id: 'm12-l04-q4',
@@ -57,7 +57,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Новые инструменты не исправят ошибки исполнения, а добавят новые.',
-      tags: ['trading-strategy'],
+      tags: ['improvement-cycle'],
     },
     {
       id: 'm12-l04-q5',
@@ -71,7 +71,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Журнал показывает, где теряются деньги именно у тебя.',
-      tags: ['trading-journal'],
+      tags: ['improvement-cycle', 'trading-journal'],
     },
     {
       id: 'm12-l04-q6',
@@ -85,7 +85,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Регуляторы прямо называют «гарантированную прибыль» признаком мошенничества.',
-      tags: ['trading-strategy'],
+      tags: ['scam-red-flags'],
     },
     {
       id: 'm12-l04-q7',
@@ -93,7 +93,7 @@ export const quiz: Quiz = {
       prompt: 'Расставь шаги ежемесячного цикла развития.',
       items: ['Разбор журнала', 'Одно улучшение', 'Проверка: бэктест или демо', 'Внедрение в план'],
       explanation: 'Сначала факты, потом одно изменение, проверка — и только потом правило плана.',
-      tags: ['trade-review'],
+      tags: ['improvement-cycle'],
     },
     {
       id: 'm12-l04-q8',
@@ -110,7 +110,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Статистика показывает, где у тебя больше всего ошибок, — начни с них.',
-      tags: ['trade-review'],
+      tags: ['improvement-cycle'],
     },
     {
       id: 'm12-l04-q9',
@@ -141,7 +141,7 @@ export const quiz: Quiz = {
       ],
       correct: 'a',
       explanation: 'Полезно учиться вместе и проверять идеи самостоятельно.',
-      tags: ['trade-review'],
+      tags: ['scam-red-flags', 'trade-review'],
     },
   ],
 };
