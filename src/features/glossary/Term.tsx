@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import { Link } from 'react-router';
-import { BookOpen } from 'lucide-react';
+import { lazy, Suspense, type ReactNode } from 'react';
 import { Popover } from '@/components/ui/Popover';
-import { getTerm } from '@/content/glossary';
-import { paths } from '@/app/paths';
+
+// The glossary is large: load it with the card on first open, not with every lesson page.
+// Unknown ids are caught by the content validation test (content.test.ts).
+const TermCard = lazy(() => import('./TermCard').then((m) => ({ default: m.TermCard })));
 
 export interface TermProps {
   id: string;
@@ -12,27 +12,14 @@ export interface TermProps {
 
 /** Inline glossary term: dotted underline, popover with the short definition on hover/focus/tap. */
 export function Term({ id, children }: TermProps) {
-  const term = getTerm(id);
-  if (!term) {
-    if (import.meta.env.DEV) throw new Error(`Глоссарий: неизвестный термин "${id}"`);
-    return <>{children}</>;
-  }
   return (
     <Popover
       trigger="hover"
       placement="top"
       content={
-        <span className="flex flex-col gap-1.5">
-          <span className="font-extrabold">{term.term}</span>
-          <span className="text-text-muted">{term.short}</span>
-          <Link
-            to={paths.glossary(term.id)}
-            className="inline-flex items-center gap-1 text-xs font-extrabold text-info hover:underline"
-          >
-            <BookOpen className="size-3.5" aria-hidden="true" />
-            Подробнее в глоссарии
-          </Link>
-        </span>
+        <Suspense fallback={<span className="text-text-muted">Загружаю…</span>}>
+          <TermCard id={id} />
+        </Suspense>
       }
     >
       <button

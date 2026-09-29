@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import { Flame, Snowflake, Star, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatNumber, plural } from '@/lib/format';
@@ -107,23 +106,20 @@ export function XpChip() {
       <button type="button" className={cn(chipClass, 'relative')} aria-label={`Опыт: ${xp} XP`}>
         <Zap className="size-5 fill-xp text-xp-shade" aria-hidden="true" />
         <span className="font-mono tabular-nums">{formatNumber(xp, 0)}</span>
-        <AnimatePresence>
-          {flash && (
-            <motion.span
-              key={flash.id}
-              aria-hidden="true"
-              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 4 }}
-              animate={reduced ? { opacity: 1 } : { opacity: 1, y: -22 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
-              // Fading decoration: excluded from contrast checks (e2e/a11y.spec.ts).
-              data-transient=""
-              className="pointer-events-none absolute -top-1 right-0 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp"
-            >
-              +{flash.amount}
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {flash && (
+          <span
+            key={flash.id}
+            aria-hidden="true"
+            // Fading decoration: excluded from contrast checks (e2e/a11y.spec.ts).
+            data-transient=""
+            className={cn(
+              'pointer-events-none absolute -top-1 right-0 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp',
+              !reduced && 'animate-[xp-fly_900ms_ease-out_forwards]',
+            )}
+          >
+            +{flash.amount}
+          </span>
+        )}
       </button>
     </Popover>
   );

@@ -24,8 +24,14 @@ describe('Term', () => {
     );
   });
 
-  it('throws in dev for unknown ids so broken links are caught early', () => {
-    expect(() => render(<Term id="no-such-term">x</Term>)).toThrow(/неизвестный термин/);
+  it('shows a fallback for an unknown id (broken ids fail content.test.ts)', async () => {
+    render(
+      <MemoryRouter>
+        <Term id="no-such-term">x</Term>
+      </MemoryRouter>,
+    );
+    await userEvent.tab();
+    expect(await screen.findByText('Термин не найден')).toBeInTheDocument();
   });
 });
 

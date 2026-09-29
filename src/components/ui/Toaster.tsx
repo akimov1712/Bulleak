@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useUi, type Toast, type ToastTone } from '@/store/uiStore';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const tones: Record<ToastTone, string> = {
   success: 'border-bull bg-bull-soft',
@@ -54,27 +52,18 @@ function ToastItem({ item }: { item: Toast }) {
  */
 export function Toaster() {
   const toasts = useUi((s) => s.toasts);
-  const reduced = useReducedMotion();
   return (
     <div
       role="status"
       aria-live="polite"
       className="pointer-events-none fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-[60] mx-auto flex w-[min(24rem,calc(100vw-1.5rem))] flex-col gap-2 lg:top-auto lg:right-6 lg:bottom-6 lg:left-auto lg:mx-0"
     >
-      <AnimatePresence initial={false}>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            layout={!reduced}
-            initial={reduced ? false : { opacity: 0, y: -12, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.18 }}
-          >
-            <ToastItem item={t} />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+      {toasts.map((t) => (
+        // CSS entrance (reduced motion shortens it globally, see index.css).
+        <div key={t.id} className="animate-[pop-in_180ms_ease-out]">
+          <ToastItem item={t} />
+        </div>
+      ))}
     </div>
   );
 }

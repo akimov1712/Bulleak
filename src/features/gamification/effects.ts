@@ -1,5 +1,3 @@
-import confetti from 'canvas-confetti';
-
 /**
  * Side-effect helpers for celebrations (DOM / audio). Callers pass `enabled` flags
  * resolved from settings (reduced motion, sound) so these stay dumb.
@@ -11,36 +9,45 @@ const COLORS = ['#16c26a', '#ffb020', '#3b82f6', '#a07af8', '#ec4899'];
 
 export function fireConfetti(size: ConfettiSize, enabled: boolean): void {
   if (!enabled || typeof window === 'undefined') return;
-  const particleCount = size === 'big' ? 160 : size === 'medium' ? 90 : 45;
+  // No 2D canvas (jsdom, locked-down browsers): the library would throw inside its frame loop.
   try {
-    void confetti({
-      particleCount,
-      spread: size === 'big' ? 100 : 70,
-      origin: { y: 0.65 },
-      colors: COLORS,
-      disableForReducedMotion: true,
-    });
-    if (size === 'big') {
-      window.setTimeout(() => {
-        void confetti({
-          particleCount: 60,
-          angle: 60,
-          spread: 60,
-          origin: { x: 0 },
-          colors: COLORS,
-        });
-        void confetti({
-          particleCount: 60,
-          angle: 120,
-          spread: 60,
-          origin: { x: 1 },
-          colors: COLORS,
-        });
-      }, 250);
-    }
+    if (!document.createElement('canvas').getContext('2d')) return;
   } catch {
-    // canvas unavailable (tests, old browsers): celebrations are optional
+    return;
   }
+  const particleCount = size === 'big' ? 160 : size === 'medium' ? 90 : 45;
+  // Loaded on the first celebration: keeps canvas-confetti out of the start-up bundle.
+  import('canvas-confetti')
+    .then(({ default: confetti }) => {
+      void confetti({
+        particleCount,
+        spread: size === 'big' ? 100 : 70,
+        origin: { y: 0.65 },
+        colors: COLORS,
+        disableForReducedMotion: true,
+      });
+      if (size === 'big') {
+        window.setTimeout(() => {
+          void confetti({
+            particleCount: 60,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0 },
+            colors: COLORS,
+          });
+          void confetti({
+            particleCount: 60,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1 },
+            colors: COLORS,
+          });
+        }, 250);
+      }
+    })
+    .catch(() => {
+      // canvas or network unavailable (tests, old browsers, offline): celebrations are optional
+    });
 }
 
 export type SoundName = 'correct' | 'wrong' | 'levelUp' | 'achievement';

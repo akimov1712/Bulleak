@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { RotateCcw, Shuffle, Wallet } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
@@ -21,8 +21,6 @@ import { formatUsd } from '@/lib/format';
 import { SIM_BALANCE_KEY, SIM_START_BALANCE } from '@/lib/trading/simPlan';
 import { forgetDataset } from '@/features/charts/useDataset';
 import type { SimIndicators } from '@/features/simulator/SimChart';
-import { SimSession } from '@/features/simulator/SimSession';
-import { SimHistory } from '@/features/simulator/SimHistory';
 import { getScenario } from '@/content/scenarios';
 import { getStrategy } from '@/content/strategies';
 import { useProgress } from '@/store/progressStore';
@@ -31,6 +29,15 @@ import { Mascot } from '@/components/mascot/Mascot';
 import { buttonClass } from '@/components/ui/styles';
 import { paths } from '@/app/paths';
 import { isDatasetName } from '@/lib/trading/candles';
+
+// The chart library and the database are the heavy part: load them after the page header,
+// so the page paints first on a slow connection.
+const SimSession = lazy(() =>
+  import('@/features/simulator/SimSession').then((m) => ({ default: m.SimSession })),
+);
+const SimHistory = lazy(() =>
+  import('@/features/simulator/SimHistory').then((m) => ({ default: m.SimHistory })),
+);
 
 interface Instrument {
   symbol: DatasetSymbol;
@@ -211,10 +218,12 @@ export function SimulatorPage() {
           />
         </Suspense>
       </ErrorBoundary>
-      <SimHistory
-        key={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
-        initialFilter={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
-      />
+      <Suspense fallback={<Skeleton className="h-40 w-full rounded-2xl" />}>
+        <SimHistory
+          key={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
+          initialFilter={strategy ? 'backtest' : scenario ? 'scenario' : 'free'}
+        />
+      </Suspense>
     </div>
   );
 }

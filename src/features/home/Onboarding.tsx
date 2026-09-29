@@ -62,7 +62,7 @@ export function Onboarding() {
                   <span className="font-extrabold">
                     {g.label} · {g.xp} XP
                   </span>
-                  <span className="text-xs font-semibold opacity-80">{g.hint}</span>
+                  <span className="text-xs font-semibold">{g.hint}</span>
                 </Pill>
               ))}
             </div>
