@@ -9,6 +9,7 @@ import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
 import { StorageBanner } from './StorageBanner';
+import { UpdatePrompt } from './UpdatePrompt';
 
 /** App shell: sidebar on desktop, top bar + bottom nav on mobile. */
 export function RootLayout() {
@@ -59,6 +60,7 @@ export function RootLayout() {
         <BottomNav />
       </div>
       <Toaster />
+      <UpdatePrompt />
       <RewardsPresenter />
     </div>
   );

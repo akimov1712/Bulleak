@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
 import { normalizePath, type Plugin } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 /**
  * Without HMR (pane mode) Vite does not re-run import.meta.glob when files are added,
@@ -130,6 +131,39 @@ export default defineConfig(({ mode }) => ({
     },
     react({ include: /\.(mdx|tsx?)$/ }),
     tailwindcss(),
+    VitePWA({
+      // The app asks before switching to a new version (UpdatePrompt), never mid-lesson.
+      registerType: 'prompt',
+      includeAssets: ['favicon.svg', 'robots.txt', 'icons/apple-touch-icon.png'],
+      manifest: {
+        name: 'Трейдинг на Bybit с нуля',
+        short_name: 'Трейдинг',
+        description:
+          'Интерактивный курс по криптотрейдингу на Bybit: с нуля до своей свинг-стратегии.',
+        lang: 'ru',
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        background_color: '#f7f8fc',
+        theme_color: '#16C26A',
+        icons: [
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'icons/maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        // Everything the course needs offline: app chunks, fonts, icons and the candle data.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json,txt}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        navigateFallback: 'index.html',
+      },
+    }),
     stylesheetFirst(),
     preloadRoutePage(),
     ...(mode === 'pane' ? [refreshContentGlobs()] : []),
@@ -158,6 +192,12 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: 'jsdom',
+    alias: {
+      // The PWA plugin's virtual module only exists in dev/build.
+      'virtual:pwa-register/react': fileURLToPath(
+        new URL('./src/test/pwaRegisterStub.ts', import.meta.url),
+      ),
+    },
     // First MDX compile of a lesson can take several seconds when the suite runs in parallel.
     testTimeout: 15_000,
     // Each worker holds a jsdom + MDX compiler; with the default (cores − 1) workers the
