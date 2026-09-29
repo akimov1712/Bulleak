@@ -1,7 +1,7 @@
 # T-1004 · Проверка живого сайта
 
 - **Этап:** 10 Публикация на GitHub Pages
-- **Статус:** ☐ не начата
+- **Статус:** ✅ готово
 
 ## Контекст (прочитать перед началом)
 
@@ -14,7 +14,12 @@
 - `README.md`
 
 ## Критерии приёмки
-- [ ] Smoke-тест зелёный на проде
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Smoke-тест зелёный на проде
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `docs: add project readme with live link`
+
+## Итог
+- `PLAYWRIGHT_BASE_URL=https://akimov1712.github.io/Bulleak/` — smoke, офлайн (сервис-воркер, манифест для установки), урок → тест, тренажёр: 42/42 на desktop и mobile.
+- 375 px: карта курса без горизонтальной прокрутки.
+- Ссылка записана в README.md и PROGRESS.md.
