@@ -38,6 +38,7 @@
 | `--color-xp` | #FFB020 | #FFC247 | XP, огонь стрика (фон); `on-xp` — тёмный текст |
 | `--color-info` | #2563EB | #60A5FA | подсказки, ссылки, фокус |
 | `--color-epic` | #7C4DEA | #A78BFA | достижения, уровни |
+| `--color-on-epic` | #FFFFFF | #1C1238 | текст на `epic` (значок уровня) |
 | `--color-warn` | #B04E09 | #FFA14D | предупреждения |
 Цвета модулей: green, blue, purple, orange, pink, teal, yellow, red — по паре `--mod-X` / `--mod-X-shade` (используются как фоны/декор; текст на них — `text` или `on-primary`).
 

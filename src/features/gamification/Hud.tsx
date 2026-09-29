@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Flame, Snowflake, Star, Zap } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Flame, Snowflake, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatNumber, plural } from '@/lib/format';
 import { levelFromXp } from '@/lib/gamification/levels';
@@ -14,8 +14,69 @@ import { useSettings } from '@/store/settingsStore';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useToday } from '@/hooks/useToday';
 
-const chipClass =
-  'flex items-center gap-1 rounded-full px-1.5 py-1 font-extrabold text-text hover:bg-surface-2 sm:px-2';
+/** One segment of the HUD bar: badge + value (+ caption on wide screens). */
+const segmentClass =
+  'relative flex min-h-11 items-center gap-1.5 rounded-[0.9rem] px-1 text-text transition-colors hover:bg-surface-2 sm:gap-2 sm:px-2.5';
+
+function SegmentText({ value, caption }: { value: ReactNode; caption: ReactNode }) {
+  return (
+    <span className="flex flex-col items-start leading-none">
+      <span className="font-mono text-[0.95rem] font-extrabold tabular-nums">{value}</span>
+      <span className="mt-1 hidden text-[0.65rem] font-bold whitespace-nowrap text-text-muted md:block">
+        {caption}
+      </span>
+    </span>
+  );
+}
+
+/** Decorative ring around the XP icon: today's progress to the daily goal. */
+function GoalRing({ value }: { value: number }) {
+  const r = 15;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
+  return (
+    <span className="relative grid size-8 shrink-0 place-items-center sm:size-9" aria-hidden="true">
+      <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90">
+        <circle cx="18" cy="18" r={r} fill="none" strokeWidth="3.5" className="stroke-surface-2" />
+        <circle
+          cx="18"
+          cy="18"
+          r={r}
+          fill="none"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - clamped)}
+          className="stroke-xp transition-[stroke-dashoffset] duration-500"
+        />
+      </svg>
+      <Zap className="size-4 fill-xp text-xp-shade" />
+    </span>
+  );
+}
+
+/** Hexagon badge with the level number. */
+function LevelBadge({ level }: { level: number }) {
+  return (
+    <span className="relative grid size-8 shrink-0 place-items-center sm:size-9" aria-hidden="true">
+      <svg viewBox="0 0 36 36" className="absolute inset-0">
+        <path
+          d="M18 2.5 31.5 10.3v15.4L18 33.5 4.5 25.7V10.3Z"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          className="fill-epic stroke-epic"
+        />
+        <path
+          d="M18 7 27.5 12.5v11L18 29 8.5 23.5v-11Z"
+          fill="none"
+          strokeWidth="1.2"
+          className="stroke-on-epic/30"
+        />
+      </svg>
+      <span className="relative font-mono text-sm font-black text-on-epic">{level}</span>
+    </span>
+  );
+}
 
 export function StreakChip() {
   const streak = useProgress((s) => s.streak);
@@ -50,14 +111,30 @@ export function StreakChip() {
     >
       <button
         type="button"
-        className={chipClass}
+        className={segmentClass}
         aria-label={`Серия: ${value} ${plural(value, ['день', 'дня', 'дней'])} подряд`}
       >
-        <Flame
-          className={cn('size-5', activeToday ? 'fill-xp text-xp-shade' : 'text-text-muted')}
+        <span
           aria-hidden="true"
+          className={cn(
+            'grid size-8 shrink-0 place-items-center sm:size-9 rounded-full',
+            activeToday ? 'bg-linear-to-b from-xp to-mod-orange shadow-sm' : 'bg-surface-2',
+          )}
+        >
+          <Flame
+            className={cn(
+              'size-5',
+              activeToday ? 'fill-white text-white' : 'text-text-muted',
+              atRisk && !activeToday && 'text-warn',
+            )}
+          />
+        </span>
+        <SegmentText
+          value={value}
+          caption={
+            activeToday ? plural(value, ['день подряд', 'дня подряд', 'дней подряд']) : 'серия'
+          }
         />
-        <span className="font-mono tabular-nums">{value}</span>
       </button>
     </Popover>
   );
@@ -103,9 +180,12 @@ export function XpChip() {
         </div>
       }
     >
-      <button type="button" className={cn(chipClass, 'relative')} aria-label={`Опыт: ${xp} XP`}>
-        <Zap className="size-5 fill-xp text-xp-shade" aria-hidden="true" />
-        <span className="font-mono tabular-nums">{formatNumber(xp, 0)}</span>
+      <button type="button" className={segmentClass} aria-label={`Опыт: ${xp} XP`}>
+        <GoalRing value={todayXp / goal} />
+        <SegmentText
+          value={formatNumber(xp, 0)}
+          caption={`цель дня ${Math.min(todayXp, goal)}/${goal}`}
+        />
         {flash && (
           <span
             key={flash.id}
@@ -113,7 +193,7 @@ export function XpChip() {
             // Fading decoration: excluded from contrast checks (e2e/a11y.spec.ts).
             data-transient=""
             className={cn(
-              'pointer-events-none absolute -top-1 right-0 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp',
+              'pointer-events-none absolute -top-1 right-1 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp',
               !reduced && 'animate-[xp-fly_900ms_ease-out_forwards]',
             )}
           >
@@ -147,21 +227,41 @@ export function LevelChip() {
     >
       <button
         type="button"
-        className={chipClass}
+        className={segmentClass}
         aria-label={`Уровень ${info.level}, ${info.rank}`}
       >
-        <Star className="size-5 fill-epic text-epic" aria-hidden="true" />
-        <span className="font-mono tabular-nums">{info.level}</span>
+        <LevelBadge level={info.level} />
+        <span className="hidden w-24 flex-col items-start gap-1.5 leading-none md:flex">
+          <span className="text-sm font-extrabold">{info.rank}</span>
+          <span
+            className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2"
+            aria-hidden="true"
+          >
+            <span
+              className="block h-full rounded-full bg-epic transition-[width] duration-500"
+              style={{ width: `${info.progress * 100}%` }}
+            />
+          </span>
+        </span>
       </button>
     </Popover>
   );
 }
 
+const Divider = () => <span className="h-6 w-0.5 rounded-full bg-border" aria-hidden="true" />;
+
+/** Progress bar of the header: streak, XP with today's goal, level. */
 export function Hud() {
   return (
-    <div className="flex items-center gap-0.5 sm:gap-2" aria-label="Твой прогресс" role="group">
+    <div
+      className="flex items-center gap-0.5 rounded-2xl border-2 border-border bg-surface shadow-[0_2px_0_0_var(--border)]"
+      aria-label="Твой прогресс"
+      role="group"
+    >
       <StreakChip />
+      <Divider />
       <XpChip />
+      <Divider />
       <LevelChip />
     </div>
   );

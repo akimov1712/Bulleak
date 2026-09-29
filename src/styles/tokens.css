@@ -31,6 +31,7 @@
   --info-soft: #dbe8ff;
   --epic: #6d3fdc;
   --epic-soft: #ece4ff;
+  --on-epic: #ffffff;
   --warn: #b04e09;
   --warn-soft: #ffe8d4;
 
@@ -95,6 +96,7 @@
   --info-soft: #172a4a;
   --epic: #a78bfa;
   --epic-soft: #2a2150;
+  --on-epic: #1c1238;
   --warn: #ffa14d;
   --warn-soft: #3d2610;
 
@@ -128,6 +130,7 @@
   --color-info-soft: var(--info-soft);
   --color-epic: var(--epic);
   --color-epic-soft: var(--epic-soft);
+  --color-on-epic: var(--on-epic);
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
 

@@ -19,13 +19,13 @@ export function Logo({ className, compact = false }: { className?: string; compa
   return (
     <Link
       to={paths.home()}
-      className={cn('flex items-center gap-2.5 rounded-xl', className)}
+      className={cn('flex min-h-11 items-center gap-2.5 rounded-xl', className)}
       aria-label={`${BRAND.name} — на главную`}
     >
       <LogoMark size={compact ? 36 : 42} className="shrink-0 drop-shadow-sm" />
       <span className="flex flex-col">
         <Wordmark
-          className={cn('leading-none', compact ? 'text-xl max-[359px]:sr-only' : 'text-[1.6rem]')}
+          className={cn('leading-none', compact ? 'text-xl max-[419px]:sr-only' : 'text-[1.6rem]')}
         />
         {!compact && (
           <span className="mt-1 text-[0.7rem] leading-none font-extrabold text-text-muted">
