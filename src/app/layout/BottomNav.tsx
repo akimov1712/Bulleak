@@ -8,7 +8,7 @@ import { mobileBarNav, mobileMoreNav } from './nav';
 const itemClass = (active: boolean) =>
   cn(
     'flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl text-[0.7rem] font-extrabold transition-colors',
-    active ? 'text-info' : 'text-text-muted hover:text-text',
+    active ? 'text-bull' : 'text-text-muted hover:text-text',
   );
 
 /** Mobile/tablet navigation (< lg): 4 main sections + "Ещё" sheet. */
@@ -38,7 +38,7 @@ export function BottomNav() {
                     <span
                       className={cn(
                         'grid h-8 w-12 place-items-center rounded-full transition-colors',
-                        isActive && 'bg-info-soft',
+                        isActive && 'bg-bull-soft',
                       )}
                     >
                       <Icon className="size-6" strokeWidth={2.4} aria-hidden="true" />
@@ -59,7 +59,7 @@ export function BottomNav() {
             <span
               className={cn(
                 'grid h-8 w-12 place-items-center rounded-full',
-                moreActive && 'bg-info-soft',
+                moreActive && 'bg-bull-soft',
               )}
             >
               <MoreHorizontal className="size-6" strokeWidth={2.4} aria-hidden="true" />
@@ -82,7 +82,7 @@ export function BottomNav() {
                     cn(
                       'flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border-2 p-3 text-center text-sm font-extrabold',
                       isActive
-                        ? 'border-info/60 bg-info-soft text-info'
+                        ? 'border-bull/50 bg-bull-soft text-bull'
                         : 'border-border bg-surface text-text hover:bg-surface-2',
                     )
                   }

@@ -13,6 +13,15 @@ export function isLessonCompleted(ctx: UnlockContext, id: LessonId): boolean {
   return ctx.progress.lessons[id]?.completedAt !== undefined;
 }
 
+/** Completed lessons out of all lessons of the course (map, sidebar). */
+export function courseCompletion(ctx: UnlockContext): { done: number; total: number } {
+  const { lessons } = ctx.course;
+  return {
+    done: lessons.filter((l) => isLessonCompleted(ctx, l.id)).length,
+    total: lessons.length,
+  };
+}
+
 export function isExamPassed(ctx: UnlockContext, id: ModuleId | 'final'): boolean {
   return ctx.progress.exams[id]?.passedAt !== undefined;
 }

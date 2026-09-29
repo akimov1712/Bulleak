@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { courseIndex } from '@/content/courseIndex';
 import { emptyLessonProgress } from './initial';
 import { nextStep, shouldRemindBackup } from './nextStep';
-import type { UnlockContext } from './unlock';
+import { courseCompletion, type UnlockContext } from './unlock';
 
 const done = { ...emptyLessonProgress(), completedAt: 1, quizBest: 1 };
 const ctx = (patch: Partial<UnlockContext['progress']> = {}): UnlockContext => ({
@@ -67,5 +67,21 @@ describe('shouldRemindBackup', () => {
     expect(shouldRemindBackup({ startedAt: 0, lastBackupAt: 5 * DAY }, 10, 8 * DAY)).toBe(false);
     expect(shouldRemindBackup({ startedAt: 0 }, 10, 8 * DAY, 9 * DAY)).toBe(false);
     expect(shouldRemindBackup({ startedAt: 0 }, 10, 10 * DAY, 9 * DAY)).toBe(true);
+  });
+});
+
+describe('courseCompletion', () => {
+  it('counts completed lessons out of the whole course', () => {
+    const total = courseIndex.lessons.length;
+    expect(courseCompletion(ctx())).toEqual({ done: 0, total });
+    expect(courseCompletion(ctx({ lessons: allLessons(['m00']) }))).toEqual({
+      done: courseIndex.lessons.filter((l) => l.moduleId === 'm00').length,
+      total,
+    });
+  });
+
+  it('ignores lessons that were only read', () => {
+    const read = { ...emptyLessonProgress(), readAt: 1 };
+    expect(courseCompletion(ctx({ lessons: { 'm00-l01': read } })).done).toBe(0);
   });
 });
