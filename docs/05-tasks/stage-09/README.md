@@ -20,8 +20,8 @@
 | [T-907](T-907-final-audit.md) | Финальный аудит и багбаш | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
 - [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
 - [ ] Тег `stage-09-done`
