@@ -145,10 +145,10 @@ export function LiquidationCalc() {
           min={0}
         />
       </div>
-      <label className="flex items-center gap-2 text-sm font-bold">
+      <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold">
         <input
           type="checkbox"
-          className="size-4"
+          className="size-5 shrink-0"
           checked={inputs.withFee}
           onChange={(e) => set({ withFee: e.target.checked })}
         />

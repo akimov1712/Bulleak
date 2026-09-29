@@ -35,7 +35,7 @@ export function ToolsPage() {
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
         <Link
           to={paths.tools()}
-          className="flex items-center gap-1 self-start font-bold text-info hover:underline"
+          className="flex min-h-11 items-center gap-1 self-start font-bold text-info hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Все калькуляторы

@@ -51,7 +51,7 @@ export function CalculatorCard(props: CalculatorCardProps) {
       <button
         type="button"
         onClick={props.onReset}
-        className="self-start text-sm font-bold text-info underline"
+        className="inline-flex min-h-11 items-center self-start text-sm font-bold text-info underline"
       >
         Сбросить
       </button>

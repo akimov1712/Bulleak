@@ -61,7 +61,7 @@ export function ModulePage() {
         aria-label="Хлебные крошки"
         className="flex items-center gap-1 text-sm font-bold text-text-muted"
       >
-        <Link to={paths.path()} className="hover:text-text">
+        <Link to={paths.path()} className="inline-flex min-h-11 items-center hover:text-text">
           Карта курса
         </Link>
         <ChevronRight className="size-4" aria-hidden="true" />

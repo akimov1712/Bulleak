@@ -63,7 +63,7 @@ function PreTradeChecklist() {
         </h2>
         <button
           type="button"
-          className="flex items-center gap-1 text-sm font-bold text-info underline print:hidden"
+          className="flex min-h-11 items-center gap-1 text-sm font-bold text-info underline print:hidden"
           onClick={() => setChecked(PRE_TRADE_CHECKLIST.map(() => false))}
         >
           <RotateCcw className="size-4" aria-hidden="true" />
@@ -73,7 +73,7 @@ function PreTradeChecklist() {
       <ul className="flex flex-col gap-2">
         {PRE_TRADE_CHECKLIST.map((item, i) => (
           <li key={item}>
-            <label className="flex cursor-pointer items-start gap-3">
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2.5">
               <input
                 type="checkbox"
                 className="mt-1 size-5 shrink-0"

@@ -21,7 +21,7 @@ export function RecentAchievements() {
         </h2>
         <Link
           to={paths.achievements()}
-          className="flex items-center font-bold text-info hover:underline"
+          className="flex min-h-11 items-center font-bold text-info hover:underline"
         >
           Все {Object.keys(unlocked).length}/40
           <ChevronRight className="size-4" aria-hidden="true" />

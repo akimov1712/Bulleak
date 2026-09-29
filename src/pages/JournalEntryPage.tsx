@@ -141,7 +141,7 @@ function Editor({ existing, setups }: { existing: JournalTrade | null; setups: s
     >
       <Link
         to={paths.journal()}
-        className="flex items-center gap-1 self-start font-bold text-info hover:underline"
+        className="flex min-h-11 items-center gap-1 self-start font-bold text-info hover:underline"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         Журнал

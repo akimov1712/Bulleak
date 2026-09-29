@@ -180,7 +180,7 @@ export function OrderTypes() {
               step={50}
               value={walk.current}
               onChange={(e) => setWalk((w) => moveTo(w, Number(e.target.value)))}
-              className="flex-1 accent-[var(--xp-shade)]"
+              className="h-11 flex-1 accent-[var(--xp-shade)]"
             />
             <span className="w-20 text-right text-text tabular-nums">
               {formatNumber(walk.current, 0)}

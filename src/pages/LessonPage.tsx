@@ -99,11 +99,14 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             aria-label="Хлебные крошки"
             className="mb-3 flex flex-wrap items-center gap-1 text-sm font-bold text-text-muted"
           >
-            <Link to={paths.path()} className="hover:text-text">
+            <Link to={paths.path()} className="inline-flex min-h-11 items-center hover:text-text">
               Карта курса
             </Link>
             <ChevronRight className="size-4" aria-hidden="true" />
-            <Link to={paths.module(module.id)} className="hover:text-text">
+            <Link
+              to={paths.module(module.id)}
+              className="inline-flex min-h-11 items-center hover:text-text"
+            >
               Модуль {module.index}. {module.title}
             </Link>
           </nav>

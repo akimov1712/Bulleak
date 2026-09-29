@@ -40,7 +40,7 @@ function ToastItem({ item }: { item: Toast }) {
         type="button"
         onClick={() => dismiss(item.id)}
         aria-label="Скрыть уведомление"
-        className="-m-1 rounded-full p-1 text-text-muted hover:bg-black/5 hover:text-text"
+        className="-m-3 grid size-11 shrink-0 place-items-center rounded-full text-text-muted hover:bg-black/5 hover:text-text"
       >
         <X className="size-4" />
       </button>

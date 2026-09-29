@@ -343,7 +343,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
                   aria-checked={chartType === t}
                   onClick={() => setChartType(t)}
                   className={cn(
-                    'rounded-md px-2 py-0.5 text-xs font-bold',
+                    "relative rounded-md px-2 py-0.5 text-xs font-bold before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']",
                     chartType === t ? 'bg-info/20 text-info' : 'text-text-muted hover:bg-surface-2',
                   )}
                 >

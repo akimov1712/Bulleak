@@ -120,7 +120,7 @@ function GlossaryList() {
               <button
                 key={letter}
                 type="button"
-                className="min-w-8 rounded-lg border-2 border-border px-2 py-0.5 text-sm font-extrabold hover:border-info"
+                className="min-h-11 min-w-11 rounded-lg border-2 border-border px-2 text-sm font-extrabold hover:border-info"
                 onClick={() =>
                   document
                     .getElementById(`letter-${letter}`)
@@ -188,7 +188,7 @@ function TermDetail({ term }: { term: GlossaryTerm }) {
     <div className="mx-auto flex max-w-2xl flex-col gap-4">
       <Link
         to={paths.glossary()}
-        className="flex items-center gap-1 self-start font-bold text-info hover:underline"
+        className="flex min-h-11 items-center gap-1 self-start font-bold text-info hover:underline"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         Весь глоссарий

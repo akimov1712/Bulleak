@@ -139,7 +139,10 @@ export function SimulatorPage() {
         }
       />
       {scenario ? (
-        <Link to={paths.simulator()} className="self-start font-bold text-info hover:underline">
+        <Link
+          to={paths.simulator()}
+          className="inline-flex min-h-11 items-center self-start font-bold text-info hover:underline"
+        >
           ← Свободный режим
         </Link>
       ) : (

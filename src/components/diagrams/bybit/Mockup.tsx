@@ -81,7 +81,11 @@ export function HotspotBadge({
       onClick={onClick}
       aria-pressed={active}
       aria-label={`Пояснение ${n}${label ? `: ${label}` : ''}`}
-      className={cn(className, 'transition-transform hover:scale-110')}
+      // 24px badge, 44px tap area.
+      className={cn(
+        className,
+        "relative before:absolute before:-inset-2.5 before:content-[''] transition-transform hover:scale-110",
+      )}
     >
       {n}
     </button>

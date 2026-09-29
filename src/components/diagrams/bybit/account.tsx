@@ -143,8 +143,8 @@ export function BybitKycLevels() {
                   aria-label={`Пояснение ${l.n}: уровень ${l.name}`}
                   className={
                     active === l.n
-                      ? 'inline-flex size-6 items-center justify-center rounded-full bg-xp text-xs font-extrabold text-on-xp'
-                      : 'inline-flex size-6 items-center justify-center rounded-full bg-info text-xs font-extrabold text-surface'
+                      ? "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-xp text-xs font-extrabold text-on-xp"
+                      : "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-info text-xs font-extrabold text-surface"
                   }
                 >
                   {l.n}

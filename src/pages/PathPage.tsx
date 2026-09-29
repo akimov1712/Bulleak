@@ -98,7 +98,7 @@ export function PathPage() {
           {finalPassed && (
             <Link
               to={paths.certificate()}
-              className="flex items-center gap-2 font-extrabold text-info hover:underline"
+              className="flex min-h-11 items-center gap-2 font-extrabold text-info hover:underline"
             >
               <Award className="size-5" aria-hidden="true" />
               Мой сертификат

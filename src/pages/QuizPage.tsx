@@ -151,7 +151,7 @@ function LessonQuiz({ lesson }: { lesson: LessonMeta }) {
       </Card>
       <Link
         to={paths.lesson(lesson.id)}
-        className="text-center font-bold text-info hover:underline"
+        className="flex min-h-11 items-center justify-center font-bold text-info hover:underline"
       >
         Вернуться к уроку
       </Link>

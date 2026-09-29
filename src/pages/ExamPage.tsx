@@ -177,7 +177,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
       </Card>
       <Link
         to={paths.module(module.id)}
-        className="text-center font-bold text-info hover:underline"
+        className="flex min-h-11 items-center justify-center font-bold text-info hover:underline"
       >
         К урокам модуля
       </Link>
