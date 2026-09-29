@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { routes } from '@/app/routes';
@@ -80,7 +80,7 @@ describe('PathPage', () => {
     renderMap();
     expect(await screen.findByRole('img', { name: '2 из 3 звёзд' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Урок 0\.2: Реалистичные/ })).toBeInTheDocument();
-    expect(screen.getByText('1/62')).toBeInTheDocument();
+    expect(within(screen.getByRole('main')).getByText('1/62')).toBeInTheDocument();
   });
 
   it('keeps the final exam locked until all module exams are passed', async () => {
