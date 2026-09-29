@@ -10,7 +10,7 @@ export async function answerQuestion(page: Page, questions: Question[], correct:
   switch (q.type) {
     case 'single': {
       const option = q.options.find((o) => (o.id === q.correct) === correct);
-      await page.getByRole('radio', { name: option?.text }).click();
+      await page.getByRole('radio', { name: option?.text, exact: true }).click();
       break;
     }
     case 'truefalse':
@@ -20,7 +20,7 @@ export async function answerQuestion(page: Page, questions: Question[], correct:
       break;
     case 'multi':
       for (const o of q.options.filter((x) => q.correct.includes(x.id) === correct)) {
-        await page.getByRole('checkbox', { name: o.text }).click();
+        await page.getByRole('checkbox', { name: o.text, exact: true }).click();
       }
       break;
     case 'numeric':
@@ -47,7 +47,19 @@ export async function answerQuestion(page: Page, questions: Question[], correct:
       }
       break;
     case 'chart-click':
-      throw new Error('chart-click not supported in this helper yet');
+      // The keyboard-friendly alternative to clicking: step to a candle or type a price.
+      if (q.target.kind === 'price') {
+        const { min, max } = q.target;
+        const value = correct ? (min + max) / 2 : max + (max - min) * 10 + 1;
+        await page.getByRole('textbox', { name: 'Цена' }).fill(String(value).replace('.', ','));
+      } else {
+        const targets = q.target.indices;
+        const index = correct ? (targets[0] ?? q.from) : targets.includes(q.from) ? q.to : q.from;
+        for (let i = q.from; i <= index; i++) {
+          await page.getByRole('button', { name: 'Следующая свеча' }).click();
+        }
+      }
+      break;
   }
 }
 

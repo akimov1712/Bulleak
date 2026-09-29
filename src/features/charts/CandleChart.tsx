@@ -354,7 +354,10 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
           )}
         </div>
         {showOhlc && shown && (
-          <p className="font-mono text-[11px] text-text-muted tabular-nums">
+          // Two lines reserved on phones: the line wraps differently with and without the
+          // «Последняя:» prefix, and a height change under the cursor made hover flicker
+          // between the two states every frame.
+          <p className="min-h-[2lh] font-mono text-[11px] text-text-muted tabular-nums sm:min-h-0">
             <span className="font-sans font-bold">{hovered === null ? 'Последняя: ' : ''}</span>O{' '}
             <b className="text-text">{fmt(shown.o)}</b> H{' '}
             <b className="text-text">{fmt(shown.h)}</b> L{' '}
