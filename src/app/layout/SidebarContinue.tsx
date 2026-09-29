@@ -44,7 +44,7 @@ export function SidebarContinue() {
       className="group relative mx-3 mb-6 flex shrink-0 flex-col gap-1 overflow-hidden rounded-2xl bg-primary p-3.5 text-on-primary shadow-[0_3px_0_0_var(--primary-shade)] transition-transform active:translate-y-0.5 active:shadow-none"
     >
       <span className="flex items-center justify-between gap-2 text-[0.68rem] font-black tracking-[0.12em] uppercase">
-        <span className="opacity-80">{eyebrow}</span>
+        <span>{eyebrow}</span>
         <ArrowRight
           className="size-4 shrink-0 opacity-70 transition-transform group-hover:translate-x-0.5"
           aria-hidden="true"

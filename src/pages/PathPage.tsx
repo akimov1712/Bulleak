@@ -6,7 +6,12 @@ import { paths } from '@/app/paths';
 import { courseIndex } from '@/content/courseIndex';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { cn } from '@/lib/cn';
-import { currentLesson, isExamPassed, isFinalAvailable } from '@/lib/progress/unlock';
+import {
+  courseCompletion,
+  currentLesson,
+  isExamPassed,
+  isFinalAvailable,
+} from '@/lib/progress/unlock';
 import { ModuleSection } from '@/features/path-map/ModuleSection';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -17,9 +22,7 @@ export function PathPage() {
   const ctx = useUnlockContext();
   const lessons = useProgress((s) => s.lessons);
   const current = currentLesson(ctx);
-  const completed = courseIndex.lessons.filter(
-    (l) => lessons[l.id]?.completedAt !== undefined,
-  ).length;
+  const { done: completed, total } = courseCompletion(ctx);
   const finalOpen = isFinalAvailable(ctx);
   const finalPassed = isExamPassed(ctx, 'final');
 
@@ -41,12 +44,12 @@ export function PathPage() {
         <div className="flex items-center gap-3">
           <ProgressBar
             label="Пройдено уроков"
-            value={completed / courseIndex.lessons.length}
-            valueText={`${completed} из ${courseIndex.lessons.length}`}
+            value={completed / total}
+            valueText={`${completed} из ${total}`}
             size="lg"
           />
           <span className="shrink-0 font-mono text-sm font-extrabold text-text-muted">
-            {completed}/{courseIndex.lessons.length}
+            {completed}/{total}
           </span>
         </div>
       </div>
