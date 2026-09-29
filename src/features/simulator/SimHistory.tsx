@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { History } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
@@ -56,7 +56,7 @@ function tradeTitle(t: SimTrade): string {
 export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTradeKind }) {
   const [filter, setFilter] = useState<SimTradeKind>(initialFilter);
   const [review, setReview] = useState<SimTrade | null>(null);
-  const loaded = useLiveQuery<Loaded>(async () => {
+  const loaded = useDbQuery<Loaded>(async () => {
     try {
       return { trades: await simRepo.list({ limit: HISTORY_LIMIT }) };
     } catch (error) {

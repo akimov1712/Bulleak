@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { Mascot } from '@/components/mascot/Mascot';
@@ -41,7 +41,7 @@ const KIND_OPTIONS: { value: SimTradeKind; label: string }[] = [
 /** Simulator tab: summary, virtual balance curve and the distribution of results in R. */
 export function SimulatorStats() {
   const [kind, setKind] = useState<SimTradeKind>('free');
-  const loaded = useLiveQuery(() => simRepo.list().catch(toError), []);
+  const loaded = useDbQuery(() => simRepo.list().catch(toError), []);
   if (loaded === undefined) return null;
   if (loaded instanceof Error) return <LoadError message={loaded.message} />;
   if (loaded.length === 0) {
@@ -180,7 +180,7 @@ function BacktestReportCard({ tag, trades }: { tag: string; trades: SimTrade[] }
 /** Journal tab: the journal metrics with an account filter. */
 export function JournalStats() {
   const [account, setAccount] = useState<JournalAccount | 'all'>('all');
-  const loaded = useLiveQuery(() => journalRepo.list().catch(toError), []);
+  const loaded = useDbQuery(() => journalRepo.list().catch(toError), []);
   if (loaded === undefined) return null;
   if (loaded instanceof Error) return <LoadError message={loaded.message} />;
   if (loaded.length === 0) {

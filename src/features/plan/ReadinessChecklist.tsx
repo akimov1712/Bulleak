@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { Card } from '@/components/ui/Card';
@@ -62,7 +62,7 @@ export function ReadinessChecklist() {
   const exams = useProgress((s) => s.exams);
   const tradingPlan = useProgress((s) => s.tradingPlan);
   const strategy = useProgress((s) => s.strategy);
-  const data = useLiveQuery(
+  const data = useDbQuery(
     () =>
       Promise.all([simRepo.list(), journalRepo.list()])
         .then(([simTrades, journal]) => ({ simTrades, journal }))

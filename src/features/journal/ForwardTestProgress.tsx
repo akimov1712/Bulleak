@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { NotebookPen, Radar } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -13,7 +13,7 @@ import { FORWARD_TARGET_TRADES, forwardComparison } from '@/lib/journal/forward'
  * (N/30) and the share of trades made by the plan (`<ForwardTestProgress/>`).
  */
 export function ForwardTestProgress() {
-  const forward = useLiveQuery(
+  const forward = useDbQuery(
     () =>
       journalRepo
         .list()

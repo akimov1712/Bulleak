@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { ClipboardList } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -17,7 +17,7 @@ export interface BacktestPanelProps {
 
 /** Backtest side panel: rule checklist for the current setup, N/30 counter and a report. */
 export function BacktestPanel({ strategy, decisionKey }: BacktestPanelProps) {
-  const trades = useLiveQuery<SimTrade[] | null>(
+  const trades = useDbQuery<SimTrade[] | null>(
     () => simRepo.list({ strategyTag: strategy.tag }).catch(() => null),
     [strategy.tag],
   );

@@ -4,6 +4,7 @@ import { HomePage } from '@/pages/HomePage';
 import { PathPage } from '@/pages/PathPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { RootLayout } from './layout/RootLayout';
+import { RouteError } from './layout/RouteError';
 
 /**
  * Route table (see docs/02-architecture/routing.md). Home and Path are eager;
@@ -14,6 +15,8 @@ export const routes: RouteObject[] = [
     path: '/',
     Component: RootLayout,
     HydrateFallback: PageSkeleton,
+    // Any render or loading error: a friendly screen instead of a blank page.
+    ErrorBoundary: RouteError,
     children: [
       { index: true, Component: HomePage },
       { path: 'path', Component: PathPage },

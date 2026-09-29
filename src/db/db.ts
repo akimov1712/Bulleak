@@ -48,6 +48,11 @@ export function dbErrorMessage(action: string, error: unknown): string {
 
 /** Runs a database operation and turns any failure into a DbError with a readable message. */
 export async function guard<T>(action: string, op: () => Promise<T>): Promise<T> {
+  // Without IndexedDB (disabled by policy, some private modes) Dexie queries never settle:
+  // fail fast so the page can say what is wrong instead of loading forever.
+  if (typeof indexedDB === 'undefined') {
+    throw new DbError(dbErrorMessage(action, new Error('IndexedDB is not available')));
+  }
   try {
     return await op();
   } catch (error) {

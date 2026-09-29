@@ -1,4 +1,4 @@
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { Card } from '@/components/ui/Card';
 import { journalRepo } from '@/db/journalRepo';
 import { simRepo } from '@/db/simRepo';
@@ -20,7 +20,7 @@ const ROWS: [string, (m: ResultMetrics) => string][] = [
  * (closed demo/testnet journal trades). Hidden until both sides have at least one trade.
  */
 export function BacktestVsForward() {
-  const loaded = useLiveQuery(
+  const loaded = useDbQuery(
     () =>
       Promise.all([simRepo.list(), journalRepo.list()])
         .then(([sim, journal]) =>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { Plus } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { paths } from '@/app/paths';
@@ -42,7 +42,7 @@ function matches(t: JournalTrade, account: AccountFilter, setup: string, result:
 /** /journal — the learner's own trades (demo, testnet, real) with metrics. */
 export function JournalPage() {
   usePageTitle('Журнал сделок');
-  const loaded = useLiveQuery<Loaded>(async () => {
+  const loaded = useDbQuery<Loaded>(async () => {
     try {
       return { trades: await journalRepo.list() };
     } catch (error) {

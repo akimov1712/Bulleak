@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { FlaskConical, Play } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -16,7 +16,7 @@ import { plural } from '@/lib/format';
 export function BacktestProgress({ strategy = 'tps' }: { strategy?: string }) {
   const rules = getStrategy(strategy);
   // null while loading or when the database is unavailable: the button still works.
-  const count = useLiveQuery(
+  const count = useDbQuery(
     () =>
       simRepo
         .list({ strategyTag: strategy })

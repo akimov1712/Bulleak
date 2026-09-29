@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useDbQuery } from '@/db/useDbQuery';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { paths } from '@/app/paths';
@@ -32,7 +32,7 @@ export function JournalEntryPage() {
   const id = Number(entryId);
   usePageTitle(isNew ? 'Новая сделка' : 'Сделка');
 
-  const loaded = useLiveQuery<Loaded>(async () => {
+  const loaded = useDbQuery<Loaded>(async () => {
     try {
       const all = await journalRepo.list();
       const setups = [...new Set(all.map((t) => t.setup).filter(Boolean))].sort();

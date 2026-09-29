@@ -3,10 +3,24 @@ import { AlertTriangle } from 'lucide-react';
 import { isStorageHealthy, onStorageHealthChange } from '@/store/safeStorage';
 import { subscribeToOtherTabs } from '@/store/progressStore';
 
-/** Warns when progress cannot be written (private mode, full storage) and syncs other tabs. */
+const HAS_INDEXED_DB = typeof indexedDB !== 'undefined';
+
+/** Warns when the trade database is missing or progress cannot be written (private mode, full storage) and syncs other tabs. */
 export function StorageBanner() {
   useEffect(() => subscribeToOtherTabs(), []);
   const healthy = useSyncExternalStore(onStorageHealthChange, isStorageHealthy, () => true);
+  if (!HAS_INDEXED_DB) {
+    return (
+      <div
+        role="alert"
+        className="flex items-center gap-2 border-b-2 border-warn bg-warn-soft px-4 py-2 text-sm font-bold text-warn"
+      >
+        <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />
+        Журнал сделок и история тренажёра недоступны: браузер не даёт доступ к базе данных
+        (IndexedDB). Уроки и тесты работают как обычно.
+      </div>
+    );
+  }
   if (healthy) return null;
   return (
     <div
