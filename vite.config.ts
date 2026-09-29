@@ -138,8 +138,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'robots.txt', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'Трейдинг на Bybit с нуля',
-        short_name: 'Трейдинг',
+        name: 'Bulleak — трейдинг на Bybit с нуля',
+        short_name: 'Bulleak',
         description:
           'Интерактивный курс по криптотрейдингу на Bybit: с нуля до своей свинг-стратегии.',
         lang: 'ru',

@@ -4,6 +4,8 @@ import { Download, Printer } from 'lucide-react';
 import { paths } from '@/app/paths';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Mascot } from '@/components/mascot/Mascot';
+import { LogoMark } from '@/components/brand/LogoMark';
+import { BRAND } from '@/app/brand';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
@@ -16,7 +18,7 @@ import { formatNumber, formatPct } from '@/lib/format';
 import { useProgress } from '@/store/progressStore';
 import { toast } from '@/store/uiStore';
 
-const COURSE_TITLE = 'Трейдинг на Bybit с нуля';
+const COURSE_TITLE = BRAND.tagline;
 const dateFormat = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric',
   month: 'long',
@@ -123,6 +125,13 @@ export function CertificatePage() {
         className="relative overflow-hidden rounded-3xl border-4 p-6 text-center sm:p-10"
         style={{ background: '#fffdf5', borderColor: '#f5b400', color: '#1f2433' }}
       >
+        <p className="mb-4 flex items-center justify-center gap-2 text-xl font-black tracking-[-0.035em]">
+          <LogoMark size={32} />
+          <span>
+            <span style={{ color: '#0a7f41' }}>{BRAND.name.slice(0, 4)}</span>
+            {BRAND.name.slice(4)}
+          </span>
+        </p>
         <p
           className="text-sm font-extrabold tracking-[0.2em] uppercase"
           style={{ color: '#8a6d00' }}

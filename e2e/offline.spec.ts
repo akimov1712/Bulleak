@@ -32,6 +32,6 @@ test('the manifest makes the app installable', async ({ page }) => {
       ? ((await (await fetch(link.href)).json()) as { name: string; icons: unknown[] })
       : null;
   });
-  expect(manifest?.name).toBe('Трейдинг на Bybit с нуля');
+  expect(manifest?.name).toBe('Bulleak — трейдинг на Bybit с нуля');
   expect(manifest?.icons.length).toBeGreaterThanOrEqual(3);
 });

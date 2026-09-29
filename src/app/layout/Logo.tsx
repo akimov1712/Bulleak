@@ -1,28 +1,35 @@
 import { Link } from 'react-router';
 import { cn } from '@/lib/cn';
-import { Mascot } from '@/components/mascot/Mascot';
+import { LogoMark } from '@/components/brand/LogoMark';
+import { BRAND } from '../brand';
 import { paths } from '../paths';
 
+/** «Bull» in the brand green, «eak» in the text colour. */
+export function Wordmark({ className }: { className?: string }) {
+  return (
+    <span className={cn('font-black tracking-[-0.035em]', className)}>
+      <span className="text-bull">{BRAND.name.slice(0, 4)}</span>
+      {BRAND.name.slice(4)}
+    </span>
+  );
+}
+
+/** Brand logo linking home: mark + name (+ course tagline in the full variant). */
 export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
   return (
     <Link
       to={paths.home()}
-      className={cn('flex items-center gap-2 rounded-xl', className)}
-      aria-label="Трейдинг на Bybit с нуля — на главную"
+      className={cn('flex items-center gap-2.5 rounded-xl', className)}
+      aria-label={`${BRAND.name} — на главную`}
     >
-      <Mascot mood="happy" size={compact ? 36 : 44} />
-      <span className="flex flex-col leading-none">
-        <span
-          className={cn(
-            'text-lg font-black tracking-tight text-bull',
-            compact && 'hidden min-[420px]:inline',
-          )}
-        >
-          Трейдинг
-        </span>
+      <LogoMark size={compact ? 36 : 42} className="shrink-0 drop-shadow-sm" />
+      <span className="flex flex-col">
+        <Wordmark
+          className={cn('leading-none', compact ? 'text-xl max-[359px]:sr-only' : 'text-[1.6rem]')}
+        />
         {!compact && (
-          <span className="text-xs font-extrabold tracking-wide text-text-muted">
-            на Bybit с нуля
+          <span className="mt-1 text-[0.7rem] leading-none font-extrabold text-text-muted">
+            {BRAND.tagline}
           </span>
         )}
       </span>

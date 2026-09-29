@@ -12,7 +12,7 @@ export function AboutPage() {
   usePageTitle('О курсе');
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="О курсе" subtitle="Трейдинг на Bybit с нуля" />
+      <PageHeader title="О курсе" subtitle="Bulleak · Трейдинг на Bybit с нуля" />
 
       <MascotSay mood="happy">
         Привет! Я Буллик. Мы пройдём путь от первой свечи до собственной свинг-стратегии — без
