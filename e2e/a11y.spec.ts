@@ -59,7 +59,7 @@ for (const scheme of ['light', 'dark'] as const) {
 
     for (const route of PAGES) {
       test(`${route} has no serious violations`, async ({ page }) => {
-        await page.goto(`/#${route}`);
+        await page.goto(`./#${route}`);
         await page.locator('main h1').first().waitFor();
         await page.waitForLoadState('networkidle');
         const { violations } = await new AxeBuilder({ page })

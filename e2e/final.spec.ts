@@ -58,7 +58,7 @@ test('final exam: theory and practice passed → certificate (E14)', async ({ pa
       }),
     );
   });
-  await page.goto('/#/exam/final');
+  await page.goto('./#/exam/final');
   await page.getByRole('button', { name: 'Начать экзамен' }).click();
   for (let i = 0; i < 40; i++) {
     await answerQuestion(page, POOL, true);

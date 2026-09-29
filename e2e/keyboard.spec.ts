@@ -24,7 +24,7 @@ async function tabTo(page: Page, target: Locator, max = 150) {
 }
 
 test('skip link moves focus to the content without changing the route', async ({ page }) => {
-  await page.goto('/#/lesson/m09-l02');
+  await page.goto('./#/lesson/m09-l02');
   await page.locator('main h1').waitFor();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Перейти к содержимому' })).toBeFocused();
@@ -34,7 +34,7 @@ test('skip link moves focus to the content without changing the route', async ({
 });
 
 test('a quiz question can be answered with the keyboard', async ({ page }) => {
-  await page.goto('/#/lesson/m00-l01/quiz');
+  await page.goto('./#/lesson/m00-l01/quiz');
   await tabTo(page, page.getByRole('button', { name: 'Начать' }));
   await page.keyboard.press('Enter');
   const check = page.getByRole('button', { name: 'Проверить' });
@@ -57,7 +57,7 @@ test('a quiz question can be answered with the keyboard', async ({ page }) => {
 });
 
 test('simulator and journal controls are reachable with Tab', async ({ page }) => {
-  await page.goto('/#/simulator?seed=424242');
+  await page.goto('./#/simulator?seed=424242');
   // The trade panel loads after the page header (lazy chunk): wait for it before tabbing.
   await expect(page.getByRole('radio', { name: 'Long' })).toBeVisible();
   // «Открыть сделку» is enabled once a side is picked.
@@ -67,7 +67,7 @@ test('simulator and journal controls are reachable with Tab', async ({ page }) =
   // Enabled once the trade plan is computed for the chosen side (disabled buttons skip focus).
   await expect(open).toBeEnabled();
   await tabTo(page, open);
-  await page.goto('/#/journal/new');
+  await page.goto('./#/journal/new');
   await expect(page.getByRole('button', { name: 'Сохранить' })).toBeVisible();
   await tabTo(page, page.getByRole('button', { name: 'Сохранить' }));
 });

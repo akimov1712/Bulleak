@@ -6,7 +6,7 @@ test.describe('rewards after a lesson (E4)', () => {
   test('passing the first quiz gives XP, achievements, level-up, streak and opens the next node', async ({
     page,
   }) => {
-    await page.goto('/#/lesson/m00-l01/quiz');
+    await page.goto('./#/lesson/m00-l01/quiz');
     await expect(page.getByRole('button', { name: 'Опыт: 0 XP' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Уровень 1, Новичок' })).toBeVisible();
 
@@ -30,7 +30,7 @@ test.describe('rewards after a lesson (E4)', () => {
     await expect(page.getByRole('button', { name: 'Серия: 1 день подряд' })).toBeVisible();
 
     // Map: first node completed with 3 stars, second open
-    await page.goto('/#/path');
+    await page.goto('./#/path');
     await expect(page.getByRole('img', { name: '3 из 3 звёзд' }).first()).toBeVisible();
     await page.getByRole('button', { name: /^Урок 0\.2: Реалистичные/ }).click();
     await expect(page.getByRole('link', { name: 'Начать урок' })).toHaveAttribute(
@@ -39,7 +39,7 @@ test.describe('rewards after a lesson (E4)', () => {
     );
 
     // Achievements page counts them
-    await page.goto('/#/achievements');
+    await page.goto('./#/achievements');
     await expect(page.getByText(/^Получено [2-9] из 40$/)).toBeVisible();
   });
 });

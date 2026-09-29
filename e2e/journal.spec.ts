@@ -42,7 +42,7 @@ test.describe('journal (T-612)', () => {
   });
 
   test('a stop on the wrong side is rejected in the form', async ({ page }) => {
-    await page.goto('/#/journal/new');
+    await page.goto('./#/journal/new');
     await page.getByLabel('Цена входа').fill('100');
     await page.getByLabel('Стоп-лосс').fill('110');
     await page.getByLabel('Объём (в монетах)').fill('1');

@@ -18,7 +18,7 @@ async function expectNoHorizontalScroll(page: Page) {
 
 test('home opens without console errors', async ({ page }) => {
   const errors = collectErrors(page);
-  await page.goto('/');
+  await page.goto('./');
   await expect(
     page.getByRole('heading', { level: 1, name: 'Добро пожаловать в курс!' }),
   ).toBeVisible();
@@ -42,7 +42,7 @@ const pages: [string, string][] = [
 ];
 
 test('navigation reaches sections on every screen size', async ({ page, isMobile }) => {
-  await page.goto('/');
+  await page.goto('./');
   if (isMobile) {
     const bottomNav = page.getByRole('navigation', { name: 'Основная навигация' });
     await bottomNav.getByRole('link', { name: 'Тренажёр' }).click();
@@ -64,7 +64,7 @@ test('navigation reaches sections on every screen size', async ({ page, isMobile
 
 test('theme toggle switches and persists', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
-  await page.goto('/');
+  await page.goto('./');
   await page.getByRole('button', { name: 'Включить тёмную тему' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
@@ -74,7 +74,7 @@ test('theme toggle switches and persists', async ({ page }) => {
 for (const [hash, heading] of pages) {
   test(`${hash} renders "${heading}"`, async ({ page }) => {
     const errors = collectErrors(page);
-    await page.goto(`/${hash}`);
+    await page.goto(`./${hash}`);
     await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
     await expectNoHorizontalScroll(page);
     expect(errors).toEqual([]);

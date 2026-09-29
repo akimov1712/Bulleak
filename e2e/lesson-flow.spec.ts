@@ -9,7 +9,7 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
     page,
   }) => {
     await page.clock.install();
-    await page.goto('/#/lesson/m00-l01');
+    await page.goto('./#/lesson/m00-l01');
     await expect(page.getByRole('heading', { level: 1, name: LESSON_TITLE })).toBeVisible();
     await expect(page.getByText('Новый урок')).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -27,7 +27,7 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
     await expect(page.getByRole('img', { name: '3 из 3 звёзд' })).toBeVisible();
 
     await page.reload();
-    await page.goto('/#/module/m00');
+    await page.goto('./#/module/m00');
     const lessons = page.getByRole('list', { name: 'Уроки модуля' }).getByRole('listitem');
     await expect(lessons.nth(0).getByRole('img', { name: '3 из 3 звёзд' })).toBeVisible();
     await expect(lessons.nth(1).getByRole('link')).toHaveAttribute('href', '#/lesson/m00-l02');
@@ -37,17 +37,17 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
   test('a failed quiz (below 80%) keeps the next lesson closed; a retake can pass', async ({
     page,
   }) => {
-    await page.goto('/#/lesson/m00-l01/quiz');
+    await page.goto('./#/lesson/m00-l01/quiz');
     // Derived from the quiz so the test survives content edits: one below / exactly at 80%.
     const toPass = Math.ceil(quiz.questions.length * quiz.passRatio);
     await runLessonQuiz(page, quiz.questions, toPass - 1);
     await expect(page.getByRole('heading', { name: 'Почти получилось' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Разбор ошибок' })).toBeVisible();
 
-    await page.goto('/#/lesson/m00-l02');
+    await page.goto('./#/lesson/m00-l02');
     await expect(page.getByText('Урок пока закрыт')).toBeVisible();
 
-    await page.goto('/#/lesson/m00-l01/quiz');
+    await page.goto('./#/lesson/m00-l01/quiz');
     await runLessonQuiz(page, quiz.questions, toPass);
     await expect(page.getByRole('heading', { name: 'Тест сдан!' })).toBeVisible();
     await dismissLevelUp(page);
@@ -61,7 +61,7 @@ test.describe('lesson → quiz → progress (E2, E3, E5)', () => {
   });
 
   test('a locked lesson opened by link shows the locked screen', async ({ page }) => {
-    await page.goto('/#/lesson/m01-l03');
+    await page.goto('./#/lesson/m01-l03');
     await expect(page.getByText('Урок пока закрыт')).toBeVisible();
     await page.getByRole('link', { name: /К уроку «Добро пожаловать/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: LESSON_TITLE })).toBeVisible();

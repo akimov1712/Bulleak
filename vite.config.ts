@@ -123,6 +123,8 @@ function preloadRoutePage(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves the site under /<repo>/ (set by the deploy workflow); locally — root.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     // MDX must run before the React plugin so lessons compile to JSX first.
     {

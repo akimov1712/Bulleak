@@ -52,7 +52,7 @@ async function runExam(page: Page, correct: boolean) {
 test.describe('module exam (E6)', () => {
   test('a failed exam shows what to repeat and a retake timer', async ({ page }) => {
     await seedProgress(page);
-    await page.goto('/#/exam/m01');
+    await page.goto('./#/exam/m01');
     await runExam(page, false);
     await expect(page.getByText('Почти получилось')).toBeVisible();
     await expect(page.getByRole('region', { name: 'Что повторить' })).toBeVisible();
@@ -63,13 +63,13 @@ test.describe('module exam (E6)', () => {
 
   test('a passed exam opens the next module', async ({ page }) => {
     await seedProgress(page);
-    await page.goto('/#/lesson/m02-l01');
+    await page.goto('./#/lesson/m02-l01');
     await expect(page.getByText('Урок пока закрыт')).toBeVisible();
-    await page.goto('/#/exam/m01');
+    await page.goto('./#/exam/m01');
     await runExam(page, true);
     await dismissLevelUp(page);
     await page.getByRole('link', { name: /К модулю «/ }).click();
-    await page.goto('/#/lesson/m02-l01');
+    await page.goto('./#/lesson/m02-l01');
     await expect(page.getByText('Урок пока закрыт')).toBeHidden();
     await expect(page.locator('main h1')).toBeVisible();
   });
@@ -84,7 +84,7 @@ test('chart-click question: a click picks a candle, arrows reach the answer (E7)
       JSON.stringify({ state: { freeMode: true, theme: 'system' }, version: 1 }),
     ),
   );
-  await page.goto('/#/lesson/m03-l03/quiz');
+  await page.goto('./#/lesson/m03-l03/quiz');
   await page.getByRole('button', { name: 'Начать' }).click();
   const questions = [...m03l03Quiz.questions];
   for (let i = 0; i < questions.length; i++) {

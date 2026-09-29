@@ -102,7 +102,7 @@ export interface JournalInput {
 
 /** Adds a trade through the journal form and waits for the journal list. */
 export async function addJournalTrade(page: Page, t: JournalInput) {
-  await page.goto('/#/journal/new');
+  await page.goto('./#/journal/new');
   await expect(page.getByRole('heading', { level: 1, name: 'Новая сделка' })).toBeVisible();
   if (t.side === 'Short') await page.getByRole('radio', { name: 'Short' }).click();
   await page.getByLabel('Цена входа').fill(t.entry);

@@ -47,7 +47,7 @@ test.describe('simulator (T-511)', () => {
     page,
   }) => {
     const expected = expectedLongResult();
-    await page.goto(`/#/simulator?seed=${SEED}`);
+    await page.goto(`./#/simulator?seed=${SEED}`);
     await expect(page.getByTestId('sim-chart')).toBeVisible();
 
     await page.getByRole('radio', { name: 'Long' }).click();
@@ -78,7 +78,7 @@ test.describe('simulator (T-511)', () => {
   test('a lesson scenario: skipping the mid-range setup is the textbook decision', async ({
     page,
   }) => {
-    await page.goto('/#/simulator/m03-range-middle');
+    await page.goto('./#/simulator/m03-range-middle');
     await expect(page.getByRole('heading', { level: 1, name: 'Середина диапазона' })).toBeVisible();
     await expect(page.getByText('Сценарий: Середина диапазона')).toBeVisible();
     await page.getByRole('button', { name: /Пропустить/ }).click();

@@ -13,7 +13,7 @@ test.describe('backup (T-612)', () => {
       exit: '120',
       closedAt: '2026-09-02T10:00',
     });
-    await page.goto('/#/settings');
+    await page.goto('./#/settings');
     await page.getByLabel('Имя').fill('Тестер');
     await page.getByRole('radio', { name: 'Тёмная' }).click();
 
@@ -31,11 +31,11 @@ test.describe('backup (T-612)', () => {
     await reset.getByRole('textbox').fill('СБРОС');
     await reset.getByRole('button', { name: 'Сбросить' }).click();
     await expect(page.getByLabel('Имя')).toHaveValue('');
-    await page.goto('/#/journal');
+    await page.goto('./#/journal');
     await expect(page.getByText('Журнал пока пуст')).toBeVisible();
 
     // A broken file: readable error, nothing changes
-    await page.goto('/#/settings');
+    await page.goto('./#/settings');
     await page.getByLabel('Восстановить из файла').setInputFiles({
       name: 'broken.json',
       mimeType: 'application/json',
@@ -54,7 +54,7 @@ test.describe('backup (T-612)', () => {
       'aria-checked',
       'true',
     );
-    await page.goto('/#/journal');
+    await page.goto('./#/journal');
     await expect(kpi(page, 'Сделок')).toHaveText('1');
   });
 });

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 /** E10: the position calculator computes the size from risk and stop; bad input shows a hint. */
 test('position calculator: correct size, and a hint for impossible input', async ({ page }) => {
-  await page.goto('/#/tools/position');
+  await page.goto('./#/tools/position');
   const field = (name: string) => page.getByRole('textbox', { name });
   await field('Баланс').fill('2000');
   await field('Риск на сделку').fill('1');

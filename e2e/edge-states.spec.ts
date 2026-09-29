@@ -8,7 +8,7 @@ const ROUTES = ['/', '/lesson/m03-l02', '/simulator', '/journal', '/journal/new'
 async function expectNoBlankPages(context: BrowserContext) {
   const page = await context.newPage();
   for (const route of ROUTES) {
-    await page.goto(`/#${route}`);
+    await page.goto(`./#${route}`);
     await expect(page.locator('main h1').first()).toBeVisible();
   }
   return page;
@@ -38,7 +38,7 @@ test('no IndexedDB: journal explains the problem instead of loading forever', as
   });
   await context.addInitScript((s) => localStorage.setItem('tc-settings', s), FREE);
   const page = await expectNoBlankPages(context);
-  await page.goto('/#/journal');
+  await page.goto('./#/journal');
   await expect(page.getByText(/хранилище браузера недоступно/)).toBeVisible();
   await expect(page.getByRole('alert').filter({ hasText: 'IndexedDB' })).toBeVisible();
 });
@@ -55,7 +55,7 @@ test('missing candle data: charts show a retry instead of crashing', async ({ co
   await context.route('**/data/*.json', (route) => route.fulfill({ status: 404, body: 'nope' }));
   await context.addInitScript((s) => localStorage.setItem('tc-settings', s), FREE);
   const page = await expectNoBlankPages(context);
-  await page.goto('/#/simulator');
+  await page.goto('./#/simulator');
   await expect(
     page.getByRole('alert').filter({ hasText: 'Не удалось загрузить график' }),
   ).toBeVisible();
