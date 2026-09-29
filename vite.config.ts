@@ -112,7 +112,7 @@ function preloadRoutePage(): Plugin {
         }
         const script =
           `<script>(function(){var m=${JSON.stringify(map)};` +
-          `var p=location.hash.replace(/^#\\/?/,'').split('/');` +
+          `var p=location.hash.replace(/^#\\/?/,'').split(/[?\\/]/);` +
           `var k=p[0]==='lesson'&&p[2]==='quiz'?'quiz':p[0]==='journal'&&p[1]?'entry':p[0];` +
           `(m[k]||[]).forEach(function(u){var l=document.createElement('link');` +
           `l.rel='modulepreload';l.href=u;document.head.appendChild(l);});})();</script>`;
