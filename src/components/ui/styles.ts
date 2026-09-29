@@ -76,4 +76,5 @@ export function cardClass({
 export const inputClass =
   'min-h-11 w-full rounded-xl border-2 border-border bg-surface px-3.5 text-base text-text ' +
   'placeholder:text-text-muted/70 transition-colors hover:border-text-muted/40 ' +
-  'focus:border-info focus:outline-none aria-invalid:border-bear disabled:opacity-50';
+  'focus:border-info focus:ring-4 focus:ring-info/30 focus:outline-none aria-invalid:border-bear ' +
+  'disabled:opacity-50';

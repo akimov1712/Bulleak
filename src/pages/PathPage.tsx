@@ -67,6 +67,13 @@ export function PathPage() {
           <Link
             to={paths.finalExam()}
             aria-disabled={!finalOpen}
+            aria-label={
+              finalPassed
+                ? 'Финальный экзамен: сдан'
+                : finalOpen
+                  ? 'Финальный экзамен: открыт'
+                  : 'Финальный экзамен: закрыт'
+            }
             onClick={(e) => {
               if (!finalOpen) e.preventDefault();
             }}

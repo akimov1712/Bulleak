@@ -272,7 +272,7 @@ export function SimChart(props: SimChartProps) {
     <div
       ref={containerRef}
       data-testid="sim-chart"
-      role="img"
+      role="group"
       aria-label="График тренажёра: видны только свечи до текущего момента"
       className="overflow-hidden rounded-2xl border-2 border-border bg-surface"
       style={{ height, touchAction: 'pan-y' }}

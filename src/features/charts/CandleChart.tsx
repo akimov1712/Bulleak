@@ -367,7 +367,8 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
         ref={containerRef}
         style={{ height, touchAction: interactive ? 'pan-y' : 'auto' }}
         aria-label={`Свечной график ${legend}`}
-        role="img"
+        // A group, not an image: the chart library adds a focusable attribution link inside.
+        role="group"
       />
     </div>
   );

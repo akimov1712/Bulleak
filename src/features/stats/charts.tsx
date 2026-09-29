@@ -64,7 +64,7 @@ const HEAT: Record<HeatCell['level'], string> = {
 /** GitHub-style activity calendar: one column per week, Monday on top. */
 export function Heatmap({ weeks }: { weeks: readonly (readonly HeatCell[])[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div tabIndex={0} role="region" aria-label="Календарь активности" className="overflow-x-auto">
       <div className="inline-flex gap-[3px]" role="img" aria-label="Календарь активности по дням">
         {weeks.map((week) => (
           <div key={week[0]?.key} className="flex flex-col gap-[3px]">

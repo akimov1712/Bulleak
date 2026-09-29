@@ -18,6 +18,13 @@ export function RootLayout() {
     <div className="flex min-h-dvh">
       <a
         href="#main"
+        // The hash belongs to the router: move focus by hand instead of navigating to "#main".
+        onClick={(e) => {
+          e.preventDefault();
+          const main = document.getElementById('main');
+          main?.focus();
+          main?.scrollIntoView();
+        }}
         className="sr-only z-50 rounded-xl bg-surface px-4 py-2 font-bold focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
       >
         Перейти к содержимому

@@ -116,6 +116,8 @@ export function XpChip() {
               animate={reduced ? { opacity: 1 } : { opacity: 1, y: -22 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6 }}
+              // Fading decoration: excluded from contrast checks (e2e/a11y.spec.ts).
+              data-transient=""
               className="pointer-events-none absolute -top-1 right-0 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp"
             >
               +{flash.amount}

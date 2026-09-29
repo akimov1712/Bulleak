@@ -147,7 +147,12 @@ export function LearningStats() {
       </Card>
 
       {progress.quizAttempts.length > 0 && (
-        <Card className="flex flex-col gap-2 overflow-x-auto">
+        <Card
+          className="flex flex-col gap-2 overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="Последние тесты"
+        >
           <h2 className="font-extrabold">Последние тесты</h2>
           <table className="w-full text-sm">
             <thead>

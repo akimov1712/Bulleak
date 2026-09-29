@@ -92,7 +92,13 @@ export function A({ className, href, children, ...rest }: ComponentProps<'a'>) {
 
 export function Table({ className, ...rest }: ComponentProps<'table'>) {
   return (
-    <div className="my-6 overflow-x-auto rounded-2xl border-2 border-border">
+    // Focusable so a keyboard user can scroll a wide table on a phone.
+    <div
+      tabIndex={0}
+      role="region"
+      aria-label="Таблица"
+      className="my-6 overflow-x-auto rounded-2xl border-2 border-border"
+    >
       <table
         className={cn('w-full border-collapse text-left text-[0.95rem]', className)}
         {...rest}
