@@ -8,12 +8,19 @@
     "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
     "start": "tsx src/main.ts",
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:migrate": "tsx --env-file-if-exists=.env src/db/migrate-cli.ts"
   },
   "dependencies": {
     "@bulleak/shared": "^0.1.0",
+    "@electric-sql/pglite": "^0.5.8",
     "@hono/node-server": "^2.1.3",
+    "drizzle-orm": "^0.45.3",
     "hono": "^4.13.12",
+    "pg": "^8.23.0",
     "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
   }
 }

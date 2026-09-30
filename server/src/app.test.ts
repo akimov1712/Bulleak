@@ -73,10 +73,14 @@ describe('loadConfig', () => {
       appOrigin: 'http://localhost:5173',
     });
     expect(config.jwtSecret.length).toBeGreaterThanOrEqual(32);
+    expect(config.database).toMatchObject({ kind: 'pglite' });
+    expect(loadConfig({ NODE_ENV: 'test' }).database).toEqual({ kind: 'pglite' });
   });
 
   it('refuses to start production without a strong secret and origin', () => {
-    expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(/JWT_SECRET[\s\S]*APP_ORIGIN/);
+    expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(
+      /JWT_SECRET[\s\S]*DATABASE_URL[\s\S]*APP_ORIGIN/,
+    );
     expect(() =>
       loadConfig({ NODE_ENV: 'production', APP_ORIGIN: 'https://x.test', JWT_SECRET: 'short' }),
     ).toThrow(/JWT_SECRET: нужно не меньше 32 символов/);
@@ -85,8 +89,12 @@ describe('loadConfig', () => {
         NODE_ENV: 'production',
         APP_ORIGIN: 'https://x.test',
         JWT_SECRET: 'k'.repeat(48),
+        DATABASE_URL: 'postgres://u:p@db.test:5432/bulleak',
         PORT: '9000',
-      }).port,
-    ).toBe(9000);
+      }),
+    ).toMatchObject({
+      port: 9000,
+      database: { kind: 'postgres', url: 'postgres://u:p@db.test:5432/bulleak' },
+    });
   });
 });

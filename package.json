@@ -24,7 +24,8 @@
     "gen:course": "tsx scripts/gen-course.ts",
     "data:fetch": "tsx scripts/fetch-klines.ts",
     "audit:responsive": "node scripts/audit-responsive.mjs",
-    "dev:server": "npm run dev -w server"
+    "dev:server": "npm run dev -w server",
+    "db:migrate": "npm run db:migrate -w server"
   },
   "dependencies": {
     "@bulleak/shared": "^0.1.0",

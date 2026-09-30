@@ -47,7 +47,7 @@
 | Рантайм | Node 24 LTS | Тот же, что и у фронтенда; один `npm` |
 | HTTP | **Hono** | Лёгкий, строгие типы, работает на Node и на edge-хостингах |
 | БД | **PostgreSQL** | Надёжно, бесплатные тарифы (Neon, Supabase-Postgres) |
-| ORM и миграции | **Drizzle** | TypeScript-схема, SQL-миграции в репозитории |
+| ORM и миграции | **Drizzle** (запросы) + свои SQL-миграции | Типизированные запросы; миграции — простые `.sql` файлы (drizzle-kit не берём: уязвимые зависимости) |
 | Валидация | **zod** | Общие схемы фронтенда и сервера в `@bulleak/shared` |
 | Пароли | **argon2id** (`@node-rs/argon2`) | Рекомендация OWASP |
 | Тесты | Vitest + **PGlite** (Postgres в WASM) | Настоящий Postgres в тестах без Docker; работает в CI |
@@ -66,7 +66,7 @@ npm workspaces. `npm run check` проверяет всё: фронтенд, с�
 ## 5. Модель данных (PostgreSQL)
 | Таблица | Поля | Примечание |
 |---|---|---|
-| `users` | `id uuid pk`, `email citext unique`, `email_verified_at`, `password_hash`, `name`, `created_at`, `deleted_at` | |
+| `users` | `id uuid pk`, `email` (уникален без учёта регистра), `email_verified_at`, `password_hash`, `name`, `created_at` | Удаление — сразу и каскадом |
 | `sessions` | `id uuid pk`, `user_id`, `refresh_hash`, `family_id`, `user_agent`, `created_at`, `expires_at`, `revoked_at` | Ротация refresh-токенов; повторное использование старого токена отзывает всю «семью» |
 | `email_tokens` | `token_hash pk`, `user_id`, `kind (verify\|reset)`, `expires_at`, `used_at` | Хранится только хэш |
 | `progress` | `user_id pk`, `state jsonb`, `schema_version int`, `rev bigint`, `updated_at` | Один документ `ProgressState` на пользователя |

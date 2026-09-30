@@ -14,3 +14,4 @@ Thumbs.db
 .vite/
 shot.png
 !.env.example
+server/.data/
