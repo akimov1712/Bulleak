@@ -40,6 +40,12 @@ export default tseslint.config(
     rules: { 'no-console': 'off', 'react-refresh/only-export-components': 'off' },
   },
   {
+    // API server and shared contract: Node runtime, no React.
+    files: ['server/**/*.ts', 'shared/**/*.ts'],
+    languageOptions: { globals: { ...globals.node } },
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'src/test/**'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },

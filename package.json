@@ -4,25 +4,27 @@
   "version": "0.1.0",
   "type": "module",
   "workspaces": [
-    "shared"
+    "shared",
+    "server"
   ],
   "description": "Интерактивный курс «Трейдинг на Bybit с нуля»",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck -w server",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
-    "test": "vitest run",
+    "test": "vitest run && npm run test -w server",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "gen:course": "tsx scripts/gen-course.ts",
     "data:fetch": "tsx scripts/fetch-klines.ts",
-    "audit:responsive": "node scripts/audit-responsive.mjs"
+    "audit:responsive": "node scripts/audit-responsive.mjs",
+    "dev:server": "npm run dev -w server"
   },
   "dependencies": {
     "@bulleak/shared": "^0.1.0",

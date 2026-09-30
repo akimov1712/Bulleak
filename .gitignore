@@ -13,3 +13,4 @@ Thumbs.db
 *.tsbuildinfo
 .vite/
 shot.png
+!.env.example
