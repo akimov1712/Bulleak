@@ -54,6 +54,15 @@
 
   --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(26 29 43 / 0.18);
 
+  /* Navigation chrome (sidebar, mobile header): dark "ink" panel in both themes. */
+  --ink: #12162a;
+  --ink-2: #1c2140;
+  --ink-3: #272d52;
+  --ink-border: #2a3052;
+  --on-ink: #eef0f8;
+  --on-ink-muted: #9aa2c2;
+  --ink-accent: #2bd97f;
+
   /* Mascot "Bullik": same character in both themes, only the outline adapts. */
   --mascot-body: #c9824b;
   --mascot-body-shade: #a8653a;
@@ -101,6 +110,11 @@
   --warn-soft: #3d2610;
 
   --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+
+  --ink: #0a0d19;
+  --ink-2: #161a30;
+  --ink-3: #20253f;
+  --ink-border: #1f2440;
 
   --mascot-outline: #0b0d17;
 }
@@ -150,6 +164,14 @@
   --color-mod-yellow-shade: var(--mod-yellow-shade);
   --color-mod-red: var(--mod-red);
   --color-mod-red-shade: var(--mod-red-shade);
+
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-border: var(--ink-border);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
+  --color-ink-accent: var(--ink-accent);
 
   --shadow-card: var(--shadow-card);
 }

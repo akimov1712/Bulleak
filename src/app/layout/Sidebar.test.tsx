@@ -27,13 +27,19 @@ describe('Sidebar', () => {
     expect(screen.getByRole('link', { name: 'Глоссарий' })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('leads to the next lesson with course progress, except on home', () => {
-    const { unmount } = renderAt('/glossary');
-    const next = screen.getByRole('link', { name: /Продолжить · модуль 0/ });
-    expect(next).toHaveAttribute('href', '/lesson/m00-l01');
-    expect(next).toHaveTextContent(/0\/\d+/);
-    unmount();
-    renderAt('/');
+  it('shows learner progress and the theme switch instead of a header', () => {
+    renderAt('/glossary');
+    const progress = screen.getByRole('region', { name: 'Твой прогресс' });
+    expect(
+      within(progress).getByRole('button', { name: 'Уровень 1, Новичок' }),
+    ).toBeInTheDocument();
+    expect(
+      within(progress).getByRole('button', { name: 'Серия: 0 дней подряд' }),
+    ).toBeInTheDocument();
+    expect(within(progress).getByRole('button', { name: 'Опыт: 0 XP' })).toBeInTheDocument();
+    expect(
+      within(progress).getByRole('button', { name: /Включить (тёмную|светлую) тему/ }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Продолжить/ })).not.toBeInTheDocument();
   });
 });
