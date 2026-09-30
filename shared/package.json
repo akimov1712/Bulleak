@@ -1,0 +1,13 @@
+{
+  "name": "@bulleak/shared",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Общие типы и схемы фронтенда и API",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}

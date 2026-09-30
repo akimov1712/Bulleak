@@ -207,7 +207,7 @@ export default defineConfig(({ mode }) => ({
     maxWorkers: 2,
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts', 'shared/src/**/*.test.ts'],
     css: false,
     coverage: {
       provider: 'v8',

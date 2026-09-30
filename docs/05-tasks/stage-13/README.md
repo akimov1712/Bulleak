@@ -10,7 +10,7 @@
 ## Задачи
 | ID | Задача | Статус |
 |---|---|---|
-| [T-1301](T-1301-workspaces-shared.md) | npm workspaces и общий пакет shared | ☐ |
+| [T-1301](T-1301-workspaces-shared.md) | npm workspaces и общий пакет shared | ☑ |
 | [T-1302](T-1302-api-skeleton.md) | Каркас API и конфигурация | ☐ |
 | [T-1303](T-1303-db-schema.md) | Схема БД и миграции | ☐ |
 | [T-1304](T-1304-register-login.md) | Регистрация и вход | ☐ |
