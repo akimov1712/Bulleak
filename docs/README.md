@@ -44,7 +44,7 @@
 - [bybit-mockups.md](03-content/bybit-mockups.md) — SVG-макеты экранов Bybit (вместо скриншотов)
 
 ## 04-features
-[path-map](04-features/path-map.md) · [lesson-player](04-features/lesson-player.md) · [quiz-engine](04-features/quiz-engine.md) · [gamification](04-features/gamification.md) · [stats](04-features/stats.md) · [simulator](04-features/simulator.md) · [calculators](04-features/calculators.md) · [journal](04-features/journal.md) · [glossary](04-features/glossary.md) · [settings-export](04-features/settings-export.md) · [exams-certificate](04-features/exams-certificate.md)
+[path-map](04-features/path-map.md) · [lesson-player](04-features/lesson-player.md) · [quiz-engine](04-features/quiz-engine.md) · [gamification](04-features/gamification.md) · [stats](04-features/stats.md) · [simulator](04-features/simulator.md) · [calculators](04-features/calculators.md) · [journal](04-features/journal.md) · [glossary](04-features/glossary.md) · [settings-export](04-features/settings-export.md) · [exams-certificate](04-features/exams-certificate.md) · [**accounts-backend**](04-features/accounts-backend.md) (аккаунты и бэкенд, этапы 13–16)
 
 ## 05-tasks
 [05-tasks/README.md](05-tasks/README.md) — обзор. Этапы 00–10, в каждой папке `README.md` с целью этапа и списком задач `T-XXX-*.md`.
