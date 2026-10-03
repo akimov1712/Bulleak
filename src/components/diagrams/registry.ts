@@ -87,6 +87,12 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'bybit-ui-order-form': () =>
     import('./bybit/orderForm').then((m) => ({ default: m.BybitOrderForm })),
   'bybit-ui-demo': () => import('./bybit/demo').then((m) => ({ default: m.BybitDemo })),
+  'bybit-ui-contract-data': () =>
+    import('./bybit/contract').then((m) => ({ default: m.BybitContractData })),
+  'bybit-ui-funding-bar': () =>
+    import('./bybit/contract').then((m) => ({ default: m.BybitFundingBar })),
+  'bybit-ui-contract-detail': () =>
+    import('./bybit/contract').then((m) => ({ default: m.BybitContractDetail })),
 };
 
 export const isDiagramName = (name: string) => Object.hasOwn(DIAGRAM_LOADERS, name);

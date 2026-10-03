@@ -21,3 +21,6 @@
 | Файл | Страница | Дата |
 |---|---|---|
 | `public/img/bybit/terminal.webp` | https://testnet.bybit.com/ru-RU/trade/usdt/BTCUSDT | 2026-10-03 |
+| `public/img/bybit/contract-data.webp` | https://testnet.bybit.com/ru-RU/trade/usdt/BTCUSDT (панель «Данные контракта», развёрнута) | 2026-10-03 |
+| `public/img/bybit/funding-bar.webp` | https://testnet.bybit.com/ru-RU/trade/usdt/BTCUSDT (строка над графиком) | 2026-10-03 |
+| `public/img/bybit/contract-detail.webp` | https://testnet.bybit.com/ru-RU/announcement-info/contract-detail | 2026-10-03 |

@@ -15,6 +15,22 @@ interface Shot {
   width: number;
   /** Extra preparation before the capture (close banners, pick tabs…). */
   prepare?: (page: Page) => Promise<void>;
+  /** Part of the page to capture, CSS px (default — the whole viewport). */
+  clip?: (page: Page) => Promise<Box>;
+}
+
+interface Box {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** Box of the smallest visible element whose text is exactly `text`. */
+async function textBox(page: Page, text: string, pick: 'first' | 'last' = 'last'): Promise<Box> {
+  const box = await page.getByText(text, { exact: true })[pick]().boundingBox();
+  if (!box) throw new Error(`not found: ${text}`);
+  return box;
 }
 
 const BASE = 'https://testnet.bybit.com/ru-RU';
@@ -26,6 +42,52 @@ const SHOTS: Shot[] = [
     url: `${BASE}/trade/usdt/BTCUSDT`,
     viewport: { width: 1440, height: 900 },
     width: 1600,
+  },
+  {
+    // Index / mark price, open interest (m02-l05, m07-l03, m08-l04).
+    name: 'contract-data',
+    url: `${BASE}/trade/usdt/BTCUSDT`,
+    viewport: { width: 1920, height: 1200 },
+    width: 640,
+    prepare: async (page) => {
+      await page.getByText('Показать', { exact: true }).last().click();
+      await page.waitForTimeout(800);
+    },
+    clip: async (page) => {
+      const head = await textBox(page, 'Данные Контракта BTCUSDT');
+      const end = await textBox(page, 'Скрыть');
+      const x = head.x - 16;
+      return {
+        x,
+        y: head.y - 14,
+        width: 1920 - x - 2,
+        height: end.y + end.height + 14 - (head.y - 14),
+      };
+    },
+  },
+  {
+    // Funding rate and countdown in the ticker bar (m02-l04, m08-l05).
+    name: 'funding-bar',
+    url: `${BASE}/trade/usdt/BTCUSDT`,
+    viewport: { width: 1440, height: 900 },
+    width: 1400,
+    clip: async (page) => {
+      const pair = await textBox(page, 'BTCUSDT', 'first');
+      const rate = await textBox(page, 'Ставка', 'first');
+      const y = pair.y - 14;
+      return { x: 4, y, width: rate.x + 260, height: 64 };
+    },
+  },
+  {
+    // Contract rules page: funding every 8 h, premium index (m08-l05).
+    name: 'contract-detail',
+    url: `${BASE}/announcement-info/contract-detail`,
+    viewport: { width: 1440, height: 900 },
+    width: 1400,
+    clip: async (page) => {
+      const title = await textBox(page, 'BTCUSDT Данные контракта');
+      return { x: title.x - 24, y: title.y - 24, width: 1440 - (title.x - 24) - 24, height: 300 };
+    },
   },
 ];
 
@@ -67,7 +129,7 @@ for (const shot of SHOTS.filter((s) => only.size === 0 || only.has(s.name))) {
   // The terminal streams prices and draws the chart after load.
   await page.waitForTimeout(10_000);
   await shot.prepare?.(page);
-  const png = await page.screenshot();
+  const png = await page.screenshot(shot.clip ? { clip: await shot.clip(page) } : {});
   const encoder = await context.newPage();
   const webp = await toWebp(encoder, png, shot.width);
   fs.writeFileSync(`${OUT}/${shot.name}.webp`, webp);
