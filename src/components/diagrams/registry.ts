@@ -95,6 +95,10 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'bybit-ui-margin-mode': () =>
     import('./bybit/accountShots').then((m) => ({ default: m.BybitMarginMode })),
   'bybit-ui-demo': () => import('./bybit/demo').then((m) => ({ default: m.BybitDemo })),
+  'bybit-ui-demo-entry': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitDemoEntry })),
+  'bybit-ui-order-export': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitOrderExport })),
   'bybit-ui-contract-data': () =>
     import('./bybit/contract').then((m) => ({ default: m.BybitContractData })),
   'bybit-ui-funding-bar': () =>

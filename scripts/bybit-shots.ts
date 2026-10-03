@@ -130,7 +130,13 @@ function redactPersonalData() {
 /** Hides banners and pop-ups that are not part of the lesson (KYC reminder, news toasts). */
 async function tidy(page: Page) {
   await page.evaluate(() => {
-    const noise = [/верификацию KYC/, /Делистинг/, /Выписка с аккаунта/, /Больше не показывать/];
+    const noise = [
+      /верификацию KYC/,
+      /Делистинг/,
+      /Выписка с аккаунта/,
+      /Больше не показывать/,
+      /Плавающая торговая панель/,
+    ];
     const hit = (el: Element) => noise.some((n) => n.test((el as HTMLElement).innerText ?? ''));
     for (const el of document.querySelectorAll<HTMLElement>('div')) {
       if (!hit(el)) continue;
@@ -171,6 +177,34 @@ const FORM = { x: 1136, y: 100, width: 300 };
 
 /** Account screens: bybit.com with the signed-in profile. Nothing is ever confirmed or saved. */
 const ACCOUNT_SHOTS: Shot[] = [
+  {
+    // Where demo trading starts: «Торговать» menu → «Демо трейдинг» (m02-l06).
+    name: 'demo-entry',
+    account: true,
+    url: `${MAIN}/trade/usdt/BTCUSDT`,
+    viewport: { width: 1440, height: 900 },
+    width: 660,
+    prepare: async (page) => {
+      await page.mouse.move(397, 24); // «Торговать» in the header
+      await page.waitForTimeout(1800);
+    },
+    clip: async () => ({ x: 345, y: 0, width: 330, height: 765 }),
+  },
+  {
+    // Futures trade history with the Export button (m12-l03). Nothing is exported.
+    name: 'order-export',
+    account: true,
+    url: 'https://www.bybit.com/user/assets/order/fed/spot-uta-orders/trade-order/current-order',
+    viewport: { width: 1440, height: 900 },
+    width: 1400,
+    prepare: async (page) => {
+      await page.mouse.click(77, 239); // «Фьючерсы» in the side menu
+      await page.waitForTimeout(3000);
+      await page.getByText('История торговли').first().click({ timeout: 10_000 });
+      await page.waitForTimeout(3000);
+    },
+    clip: async () => ({ x: 268, y: 100, width: 1150, height: 540 }),
+  },
   {
     // Full order form: margin mode, leverage, type, price, qty, TP/SL, Long / Short (m02-l05).
     name: 'order-form',

@@ -30,4 +30,6 @@
 | `public/img/bybit/security.webp`, `security-advanced.webp` | https://www.bybit.com/ru-RU/app/user/security — e-mail заменён точками | 2026-10-03 |
 | `public/img/bybit/assets.webp` | https://www.bybit.com/ru-RU/user/assets/home/overview — суммы скрыты самим Bybit | 2026-10-03 |
 | `public/img/bybit/deposit-network.webp` | https://www.bybit.com/ru-RU/user/assets/deposit — USDT, список сетей; адрес не открывался | 2026-10-03 |
+| `public/img/bybit/demo-entry.webp` | https://www.bybit.com/ru-RU/trade/usdt/BTCUSDT — меню «Торговать» (аккаунт пользователя) | 2026-10-04 |
+| `public/img/bybit/order-export.webp` | https://www.bybit.com/user/assets/order/… — «Фьючерсы → История торговли», кнопка «Экспорт» (ничего не выгружалось) | 2026-10-04 |
 
