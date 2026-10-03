@@ -8,3 +8,6 @@ package-lock.json
 docs
 *.md
 src/content/course.ts
+
+# Local Claude Code settings (user-owned, not in git)
+.claude/settings.local.json

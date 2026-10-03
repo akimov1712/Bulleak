@@ -22,6 +22,8 @@ interface ShotProps {
   taken: string;
   /** Narrow screens (a side panel): limit the width so the image is not blown up. */
   maxWidth?: number;
+  /** Where the screen comes from (shown in the caption). */
+  source?: string;
 }
 
 /**
@@ -37,6 +39,7 @@ export function BybitShot({
   hotspots,
   taken,
   maxWidth,
+  source = 'тестовая сеть testnet.bybit.com — интерфейс как на основном сайте, цены учебные',
 }: ShotProps) {
   const [active, setActive] = useState<number | null>(null);
   const toggle = (n: number) => setActive((a) => (a === n ? null : n));
@@ -95,8 +98,7 @@ export function BybitShot({
       )}
       <div className="flex flex-wrap items-center justify-between gap-x-3 bg-surface-2 px-3 py-1 text-xs text-text-muted">
         <p className="py-0.5">
-          Скриншот Bybit, {taken}: тестовая сеть testnet.bybit.com — интерфейс как на основном
-          сайте, цены учебные. Bybit обновляет дизайн, детали могут отличаться.
+          Скриншот Bybit, {taken}: {source}. Bybit обновляет дизайн, детали могут отличаться.
         </p>
         <a
           href={url}

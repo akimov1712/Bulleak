@@ -78,14 +78,22 @@ export const DIAGRAM_LOADERS: Record<string, Loader> = {
   'scaling-ladder': () => import('./m12').then((m) => ({ default: m.ScalingLadder })),
   'growth-roadmap': () => import('./m12').then((m) => ({ default: m.GrowthRoadmap })),
   // Bybit UI mock-ups (prefix bybit-ui-: interactive, role=group)
-  'bybit-ui-security': () => import('./bybit/account').then((m) => ({ default: m.BybitSecurity })),
+  'bybit-ui-security': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitSecurity })),
+  'bybit-ui-security-advanced': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitSecurityAdvanced })),
   'bybit-ui-kyc-levels': () =>
     import('./bybit/account').then((m) => ({ default: m.BybitKycLevels })),
-  'bybit-ui-assets': () => import('./bybit/funds').then((m) => ({ default: m.BybitAssets })),
-  'bybit-ui-deposit': () => import('./bybit/funds').then((m) => ({ default: m.BybitDeposit })),
+  'bybit-ui-assets': () => import('./bybit/accountShots').then((m) => ({ default: m.BybitAssets })),
+  'bybit-ui-deposit': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitDeposit })),
   'bybit-ui-terminal': () => import('./bybit/terminal').then((m) => ({ default: m.BybitTerminal })),
   'bybit-ui-order-form': () =>
-    import('./bybit/orderForm').then((m) => ({ default: m.BybitOrderForm })),
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitOrderForm })),
+  'bybit-ui-leverage': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitLeverage })),
+  'bybit-ui-margin-mode': () =>
+    import('./bybit/accountShots').then((m) => ({ default: m.BybitMarginMode })),
   'bybit-ui-demo': () => import('./bybit/demo').then((m) => ({ default: m.BybitDemo })),
   'bybit-ui-contract-data': () =>
     import('./bybit/contract').then((m) => ({ default: m.BybitContractData })),

@@ -15,3 +15,4 @@ Thumbs.db
 shot.png
 !.env.example
 server/.data/
+scripts/.bybit-profile

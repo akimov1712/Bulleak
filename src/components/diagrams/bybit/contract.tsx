@@ -30,7 +30,7 @@ export function BybitContractData() {
     <BybitShot
       src="img/bybit/contract-data.webp"
       width={640}
-      height={832}
+      height={831}
       maxWidth={360}
       screen="Данные контракта"
       alt="Панель «Данные контракта BTCUSDT» на Bybit: срок действия — бессрочный, индексная цена, цена маркировки, сумма открытых позиций, оборот и объём за 24 часа, стоимость контракта 1 BTC."
@@ -61,7 +61,7 @@ export function BybitContractDetail() {
     <BybitShot
       src="img/bybit/contract-detail.webp"
       width={1400}
-      height={384}
+      height={382}
       screen="Данные контракта: правила"
       alt="Страница правил контракта BTCUSDT на Bybit: бессрочный контракт без даты окончания, финансирование раз в 8 часов, время следующего финансирования, ставки кредитования и индекс премиума .BTCUSDTPI для расчёта ставки."
       hotspots={[]}

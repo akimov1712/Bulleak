@@ -24,3 +24,10 @@
 | `public/img/bybit/contract-data.webp` | https://testnet.bybit.com/ru-RU/trade/usdt/BTCUSDT (панель «Данные контракта», развёрнута) | 2026-10-03 |
 | `public/img/bybit/funding-bar.webp` | https://testnet.bybit.com/ru-RU/trade/usdt/BTCUSDT (строка над графиком) | 2026-10-03 |
 | `public/img/bybit/contract-detail.webp` | https://testnet.bybit.com/ru-RU/announcement-info/contract-detail | 2026-10-03 |
+| `public/img/bybit/order-form.webp` | https://www.bybit.com/ru-RU/trade/usdt/BTCUSDT — аккаунт пользователя, форма ордера с TP/SL | 2026-10-03 |
+| `public/img/bybit/leverage.webp` | то же, список плеча | 2026-10-03 |
+| `public/img/bybit/margin-mode.webp` | то же, меню режима маржи | 2026-10-03 |
+| `public/img/bybit/security.webp`, `security-advanced.webp` | https://www.bybit.com/ru-RU/app/user/security — e-mail заменён точками | 2026-10-03 |
+| `public/img/bybit/assets.webp` | https://www.bybit.com/ru-RU/user/assets/home/overview — суммы скрыты самим Bybit | 2026-10-03 |
+| `public/img/bybit/deposit-network.webp` | https://www.bybit.com/ru-RU/user/assets/deposit — USDT, список сетей; адрес не открывался | 2026-10-03 |
+
