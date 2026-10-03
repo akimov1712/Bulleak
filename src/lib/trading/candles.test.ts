@@ -142,13 +142,13 @@ describe('downloaded datasets', () => {
  */
 describe('datasets are frozen', () => {
   const PINS: Record<DatasetName, [firstOpenTime: number, minLength: number]> = {
-    'BTCUSDT-60': [1779559200000, 3000],
+    'BTCUSDT-60': [1748736000000, 11562], // extended back to 2025-06-01 on 2026-10-04 (+8562)
     'BTCUSDT-240': [1747152000000, 3000],
     'BTCUSDT-D': [1585094400000, 2375],
-    'ETHUSDT-60': [1779559200000, 3000],
+    'ETHUSDT-60': [1748736000000, 11562],
     'ETHUSDT-240': [1747152000000, 3000],
     'ETHUSDT-D': [1615766400000, 2020],
-    'SOLUSDT-60': [1779559200000, 3000],
+    'SOLUSDT-60': [1748736000000, 11562],
     'SOLUSDT-240': [1747152000000, 3000],
     'SOLUSDT-D': [1634256000000, 1806],
   };

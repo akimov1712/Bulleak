@@ -70,11 +70,11 @@
 <Reveal title="Разбор первого примера на графике">
   <CandleChart
     dataset="BTCUSDT-60"
-    from={{ index: 745 }}
-    to={{ index: 800 }}
+    from={{ index: 9307 }}
+    to={{ index: 9362 }}
     annotations={[
       { type: 'zone', top: 61900, bottom: 61150, label: 'Фибо 0,5–0,618 + флип', tone: 'warn' },
-      { type: 'marker', time: { index: 782 }, position: 'above', text: 'триггер', tone: 'bear' },
+      { type: 'marker', time: { index: 9344 }, position: 'above', text: 'триггер', tone: 'bear' },
       { type: 'hline', price: 62430, label: 'стоп', tone: 'bear', dashed: true },
       { type: 'hline', price: 59070, label: 'цель', tone: 'bull', dashed: true },
     ]}

@@ -35,6 +35,72 @@ export function visibleWindow(
   return candles.slice(windowStart(fromCursor), last + 1);
 }
 
+const DAY_MS = 86_400_000;
+
+/** One dataset of a symbol for moment selection: its candles and candle length (ms). */
+export interface MomentSeries {
+  candles: readonly Candle[];
+  intervalMs: number;
+}
+
+/** Index of the last candle already closed at moment `t` (no look-ahead); -1 if none. */
+export function lastClosedIndex(candles: readonly Candle[], t: number, intervalMs: number): number {
+  let lo = 0;
+  let hi = candles.length - 1;
+  let found = -1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    const c = candles[mid];
+    if (!c) break;
+    if (c.t + intervalMs <= t) {
+      found = mid;
+      lo = mid + 1;
+    } else hi = mid - 1;
+  }
+  return found;
+}
+
+/**
+ * Moments (UTC midnights, ms) at which every timeframe of a symbol has SIM_HISTORY closed
+ * candles behind and SIM_FUTURE ahead: on any of them 1H, 4H and 1D show the same instant.
+ * Null when the datasets have no common window.
+ */
+export function momentRange(series: readonly MomentSeries[]): { min: number; max: number } | null {
+  let min = -Infinity;
+  let max = Infinity;
+  for (const { candles, intervalMs } of series) {
+    const first = candles[SIM_HISTORY];
+    const last = candles[candles.length - 1 - SIM_FUTURE];
+    if (!first || !last || candles.length - 1 - SIM_FUTURE < SIM_HISTORY) return null;
+    min = Math.max(min, first.t + intervalMs);
+    max = Math.min(max, last.t + intervalMs);
+  }
+  const from = Math.ceil(min / DAY_MS) * DAY_MS;
+  const to = Math.floor(max / DAY_MS) * DAY_MS;
+  return Number.isFinite(from) && from <= to ? { min: from, max: to } : null;
+}
+
+/** Random UTC midnight inside the range. */
+export function pickMoment(range: { min: number; max: number }, rng: Rng): number {
+  const days = Math.round((range.max - range.min) / DAY_MS);
+  return range.min + randomInt(rng, 0, days) * DAY_MS;
+}
+
+/**
+ * Start cursor on one timeframe for a moment: the last candle closed by then, kept inside the
+ * tradeable window (enough history and future) — near the data edges the nearest valid candle.
+ */
+export function startAtMoment(
+  candles: readonly Candle[],
+  intervalMs: number,
+  moment: number,
+): number | null {
+  const max = candles.length - 1 - SIM_FUTURE;
+  if (max < SIM_HISTORY) return null;
+  const index = lastClosedIndex(candles, moment, intervalMs);
+  return Math.min(max, Math.max(SIM_HISTORY, index));
+}
+
 /**
  * Cursor after skipping a decision, or null when there would not be enough candles left
  * for the next trade (pick a new start then).

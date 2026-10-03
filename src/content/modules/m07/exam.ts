@@ -17,10 +17,10 @@ export const exam: Quiz = {
       prompt:
         'BTCUSDT 1H, 12 августа 2026 года. В этот день в 12:30 UTC вышли данные по инфляции в США. Кликни на часовую свечу, в которую попала публикация.',
       dataset: 'BTCUSDT-60',
-      from: 1925,
-      to: 1950,
+      from: 10487,
+      to: 10512,
       volume: true,
-      target: { kind: 'candle', indices: [1938] },
+      target: { kind: 'candle', indices: [10500] },
       explanation:
         'Свеча 12:00 UTC: размах в 2,3 раза больше обычного, объём — в 4 раза выше среднего. Публикация CPI в 8:30 по Нью-Йорку летом приходится на 12:30 UTC.',
       tags: ['cpi', 'economic-calendar'],

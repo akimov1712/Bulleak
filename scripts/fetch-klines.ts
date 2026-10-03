@@ -5,6 +5,11 @@
  *   npm run data:fetch                 # all datasets
  *   npm run data:fetch -- BTCUSDT-240  # one dataset
  *   npm run data:fetch -- --from-csv file.csv BTCUSDT-240   # fallback: convert a CSV export
+ *   npm run data:fetch -- --extend-back 2025-06-01 BTCUSDT-60  # prepend older history
+ *
+ * Lessons, scenarios and exams point at candles by index. A full re-download moves the end of a
+ * dataset, and --extend-back shifts every index by the number of prepended candles (printed):
+ * update the content references in the same commit.
  *
  * Existing files are only replaced after a fully successful download.
  */
@@ -28,7 +33,8 @@ interface DatasetSpec {
 
 const SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
 const DATASETS: DatasetSpec[] = SYMBOLS.flatMap((symbol) => [
-  { symbol, interval: '60', count: 3000 },
+  // 1H from June 2025: the simulator needs the same moment on 1H, 4H and 1D (simulator.md).
+  { symbol, interval: '60', since: Date.UTC(2025, 5, 1) },
   { symbol, interval: '240', count: 3000 },
   { symbol, interval: 'D', since: Date.UTC(2020, 0, 1) },
 ]);
@@ -155,8 +161,52 @@ function fromCsv(csvPath: string, name: string): void {
   console.log(`${name}: ${candles.length} candles from CSV${gaps ? `, ⚠ ${gaps} gaps` : ''}`);
 }
 
+/** Prepends older candles to an existing dataset; the newest candles stay exactly as they are. */
+async function extendBack(name: string, sinceIso: string): Promise<void> {
+  const [symbol = '', interval = ''] = name.split('-');
+  const intervalMs = INTERVAL_MS[interval as Interval];
+  const since = Date.parse(sinceIso);
+  if (!intervalMs || !Number.isFinite(since))
+    throw new Error('Usage: --extend-back <YYYY-MM-DD> <SYMBOL-INTERVAL>');
+  const file = path.join(OUT_DIR, `${name}.json`);
+  const existing = JSON.parse(fs.readFileSync(file, 'utf8')) as { candles: Row[] };
+  const first = existing.candles[0]?.[0];
+  if (first === undefined) throw new Error(`${name}: empty dataset`);
+  if (since >= first) {
+    console.log(`${name}: already starts at ${new Date(first).toISOString()} — nothing to add`);
+    return;
+  }
+  const spec: DatasetSpec = { symbol, interval: interval as Interval, since };
+  const rows: Row[] = [];
+  let end = first - 1;
+  for (;;) {
+    const page = await fetchPage(spec, end);
+    if (page.length === 0) break;
+    rows.push(...page);
+    const oldest = Math.min(...page.map((r) => r[0]));
+    if (oldest <= since || page.length < PAGE_LIMIT) break;
+    end = oldest - 1;
+    await sleep(PAUSE_MS);
+  }
+  const older = normalize(rows, intervalMs, first).candles.filter((r) => r[0] >= since);
+  const joint = (older.at(-1)?.[0] ?? 0) + intervalMs;
+  if (joint !== first)
+    throw new Error(`${name}: gap at the joint (${new Date(joint).toISOString()})`);
+  writeDataset(name, symbol, interval, [...older, ...existing.candles]);
+  console.log(
+    `${name}: +${older.length} candles before ${new Date(first).toISOString()} — shift indexes by ${older.length}`,
+  );
+}
+
 async function main() {
   const args = process.argv.slice(2);
+  if (args[0] === '--extend-back') {
+    const [, sinceIso, ...names] = args;
+    if (!sinceIso || names.length === 0)
+      throw new Error('Usage: --extend-back <YYYY-MM-DD> <SYMBOL-INTERVAL>…');
+    for (const name of names) await extendBack(name, sinceIso);
+    return;
+  }
   if (args[0] === '--from-csv') {
     const [, csv, name] = args;
     if (!csv || !name) throw new Error('Usage: --from-csv <file.csv> <SYMBOL-INTERVAL>');

@@ -40,7 +40,7 @@ export const PRACTICAL_SCENARIOS: readonly PracticalScenario[] = [
     id: 'final-p1',
     title: 'ETH, август 2026',
     dataset: 'ETHUSDT-60',
-    startIndex: 1708,
+    startIndex: 10270,
     task: 'ETHUSDT. Дневное закрытие 1 844 — ниже EMA 200 (около 2 166), структура LH/LL. Импульс на 4H: падение с 1 936,7 (30 июля) до 1 820,6 (1 августа). Откат поднялся до 1 898: Фибо 0,5–0,618 импульса — 1 879–1 892, рядом EMA 50 на 4H (около 1 885) и флип-уровень около 1 873. ATR(14) на 4H — около 24. Последняя свеча 1H — 2 августа, 22:00 UTC.',
     expected: 'short',
     debrief:
@@ -50,7 +50,7 @@ export const PRACTICAL_SCENARIOS: readonly PracticalScenario[] = [
     id: 'final-p2',
     title: 'SOL, сентябрь 2026',
     dataset: 'SOLUSDT-60',
-    startIndex: 2577,
+    startIndex: 11139,
     task: 'SOLUSDT. Дневное закрытие 103,73 — выше EMA 200 (около 91), последний слом структуры вверх. Импульс на 4H: рост со 100,01 (4 сентября) до 107,32 (6 сентября). Откат опустился до 102,62: Фибо 0,5–0,618 импульса — 102,80–103,66, рядом EMA 50 на 4H и флип-уровень около 103. ATR(14) на 4H — около 1,8. Последняя свеча 1H — 8 сентября, 03:00 UTC: длинная нижняя тень, закрытие 103,28.',
     expected: 'long',
     debrief:
@@ -60,7 +60,7 @@ export const PRACTICAL_SCENARIOS: readonly PracticalScenario[] = [
     id: 'final-p3',
     title: 'ETH, 21 сентября 2026',
     dataset: 'ETHUSDT-60',
-    startIndex: 2906,
+    startIndex: 11468,
     task: 'ETHUSDT. Дневной тренд вверх: закрытие 2 775, EMA 200 около 2 227. За четыре дня ETH вырос примерно с 2 450 до 2 807. Последняя свеча 1H — 21 сентября, 20:00 UTC — обновила максимум (2 806,9) и закрылась на 2 783. Отката к зоне пока не было.',
     expected: 'skip',
     debrief:
