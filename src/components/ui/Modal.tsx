@@ -17,13 +17,19 @@ export interface ModalProps {
   footer?: ReactNode;
   /** "center" dialog, or "sheet" that slides from the bottom (mobile-friendly). */
   variant?: 'center' | 'sheet';
-  size?: 'sm' | 'md' | 'lg';
+  /** `full` — almost the whole screen (an enlarged chart). */
+  size?: 'sm' | 'md' | 'lg' | 'full';
   /** Prevent closing by Esc/backdrop (e.g. for confirmations in progress). */
   dismissible?: boolean;
   className?: string;
 }
 
-const widths = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' } as const;
+const widths = {
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  full: 'max-w-[min(96vw,1600px)]',
+} as const;
 
 /** Accessible modal: portal, focus trap, Esc to close, focus restored on close, scroll lock. */
 export function Modal({
@@ -94,7 +100,9 @@ export function Modal({
       role="presentation"
       className={cn(
         'fixed inset-0 z-50 flex bg-black/50 backdrop-blur-[2px]',
-        variant === 'sheet' ? 'items-end justify-center' : 'items-center justify-center p-4',
+        variant === 'sheet'
+          ? 'items-end justify-center'
+          : cn('items-center justify-center', size === 'full' ? 'p-2' : 'p-4'),
       )}
       onMouseDown={(e) => {
         if (dismissible && e.target === e.currentTarget) onClose();
@@ -107,7 +115,8 @@ export function Modal({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'flex max-h-[90dvh] w-full flex-col overflow-hidden border-2 border-border bg-surface text-text shadow-2xl outline-none',
+          'flex w-full flex-col overflow-hidden border-2 border-border bg-surface text-text shadow-2xl outline-none',
+          size === 'full' ? 'max-h-[96dvh]' : 'max-h-[90dvh]',
           variant === 'sheet'
             ? 'animate-[sheet-in_220ms_ease-out] rounded-t-3xl pb-[env(safe-area-inset-bottom)]'
             : cn('animate-[pop-in_180ms_ease-out] rounded-3xl', widths[size]),

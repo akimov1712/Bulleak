@@ -25,6 +25,7 @@ import {
   type Tone,
 } from '../charts/annotations';
 import { usePalette } from '../charts/usePalette';
+import { ChartControls } from '../charts/ChartControls';
 
 export interface SimIndicators {
   ema20: boolean;
@@ -268,15 +269,24 @@ export function SimChart(props: SimChartProps) {
     };
   }, [markersKey, cursor, candles, indicatorsKey, palette, intraday]);
 
+  const shownBars = Math.min(cursor, candles.length - 1) - windowStart(anchor) + 1;
   return (
-    <div
-      ref={containerRef}
-      data-testid="sim-chart"
-      role="group"
-      aria-label="График тренажёра: видны только свечи до текущего момента"
-      className="overflow-hidden rounded-2xl border-2 border-border bg-surface"
-      style={{ height, touchAction: 'pan-y' }}
-    />
+    <div className="relative">
+      <div
+        ref={containerRef}
+        data-testid="sim-chart"
+        role="group"
+        aria-label="График тренажёра: видны только свечи до текущего момента"
+        className="overflow-hidden rounded-2xl border-2 border-border bg-surface"
+        style={{ height, touchAction: 'pan-y' }}
+      />
+      <ChartControls
+        className="absolute top-2 left-2 z-10 rounded-xl border-2 border-border bg-surface/90 backdrop-blur-sm"
+        getChart={() => builtRef.current?.api ?? null}
+        total={shownBars}
+        onReset={() => builtRef.current?.api.timeScale().fitContent()}
+      />
+    </div>
   );
 }
 

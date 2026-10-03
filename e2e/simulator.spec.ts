@@ -4,20 +4,32 @@ import { expect, test } from '@playwright/test';
 import { atr } from '../src/lib/indicators/indicators';
 import { formatR } from '../src/lib/format';
 import { mulberry32 } from '../src/lib/random';
-import { parseDataset } from '../src/lib/trading/candles';
+import { INTERVAL_MS, parseDataset, type DatasetName } from '../src/lib/trading/candles';
 import { defaultLevels, INSTRUMENT_STEPS, planTrade } from '../src/lib/trading/simPlan';
-import { pickStart } from '../src/lib/trading/simSession';
+import { momentRange, pickMoment, startAtMoment } from '../src/lib/trading/simSession';
 import { simulateTrade } from '../src/lib/trading/simulate';
 
 const SEED = 424242;
 
-/** The same trade the page opens: BTCUSDT 4H (default), seeded start, default long levels. */
+const load = (name: DatasetName) =>
+  parseDataset(
+    name,
+    JSON.parse(fs.readFileSync(path.resolve('public/data', `${name}.json`), 'utf8')) as unknown,
+  ).candles;
+
+/**
+ * The same trade the page opens: BTCUSDT 4H (default), the seeded moment shared by all
+ * timeframes, default long levels.
+ */
 function expectedLongResult() {
-  const raw: unknown = JSON.parse(
-    fs.readFileSync(path.resolve('public/data/BTCUSDT-240.json'), 'utf8'),
-  );
-  const { candles } = parseDataset('BTCUSDT-240', raw);
-  const start = pickStart(candles.length, mulberry32(SEED));
+  const candles = load('BTCUSDT-240');
+  const range = momentRange([
+    { candles: load('BTCUSDT-60'), intervalMs: INTERVAL_MS['60'] },
+    { candles, intervalMs: INTERVAL_MS['240'] },
+    { candles: load('BTCUSDT-D'), intervalMs: INTERVAL_MS.D },
+  ]);
+  if (!range) throw new Error('no common moment');
+  const start = startAtMoment(candles, INTERVAL_MS['240'], pickMoment(range, mulberry32(SEED)));
   if (start === null) throw new Error('dataset too short');
   const entry = candles[start]?.c ?? 0;
   const { sl, tp } = defaultLevels(

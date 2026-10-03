@@ -18,6 +18,7 @@ import {
 } from 'lightweight-charts';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Modal } from '@/components/ui/Modal';
 import {
   atr,
   bollinger,
@@ -52,6 +53,7 @@ import { OverlayPrimitive, type OverlayItems } from './overlayPrimitive';
 import { useDataset } from './useDataset';
 import { usePalette } from './usePalette';
 import { chartCardHeight } from './chartLayout';
+import { ChartControls } from './ChartControls';
 
 export interface ChartPick {
   /** Index in the full dataset. */
@@ -73,7 +75,7 @@ export interface CandleChartProps {
   volumeSpikes?: number;
   /** Height of the candle pane in px (indicator panes are added below). */
   height?: number;
-  /** Allow panning / zooming (off = static picture that never captures page scroll). */
+  /** Drag to pan, pinch / buttons to zoom (default on; off — a fixed picture). */
   interactive?: boolean;
   onPick?: (pick: ChartPick) => void;
   caption?: string;
@@ -98,6 +100,8 @@ export type ChartType = 'candles' | 'bars' | 'line';
 const TYPE_LABEL: Record<ChartType, string> = { candles: 'Свечи', bars: 'Бары', line: 'Линия' };
 
 const PANE_HEIGHT = 110;
+/** Candle pane height when a lesson does not set one. */
+export const DEFAULT_HEIGHT = 400;
 const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
 
 /** Candle chart with annotations; handles loading and errors itself. */
@@ -110,7 +114,8 @@ export function CandleChart(props: CandleChartProps) {
     setDataset(props.dataset);
   }
   const paneCount = props.indicators?.filter(isPaneIndicator).length ?? 0;
-  const total = (props.height ?? 320) + paneCount * PANE_HEIGHT;
+  const total = (props.height ?? DEFAULT_HEIGHT) + paneCount * PANE_HEIGHT;
+  const [expanded, setExpanded] = useState<number | null>(null);
   // Placeholders cover the header and borders too, so nothing jumps when the chart loads.
   const placeholderHeight = chartCardHeight(total, props.ohlc !== false);
   const timeframes = props.timeframes ?? [];
@@ -162,9 +167,42 @@ export function CandleChart(props: CandleChartProps) {
             </div>
           }
         >
-          <ChartBody {...props} dataset={dataset} totalHeight={total} />
+          <ChartBody
+            {...props}
+            dataset={dataset}
+            totalHeight={total}
+            // the large view: most of the screen height, minus the indicator panes
+            onExpand={() =>
+              setExpanded(
+                Math.max(360, Math.round(window.innerHeight * 0.7)) + paneCount * PANE_HEIGHT,
+              )
+            }
+          />
         </Suspense>
       </ErrorBoundary>
+      {expanded !== null && (
+        <Modal open onClose={() => setExpanded(null)} title={props.caption ?? 'График'} size="full">
+          <Suspense
+            fallback={
+              <div style={{ height: expanded }}>
+                <Skeleton className="h-full w-full rounded-2xl" />
+              </div>
+            }
+          >
+            <ChartBody
+              {...props}
+              dataset={dataset}
+              totalHeight={expanded}
+              interactive
+              wheel
+              onPick={undefined}
+            />
+          </Suspense>
+          <p className="mt-2 text-center text-xs text-text-muted">
+            Колесо мыши или щипок — масштаб, перетаскивание — сдвиг, кнопка ⟲ — исходный вид.
+          </p>
+        </Modal>
+      )}
       {props.caption && (
         <figcaption className="mt-2 text-center text-sm text-text-muted">
           {props.caption}
@@ -174,7 +212,14 @@ export function CandleChart(props: CandleChartProps) {
   );
 }
 
-function ChartBody(props: CandleChartProps & { totalHeight: number }) {
+function ChartBody(
+  props: CandleChartProps & {
+    totalHeight: number;
+    /** Large view: the mouse wheel zooms too. */
+    wheel?: boolean;
+    onExpand?: () => void;
+  },
+) {
   const { candles, symbol, interval } = useDataset(props.dataset);
   const palette = usePalette();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,7 +235,8 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
   // MDX passes fresh array literals on every render; compare by content.
   const annotationsKey = JSON.stringify(props.annotations ?? []);
   const indicatorsKey = JSON.stringify(props.indicators ?? []);
-  const interactive = props.interactive ?? false;
+  const interactive = props.interactive ?? true;
+  const wheel = props.wheel ?? false;
   const volume = props.volume ?? false;
   const volumeSpikes = props.volumeSpikes ?? 0;
   const logScale = props.logScale ?? false;
@@ -219,6 +265,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       volume,
       volumeSpikes,
       interactive,
+      wheel,
       intraday: interval !== 'D',
       palette,
       chartType,
@@ -279,6 +326,7 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
     volume,
     volumeSpikes,
     interactive,
+    wheel,
     interval,
     palette,
     chartType,
@@ -333,6 +381,15 @@ function ChartBody(props: CandleChartProps & { totalHeight: number }) {
       <div className="flex flex-col gap-0.5 border-b-2 border-border px-3 py-1.5">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <span className="text-xs font-bold text-text-muted">{legend}</span>
+          {interactive && (
+            <ChartControls
+              className="ml-auto"
+              getChart={() => chartRef.current?.api ?? null}
+              total={end - start + 1}
+              onReset={() => chartRef.current?.api.timeScale().fitContent()}
+              onExpand={props.onExpand}
+            />
+          )}
           {props.typeToggle && (
             <div role="radiogroup" aria-label="Тип графика" className="flex gap-1">
               {(Object.keys(TYPE_LABEL) as ChartType[]).map((t) => (
@@ -385,6 +442,7 @@ interface BuildOptions {
   volume: boolean;
   volumeSpikes: number;
   interactive: boolean;
+  wheel: boolean;
   intraday: boolean;
   palette: Palette;
   chartType: ChartType;
@@ -429,11 +487,12 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
     },
     crosshair: { mode: 0 },
     localization: { locale: 'ru-RU' },
+    // The wheel scrolls the page; it zooms only in the large view.
     handleScroll: o.interactive
-      ? { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
+      ? { mouseWheel: o.wheel, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
       : false,
     handleScale: o.interactive
-      ? { mouseWheel: false, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true }
+      ? { mouseWheel: o.wheel, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true }
       : false,
   });
 

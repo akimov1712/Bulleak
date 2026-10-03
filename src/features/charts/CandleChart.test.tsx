@@ -63,6 +63,11 @@ vi.mock('lightweight-charts', () => {
       let clickHandler: ((p: unknown) => void) | null = null;
       let dblHandler: ((p: unknown) => void) | null = null;
       let moveHandler: ((p: unknown) => void) | null = null;
+      const timeScale = {
+        fitContent: vi.fn(),
+        getVisibleLogicalRange: vi.fn(() => ({ from: 0, to: 100 })),
+        setVisibleLogicalRange: vi.fn(),
+      };
       const chart = {
         options,
         series,
@@ -73,7 +78,7 @@ vi.mock('lightweight-charts', () => {
           return s;
         },
         panes: () => [0, 1, 2].map(() => ({ setStretchFactor: vi.fn() })),
-        timeScale: () => ({ fitContent: vi.fn() }),
+        timeScale: () => timeScale,
         subscribeClick: (h: (p: unknown) => void) => {
           clickHandler = h;
         },
@@ -104,8 +109,9 @@ interface FakeSeries {
   primitives: unknown[];
 }
 interface FakeChart {
-  options: { handleScroll: unknown; rightPriceScale: { mode: number } };
+  options: { handleScroll: unknown; handleScale: unknown; rightPriceScale: { mode: number } };
   series: FakeSeries[];
+  timeScale: () => { setVisibleLogicalRange: ReturnType<typeof vi.fn> };
   remove: ReturnType<typeof vi.fn>;
   click: (p: unknown) => void;
   dblClick: (p: unknown) => void;
@@ -197,7 +203,12 @@ describe('CandleChart', () => {
       expect.objectContaining({ time: (190 * H) / 1000, text: 'Вход' }),
     ]);
     expect(candles?.primitives).toHaveLength(1);
-    expect(chart.options.handleScroll).toBe(false);
+    // Pannable and zoomable by default, but the mouse wheel still scrolls the page.
+    expect(chart.options.handleScroll).toMatchObject({
+      pressedMouseMove: true,
+      mouseWheel: false,
+    });
+    expect(chart.options.handleScale).toMatchObject({ pinch: true, mouseWheel: false });
   });
 
   it('keeps sloped line endpoints outside the window instead of clamping them', () => {
@@ -278,5 +289,23 @@ describe('CandleChart', () => {
     render(<CandleChart dataset="BTCUSDT-60" />);
     expect(screen.getByRole('alert')).toHaveTextContent('нет сети');
     expect(screen.getByRole('button', { name: 'Повторить' })).toBeInTheDocument();
+  });
+});
+
+describe('zoom controls', () => {
+  it('zoom in / out around the latest candles and open the large view with wheel zoom', () => {
+    render(<CandleChart dataset="BTCUSDT-60" bars={100} caption="BTC, 1H" />);
+    const chart = lastChart();
+    fireEvent.click(screen.getByRole('button', { name: 'Приблизить' }));
+    expect(chart.timeScale().setVisibleLogicalRange).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Открыть график на весь экран' }));
+    const dialog = screen.getByRole('dialog', { name: 'BTC, 1H' });
+    expect(dialog).toBeInTheDocument();
+    expect(lastChart().options.handleScale).toMatchObject({ mouseWheel: true, pinch: true });
+  });
+
+  it('a fixed picture has no zoom buttons', () => {
+    render(<CandleChart dataset="BTCUSDT-60" bars={20} interactive={false} />);
+    expect(screen.queryByRole('button', { name: 'Приблизить' })).not.toBeInTheDocument();
   });
 });

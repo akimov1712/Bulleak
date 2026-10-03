@@ -1,14 +1,22 @@
 import { useEffect, useMemo, useRef, useState, type SetStateAction } from 'react';
 import { atr } from '@/lib/indicators/indicators';
 import { mulberry32 } from '@/lib/random';
-import { datasetInterval, type DatasetName } from '@/lib/trading/candles';
+import {
+  datasetInterval,
+  INTERVAL_MS,
+  type DatasetName,
+  type DatasetSymbol,
+} from '@/lib/trading/candles';
 import { defaultLevels, INSTRUMENT_STEPS, planTrade, roundToTick } from '@/lib/trading/simPlan';
 import {
+  momentRange,
+  pickMoment,
   pickStart,
   SIM_FUTURE,
   SIM_SKIP,
   skipAhead,
   SPEED_MS,
+  startAtMoment,
   type PlaybackSpeed,
 } from '@/lib/trading/simSession';
 import {
@@ -50,6 +58,13 @@ export interface SimSessionProps {
   onBalance: (next: SetStateAction<number>) => void;
   /** Pick another random moment (new seed). */
   onNewPoint: () => void;
+  /**
+   * Free mode: the moment (UTC ms) to show, kept by the page so that switching the timeframe or
+   * the coin shows the same instant; null — derive it from the seed.
+   */
+  moment?: number | null;
+  /** The learner moved to another moment («Пропустить»). */
+  onMoment?: (moment: number) => void;
   /** Lesson scenario: fixed start, task before and debrief after the decision. */
   scenario?: SimScenario;
   /** Backtest mode: trades are tagged and kept apart from free-mode statistics. */
@@ -70,13 +85,27 @@ const EMPTY_DRAFT: Omit<OrderDraft, 'riskPct' | 'leverage'> = { side: null, sl: 
 export function SimSession(props: SimSessionProps) {
   const { dataset, balance, onBalance } = props;
   const { candles, symbol } = useDataset(dataset);
+  // All timeframes of the coin: the seed picks a moment valid on each of them (simulator.md).
+  const hourly = useDataset(`${symbol}-60` as `${DatasetSymbol}-60`);
+  const fourHour = useDataset(`${symbol}-240` as `${DatasetSymbol}-240`);
+  const daily = useDataset(`${symbol}-D` as `${DatasetSymbol}-D`);
+  const intervalMs = INTERVAL_MS[datasetInterval(dataset)];
   const steps = INSTRUMENT_STEPS[symbol];
   const scenario = props.scenario;
   const strategy = scenario ? undefined : props.strategy;
-  const start = useMemo(
-    () => scenario?.startIndex ?? pickStart(candles.length, mulberry32(props.seed)),
-    [candles, props.seed, scenario],
-  );
+  const start = useMemo(() => {
+    if (scenario) return scenario.startIndex;
+    const range = momentRange([
+      { candles: hourly.candles, intervalMs: INTERVAL_MS['60'] },
+      { candles: fourHour.candles, intervalMs: INTERVAL_MS['240'] },
+      { candles: daily.candles, intervalMs: INTERVAL_MS.D },
+    ]);
+    if (!range) return pickStart(candles.length, mulberry32(props.seed));
+    const moment = props.moment ?? pickMoment(range, mulberry32(props.seed));
+    return startAtMoment(candles, intervalMs, moment);
+    // The moment prop is read once: the session remounts on a new seed, dataset or scenario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candles, hourly, fourHour, daily, intervalMs, props.seed, scenario]);
   const atrSeries = useMemo(() => atr(candles), [candles]);
   const wide = useMediaQuery('(min-width: 1024px)');
   const dispatch = useProgress((s) => s.dispatch);
@@ -174,6 +203,8 @@ export function SimSession(props: SimSessionProps) {
 
   const newDecision = (at: number) => {
     setAnchor(at);
+    const c = candles[at];
+    if (c && !scenario) props.onMoment?.(c.t + intervalMs);
     setTrade(null);
     setPaused(false);
     setDraft((d) => ({ ...d, ...EMPTY_DRAFT }));
@@ -300,7 +331,7 @@ export function SimSession(props: SimSessionProps) {
                 }
               : undefined
           }
-          height={wide ? 480 : 340}
+          height={wide ? 580 : 420}
         />
         <div className="flex flex-col gap-4">
           {strategy && <BacktestPanel strategy={strategy} decisionKey={anchor} />}

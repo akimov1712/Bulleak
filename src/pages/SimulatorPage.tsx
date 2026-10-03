@@ -90,6 +90,13 @@ export function SimulatorPage() {
     const fromUrl = Number(search.get('seed'));
     return Number.isInteger(fromUrl) && fromUrl > 0 ? fromUrl : Date.now();
   });
+  // The moment on screen (UTC ms) survives switching the timeframe or the coin; a new seed
+  // («Другой момент») starts from a fresh one.
+  const [moment, setMoment] = useState<number | null>(null);
+  const newPoint = () => {
+    setMoment(null);
+    setSeed(Date.now());
+  };
   usePageTitle(scenario ? `Сценарий: ${scenario.title}` : 'Тренажёр');
   const [instrument, setInstrument] = useStoredState<Instrument>(
     'tc-sim:instrument',
@@ -178,7 +185,7 @@ export function SimulatorPage() {
           <Button
             variant="secondary"
             leftIcon={<Shuffle className="size-5" aria-hidden="true" />}
-            onClick={() => setSeed(Date.now())}
+            onClick={newPoint}
           >
             Другой момент
           </Button>
@@ -201,7 +208,7 @@ export function SimulatorPage() {
           </Card>
         )}
       >
-        <Suspense fallback={<Skeleton className="h-[420px] w-full rounded-2xl" />}>
+        <Suspense fallback={<Skeleton className="h-[480px] w-full rounded-2xl lg:h-[640px]" />}>
           <SimSession
             key={
               scenario ? `scenario:${scenario.id}` : `${strategy?.tag ?? 'free'}:${dataset}:${seed}`
@@ -214,7 +221,9 @@ export function SimulatorPage() {
             onToggleIndicator={(key) => setIndicators((prev) => ({ ...prev, [key]: !prev[key] }))}
             balance={balance}
             onBalance={setBalance}
-            onNewPoint={() => setSeed(Date.now())}
+            onNewPoint={newPoint}
+            moment={moment}
+            onMoment={setMoment}
           />
         </Suspense>
       </ErrorBoundary>
