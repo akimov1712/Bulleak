@@ -161,7 +161,7 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         // Everything the course needs offline: app chunks, fonts, icons and the candle data.
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2,json,txt}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,json,txt}'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: 'index.html',
       },

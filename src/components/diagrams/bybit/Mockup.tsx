@@ -64,15 +64,18 @@ export function HotspotBadge({
   active,
   onClick,
   label,
+  className: extra,
 }: {
   n: number;
   active?: boolean;
   onClick?: () => void;
   label?: string;
+  className?: string;
 }) {
   const className = cn(
     'inline-flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold',
     active ? 'bg-xp text-on-xp ring-2 ring-xp-shade' : 'bg-info text-surface',
+    extra,
   );
   if (!onClick) return <span className={className}>{n}</span>;
   return (
