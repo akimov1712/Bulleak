@@ -127,7 +127,7 @@ function LessonQuiz({ lesson }: { lesson: LessonMeta }) {
         Проверим, что запомнилось из урока «{lesson.title}»?
       </MascotSay>
       <Card className="flex flex-col gap-4">
-        <h1 className="text-2xl font-extrabold">Тест по уроку</h1>
+        <h1 className="text-2xl font-semibold">Тест по уроку</h1>
         <ul className="flex flex-col gap-3">
           <li className="flex items-center gap-3">
             <ClipboardCheck className="size-6 text-info" aria-hidden="true" />

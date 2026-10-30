@@ -20,7 +20,7 @@ export function Diagram({ name, caption }: DiagramProps) {
       ) : (
         <p
           role="alert"
-          className="rounded-2xl border-2 border-dashed border-warn p-4 text-center text-sm text-warn"
+          className="rounded-2xl border border-dashed border-warn p-4 text-center text-sm text-warn"
         >
           Схема «{name}» не найдена
         </p>

@@ -84,7 +84,7 @@ export function OrderPanel(props: OrderPanelProps) {
               aria-checked={active}
               onClick={() => props.onSide(side)}
               className={cn(
-                'flex items-center justify-center gap-1.5 rounded-2xl border-2 py-2.5 font-extrabold transition-colors',
+                'flex items-center justify-center gap-1.5 rounded-2xl border py-2.5 font-semibold transition-colors',
                 side === 'long'
                   ? active
                     ? 'border-bull bg-bull text-white'
@@ -103,7 +103,7 @@ export function OrderPanel(props: OrderPanelProps) {
 
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-sm font-bold text-text-muted">Вход по рынку</span>
-        <span className="text-xl font-extrabold tabular-nums">{fmtPrice(props.entry)}</span>
+        <span className="text-xl font-semibold tabular-nums">{fmtPrice(props.entry)}</span>
       </div>
 
       {draft.side && (

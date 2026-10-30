@@ -20,7 +20,7 @@ export function ScenarioBrief({ scenario }: { scenario: SimScenario }) {
   const lesson = courseIndex.getLesson(scenario.lessonId);
   return (
     <Card className="flex flex-col gap-2 border-info/60" aria-label="Задание сценария">
-      <p className="flex items-center gap-2 text-sm font-extrabold text-info">
+      <p className="flex items-center gap-2 text-sm font-semibold text-info">
         <Target className="size-5" aria-hidden="true" />
         Сценарий: {scenario.title}
       </p>
@@ -52,7 +52,7 @@ export function ScenarioDebrief({
       <p
         role="status"
         className={cn(
-          'flex items-center gap-2 text-lg font-extrabold',
+          'flex items-center gap-2 text-lg font-semibold',
           correct ? 'text-bull' : 'text-bear',
         )}
       >

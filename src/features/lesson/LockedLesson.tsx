@@ -10,11 +10,11 @@ export function LockedLesson({ lesson, next }: { lesson: LessonMeta; next?: Less
   return (
     <div className="flex flex-col items-center gap-4 py-10 text-center">
       <Mascot mood="thinking" size={150} />
-      <p className="flex items-center gap-2 text-sm font-extrabold tracking-wide text-text-muted uppercase">
+      <p className="flex items-center gap-2 text-sm font-semibold tracking-wide text-text-muted uppercase">
         <Lock className="size-4" aria-hidden="true" />
         Урок пока закрыт
       </p>
-      <h1 className="max-w-xl text-3xl font-extrabold">{lesson.title}</h1>
+      <h1 className="max-w-xl text-3xl font-semibold">{lesson.title}</h1>
       <p className="max-w-md text-lg text-text-muted">
         Уроки открываются по порядку: сначала пройди тест предыдущего урока. Так знания ложатся
         слоями и ничего не теряется.

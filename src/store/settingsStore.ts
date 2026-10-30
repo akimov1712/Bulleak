@@ -5,7 +5,7 @@ import { safeStorage } from './safeStorage';
 import { sanitizeSettings } from '@/lib/settings';
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'system',
+  theme: 'dark',
   sound: false,
   dailyGoalXp: 50,
   freeMode: false,

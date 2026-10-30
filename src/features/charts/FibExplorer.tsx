@@ -92,7 +92,7 @@ export function FibExplorer({ dataset, from, to, caption }: FibExplorerProps) {
           {levels.map((l) => (
             <li
               key={l.ratio}
-              className={l.ratio === 0.5 || l.ratio === 0.618 ? 'font-extrabold text-warn' : ''}
+              className={l.ratio === 0.5 || l.ratio === 0.618 ? 'font-semibold text-warn' : ''}
             >
               {ratioLabel(l.ratio)} — {formatNumber(l.price, decimals)}
             </li>

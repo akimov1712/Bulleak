@@ -76,8 +76,8 @@ export function ModulePage() {
             <ModuleIcon name={module.icon} className="size-8" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-extrabold tracking-wide uppercase">Модуль {module.index}</p>
-            <h1 className="text-3xl leading-tight font-extrabold md:text-4xl">{module.title}</h1>
+            <p className="text-sm font-semibold tracking-wide uppercase">Модуль {module.index}</p>
+            <h1 className="text-3xl leading-tight font-semibold md:text-4xl">{module.title}</h1>
           </div>
           <ModuleCover moduleId={module.id} className="ml-auto w-24 sm:w-36 md:w-44" />
         </div>
@@ -103,7 +103,7 @@ export function ModulePage() {
       </div>
 
       {!unlocked && previous && (
-        <p className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-border p-4 text-text-muted">
+        <p className="flex items-center gap-3 rounded-2xl border border-dashed border-border p-4 text-text-muted">
           <Lock className="size-5 shrink-0" aria-hidden="true" />
           Модуль откроется после {previous.hasExam ? 'экзамена' : 'прохождения'} модуля{' '}
           {previous.index} «{previous.title}».
@@ -119,7 +119,7 @@ export function ModulePage() {
             <>
               <span
                 className={cn(
-                  'grid size-11 shrink-0 place-items-center rounded-full border-2',
+                  'grid size-11 shrink-0 place-items-center rounded-full border',
                   status === 'completed' && 'border-bull bg-bull text-bull-soft',
                   (status === 'available' || status === 'read') &&
                     cn(colors.bg, 'border-transparent text-on-mod'),
@@ -135,11 +135,11 @@ export function ModulePage() {
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-xs font-extrabold tracking-wide text-text-muted uppercase">
+                <span className="block text-xs font-semibold tracking-wide text-text-muted uppercase">
                   Урок {module.index}.{lesson.index} · ~{lesson.minutes} мин
                   {status === 'read' && ' · остался тест'}
                 </span>
-                <span className="block font-extrabold">{lesson.title}</span>
+                <span className="block font-semibold">{lesson.title}</span>
                 <span className="mt-0.5 block text-sm text-text-muted">{lesson.summary}</span>
               </span>
               {status === 'completed' && <Stars count={stars} size="size-5" />}
@@ -150,7 +150,7 @@ export function ModulePage() {
               {status === 'locked' ? (
                 <div
                   aria-disabled="true"
-                  className="flex items-center gap-4 rounded-2xl border-2 border-border p-4 opacity-60"
+                  className="flex items-center gap-4 rounded-2xl border border-border p-4 opacity-60"
                 >
                   {body}
                   <span className="sr-only">(закрыт)</span>
@@ -158,7 +158,7 @@ export function ModulePage() {
               ) : (
                 <Link
                   to={paths.lesson(lesson.id)}
-                  className="flex items-center gap-4 rounded-2xl border-2 border-border bg-surface p-4 shadow-[0_3px_0_0_var(--border)] transition-transform hover:-translate-y-0.5"
+                  className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 transition-transform hover:-translate-y-0.5"
                 >
                   {body}
                 </Link>
@@ -172,7 +172,7 @@ export function ModulePage() {
         <section
           aria-label="Экзамен модуля"
           className={cn(
-            'flex flex-col gap-4 rounded-(--radius-card) border-2 p-5 sm:flex-row sm:items-center',
+            'flex flex-col gap-4 rounded-(--radius-card) border p-5 sm:flex-row sm:items-center',
             examPassed ? 'border-xp bg-surface' : 'border-dashed border-border',
           )}
         >
@@ -184,7 +184,7 @@ export function ModulePage() {
             aria-hidden="true"
           />
           <div className="flex-1">
-            <h2 className="text-xl font-extrabold">Экзамен модуля</h2>
+            <h2 className="text-xl font-semibold">Экзамен модуля</h2>
             <p className="text-text-muted">
               {examPassed
                 ? `Сдан! Лучший результат — ${formatPct(examProgress?.best ?? 0, 0)}.`

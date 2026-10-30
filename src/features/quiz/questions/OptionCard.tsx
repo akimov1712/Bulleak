@@ -5,10 +5,10 @@ import { cn } from '@/lib/cn';
 export type OptionLook = 'idle' | 'selected' | 'correct' | 'wrong' | 'missed';
 
 const looks: Record<OptionLook, string> = {
-  idle: 'border-border bg-surface hover:bg-surface-2 shadow-[0_3px_0_0_var(--border)]',
-  selected: 'border-info bg-info-soft shadow-[0_3px_0_0_var(--info)]',
-  correct: 'border-bull bg-bull-soft shadow-[0_3px_0_0_var(--bull)]',
-  wrong: 'border-bear bg-bear-soft shadow-[0_3px_0_0_var(--bear)]',
+  idle: 'border-border bg-surface hover:bg-surface-2',
+  selected: 'border-info bg-info-soft',
+  correct: 'border-bull bg-bull-soft',
+  wrong: 'border-bear bg-bear-soft',
   missed: 'border-bull border-dashed bg-surface',
 };
 
@@ -43,8 +43,8 @@ export function OptionCard({
         if (!disabled) onSelect();
       }}
       className={cn(
-        'flex min-h-14 w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left font-semibold transition-[background-color,transform] duration-100',
-        !disabled && 'active:translate-y-[2px] active:shadow-none',
+        'flex min-h-14 w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left font-semibold transition-[background-color,transform] duration-100',
+        !disabled && 'active:scale-[0.99]',
         disabled && 'cursor-default',
         looks[look],
       )}
@@ -53,7 +53,7 @@ export function OptionCard({
         <kbd
           aria-hidden="true"
           className={cn(
-            'grid size-7 shrink-0 place-items-center rounded-lg border-2 font-mono text-xs font-bold',
+            'grid size-7 shrink-0 place-items-center rounded-lg border font-mono text-xs font-bold',
             look === 'idle' ? 'border-border text-text-muted' : 'border-current',
           )}
         >

@@ -51,7 +51,7 @@ export function HomePage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold md:text-4xl">
+        <h1 className="text-3xl font-semibold md:text-4xl">
           {GREETING[dayPart(now)]}, {profile.name}!
         </h1>
         <p className="text-lg text-text-muted">Шаг за шагом к своей стратегии.</p>

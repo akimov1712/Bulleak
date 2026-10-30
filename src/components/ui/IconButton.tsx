@@ -29,7 +29,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         'disabled:cursor-not-allowed disabled:opacity-50',
         variant === 'ghost'
           ? 'hover:bg-surface-2 active:bg-border'
-          : 'border-2 border-border bg-surface hover:bg-surface-2',
+          : 'border border-border bg-surface hover:bg-surface-2',
         sizes[size],
         className,
       )}

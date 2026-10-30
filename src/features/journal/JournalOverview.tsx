@@ -28,14 +28,14 @@ export function JournalKpis({ metrics }: { metrics: JournalMetrics }) {
         {tiles.map(([label, value]) => (
           <Card key={label} padding="sm" className="flex flex-col">
             <dt className="text-sm font-bold text-text-muted">{label}</dt>
-            <dd className="text-lg font-extrabold break-words tabular-nums">{value}</dd>
+            <dd className="text-lg font-semibold break-words tabular-nums">{value}</dd>
           </Card>
         ))}
       </dl>
       {metrics.equity.length > 1 && (
         <Card className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-extrabold">Кривая капитала</h2>
+            <h2 className="font-semibold">Кривая капитала</h2>
             <Segmented
               label="Единицы кривой"
               hideLabel
@@ -89,7 +89,7 @@ function Breakdown({
 }) {
   return (
     <Card className="flex flex-col gap-2">
-      <h2 className="font-extrabold">{title}</h2>
+      <h2 className="font-semibold">{title}</h2>
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left text-text-muted">

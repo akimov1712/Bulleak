@@ -115,16 +115,16 @@ export function Modal({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'flex w-full flex-col overflow-hidden border-2 border-border bg-surface text-text shadow-2xl outline-none',
+          'flex w-full flex-col overflow-hidden border border-border bg-surface text-text shadow-2xl outline-none',
           size === 'full' ? 'max-h-[96dvh]' : 'max-h-[90dvh]',
           variant === 'sheet'
             ? 'animate-[sheet-in_220ms_ease-out] rounded-t-3xl pb-[env(safe-area-inset-bottom)]'
-            : cn('animate-[pop-in_180ms_ease-out] rounded-3xl', widths[size]),
+            : cn('animate-[pop-in_180ms_ease-out] rounded-2xl', widths[size]),
           className,
         )}
       >
         <div className="flex items-center justify-between gap-3 px-5 pt-4">
-          <h2 id={titleId} className={cn('text-xl font-extrabold', hideTitle && 'sr-only')}>
+          <h2 id={titleId} className={cn('text-xl font-semibold', hideTitle && 'sr-only')}>
             {title}
           </h2>
           {dismissible && (
@@ -138,7 +138,7 @@ export function Modal({
         </div>
         <div className="overflow-y-auto px-5 pt-2 pb-5">{children}</div>
         {footer && (
-          <div className="flex flex-wrap justify-end gap-3 border-t-2 border-border px-5 py-4">
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border px-5 py-4">
             {footer}
           </div>
         )}

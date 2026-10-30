@@ -75,7 +75,7 @@ function Caption({
   return (
     <foreignObject x={x} y={y} width={w} height={h}>
       <div className="flex flex-col gap-0.5 text-center text-[13px] leading-tight">
-        <span className="font-extrabold text-text">{name}</span>
+        <span className="font-semibold text-text">{name}</span>
         <span className="font-semibold text-text-muted">{meaning}</span>
       </div>
     </foreignObject>
@@ -220,7 +220,7 @@ export function SingleCandlePatterns() {
       />
       <foreignObject x={x + 8} y={cellH + 22} width={CELL_W - 16} height={cellH - 44}>
         <div className="flex h-full flex-col justify-center gap-1 text-center text-[13px] leading-tight">
-          <span className="font-extrabold text-info">Главное — контекст</span>
+          <span className="font-semibold text-info">Главное — контекст</span>
           <span className="font-semibold text-text">Паттерн + уровень + тренд = сетап.</span>
           <span className="font-semibold text-text-muted">Посреди «ниоткуда» — шум.</span>
         </div>

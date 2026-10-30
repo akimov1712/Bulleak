@@ -34,7 +34,7 @@ export function Segmented<T extends string>({
             disabled={disabled}
             onClick={() => onChange(o.value)}
             className={cn(
-              'rounded-full border-2 px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
+              'rounded-full border px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
               value === o.value
                 ? 'border-primary-shade bg-primary text-on-primary'
                 : 'border-border bg-surface hover:border-primary-shade',

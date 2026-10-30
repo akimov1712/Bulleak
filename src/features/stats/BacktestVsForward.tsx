@@ -36,7 +36,7 @@ export function BacktestVsForward() {
   const { backtest, forward } = loaded;
   return (
     <Card className="flex flex-col gap-3">
-      <h2 className="font-extrabold">Бэктест vs форвард</h2>
+      <h2 className="font-semibold">Бэктест vs форвард</h2>
       <table className="w-full text-left tabular-nums">
         <thead>
           <tr className="text-sm text-text-muted">

@@ -13,7 +13,7 @@ export function StorageBanner() {
     return (
       <div
         role="alert"
-        className="flex items-center gap-2 border-b-2 border-warn bg-warn-soft px-4 py-2 text-sm font-bold text-warn"
+        className="flex items-center gap-2 border-b border-warn bg-warn-soft px-4 py-2 text-sm font-bold text-warn"
       >
         <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />
         Журнал сделок и история тренажёра недоступны: браузер не даёт доступ к базе данных
@@ -25,7 +25,7 @@ export function StorageBanner() {
   return (
     <div
       role="alert"
-      className="flex items-center gap-2 border-b-2 border-warn bg-warn-soft px-4 py-2 text-sm font-bold text-warn"
+      className="flex items-center gap-2 border-b border-warn bg-warn-soft px-4 py-2 text-sm font-bold text-warn"
     >
       <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />
       Прогресс не сохраняется: браузер запрещает запись (приватный режим или нет места). Сделай

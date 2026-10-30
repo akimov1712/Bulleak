@@ -18,7 +18,7 @@ export function WeekStreak({ size = 'md' }: { size?: 'sm' | 'md' }) {
         >
           <span
             className={cn(
-              'grid place-items-center rounded-full border-2',
+              'grid place-items-center rounded-full border',
               size === 'sm' ? 'size-7' : 'size-8',
               d.active ? 'border-xp-shade bg-xp text-on-xp' : 'border-border',
               d.isToday && !d.active && 'border-dashed border-info',

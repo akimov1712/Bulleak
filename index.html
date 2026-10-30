@@ -20,7 +20,7 @@
           var saved = JSON.parse(localStorage.getItem('tc-settings') || '{}');
           if (saved && saved.state) state = saved.state;
         } catch (e) {}
-        var theme = state.theme || 'system';
+        var theme = state.theme || 'dark';
         if (theme === 'system') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }

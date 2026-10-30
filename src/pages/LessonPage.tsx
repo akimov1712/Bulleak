@@ -111,14 +111,14 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             </Link>
           </nav>
           <header className="mb-2 max-w-[72ch]">
-            <p className="mb-1 flex items-center gap-2 text-sm font-extrabold tracking-wide text-text-muted uppercase">
+            <p className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-wide text-text-muted uppercase">
               <span
                 className={cn('size-2.5 rounded-full', moduleColors[module.color].bg)}
                 aria-hidden="true"
               />
               Урок {module.index}.{lesson.index}
             </p>
-            <h1 className="text-3xl leading-tight font-extrabold tracking-tight md:text-4xl">
+            <h1 className="text-3xl leading-tight font-semibold tracking-tight md:text-4xl">
               {lesson.title}
             </h1>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">

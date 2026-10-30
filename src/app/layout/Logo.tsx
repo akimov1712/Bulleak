@@ -7,7 +7,7 @@ import { paths } from '../paths';
 /** «Bull» in the brand green, «eak» in the surrounding text colour. */
 export function Wordmark({ className, onInk = false }: { className?: string; onInk?: boolean }) {
   return (
-    <span className={cn('font-black tracking-[-0.035em]', className)}>
+    <span className={cn('font-bold tracking-[-0.035em]', className)}>
       <span className={onInk ? 'text-ink-accent' : 'text-bull'}>{BRAND.name.slice(0, 4)}</span>
       {BRAND.name.slice(4)}
     </span>

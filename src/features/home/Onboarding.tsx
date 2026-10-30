@@ -36,7 +36,7 @@ export function Onboarding() {
       </MascotSay>
       <Card padding="lg">
         <form onSubmit={submit} className="flex flex-col gap-5">
-          <h1 className="text-2xl font-extrabold">Добро пожаловать в курс!</h1>
+          <h1 className="text-2xl font-semibold">Добро пожаловать в курс!</h1>
           <Field label="Как тебя зовут?" hint="Имя будет в приветствии и на сертификате.">
             {({ id, describedBy }) => (
               <Input
@@ -59,7 +59,7 @@ export function Onboarding() {
                   onClick={() => update({ dailyGoalXp: g.xp })}
                   className="flex h-auto min-h-14 flex-col items-start rounded-2xl px-3 py-2 text-left"
                 >
-                  <span className="font-extrabold">
+                  <span className="font-semibold">
                     {g.label} · {g.xp} XP
                   </span>
                   <span className="text-xs font-semibold">{g.hint}</span>

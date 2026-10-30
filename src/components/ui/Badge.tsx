@@ -47,7 +47,7 @@ export function Pill({ selected = false, className, ...rest }: PillProps) {
       type="button"
       aria-pressed={selected}
       className={cn(
-        'inline-flex min-h-9 items-center gap-1.5 rounded-full border-2 px-3.5 text-sm font-bold transition-colors',
+        'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-bold transition-colors',
         selected
           ? 'border-info bg-info-soft text-info'
           : 'border-border bg-surface text-text-muted hover:bg-surface-2 hover:text-text',

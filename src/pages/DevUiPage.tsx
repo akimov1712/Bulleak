@@ -110,7 +110,7 @@ function DemoChartQuestion({ question }: { question: ChartClickQuestion }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-extrabold">{title}</h2>
+      <h2 className="text-xl font-semibold">{title}</h2>
       {children}
     </section>
   );
@@ -139,7 +139,7 @@ export function DevUiPage() {
               className={`flex flex-col items-center gap-1 rounded-2xl p-3 text-on-mod ${moduleColors[m.color].bg}`}
             >
               <ModuleCover moduleId={m.id} className="w-full max-w-40" />
-              <span className="text-center text-xs font-extrabold">{m.title}</span>
+              <span className="text-center text-xs font-semibold">{m.title}</span>
             </div>
           ))}
         </div>
@@ -197,7 +197,7 @@ export function DevUiPage() {
           {SWATCHES.map((name) => (
             <div key={name} className="flex flex-col gap-1 text-xs font-bold text-text-muted">
               <span
-                className="h-12 rounded-xl border-2 border-border"
+                className="h-12 rounded-xl border border-border"
                 style={{ background: `var(--${name})` }}
               />
               {name}
@@ -262,16 +262,16 @@ export function DevUiPage() {
       <Section title="Карточки и прогресс">
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
-            <p className="font-extrabold">Модуль 3 · Чтение графика</p>
+            <p className="font-semibold">Модуль 3 · Чтение графика</p>
             <p className="mb-3 text-sm text-text-muted">3 из 5 уроков</p>
             <ProgressBar label="Прогресс модуля" value={0.6} valueText="3 из 5" />
           </Card>
           <Card interactive className="flex items-center gap-4">
             <ProgressRing label="Цель дня" value={0.7} tone="xp">
-              <span className="font-mono font-extrabold">35/50</span>
+              <span className="font-mono font-semibold">35/50</span>
             </ProgressRing>
             <div>
-              <p className="font-extrabold">Цель дня</p>
+              <p className="font-semibold">Цель дня</p>
               <p className="text-sm text-text-muted">Ещё 15 XP</p>
             </div>
           </Card>

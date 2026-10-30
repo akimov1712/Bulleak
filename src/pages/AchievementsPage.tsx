@@ -75,10 +75,8 @@ export function AchievementsPage() {
             <li
               key={a.id}
               className={cn(
-                'flex gap-3 rounded-2xl border-2 bg-surface p-4',
-                got
-                  ? cn(rarity.card, 'shadow-[0_3px_0_0_var(--border)]')
-                  : 'border-dashed border-border',
+                'flex gap-3 rounded-2xl border bg-surface p-4',
+                got ? cn(rarity.card, '') : 'border-dashed border-border',
               )}
             >
               <span
@@ -91,7 +89,7 @@ export function AchievementsPage() {
                 {hidden ? <Lock className="size-6 text-text-muted" /> : a.icon}
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <p className={cn('font-extrabold', !got && 'text-text-muted')}>
+                <p className={cn('font-semibold', !got && 'text-text-muted')}>
                   {hidden ? '???' : a.title}
                 </p>
                 <p className="text-sm text-text-muted">

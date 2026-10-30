@@ -26,9 +26,7 @@ export function RouteError() {
       className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-4 px-4 text-center"
     >
       <Mascot mood={stale ? 'thinking' : 'shocked'} size={130} />
-      <h1 className="text-2xl font-extrabold">
-        {stale ? 'Сайт обновился' : 'Что-то пошло не так'}
-      </h1>
+      <h1 className="text-2xl font-semibold">{stale ? 'Сайт обновился' : 'Что-то пошло не так'}</h1>
       <p className="text-text-muted">
         {stale
           ? 'Часть страницы относится к прошлой версии. Обнови страницу — прогресс сохранится.'

@@ -18,14 +18,14 @@ export function WeakTopics({ emptyText }: { emptyText?: string }) {
   const weak = weakTopics(tagAccuracy(attempts));
   if (weak.length === 0) {
     return emptyText ? (
-      <p className="my-6 rounded-2xl border-2 border-bull bg-bull-soft p-3 text-sm font-bold">
+      <p className="my-6 rounded-2xl border border-bull bg-bull-soft p-3 text-sm font-bold">
         {emptyText}
       </p>
     ) : null;
   }
   return (
-    <div className="my-6 rounded-2xl border-2 border-warn bg-warn-soft p-3 text-sm">
-      <p className="font-extrabold">Стоит повторить</p>
+    <div className="my-6 rounded-2xl border border-warn bg-warn-soft p-3 text-sm">
+      <p className="font-semibold">Стоит повторить</p>
       <ul className="mt-1 flex flex-col gap-1">
         {weak.map((w) => {
           const lesson = lessonOfTag(w.tag);

@@ -68,7 +68,7 @@ export function ExpectancyCalc() {
             />
             <p
               className={cn(
-                'mt-3 rounded-2xl border-2 p-3 text-sm',
+                'mt-3 rounded-2xl border p-3 text-sm',
                 result.perTradeR > 0 ? 'border-border bg-surface-2' : 'border-bear bg-bear-soft',
               )}
             >

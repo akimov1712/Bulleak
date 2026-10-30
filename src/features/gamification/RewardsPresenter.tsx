@@ -71,16 +71,16 @@ export function RewardsPresenter() {
     <Modal open onClose={() => setLevelUp(null)} title="Новый уровень!" hideTitle size="sm">
       <div className="flex flex-col items-center gap-3 pb-2 text-center">
         <Mascot mood="cheering" size={150} />
-        <p className="text-sm font-extrabold tracking-wide text-epic uppercase">Новый уровень!</p>
-        <p className="font-mono text-6xl font-extrabold text-epic">{levelUp.to}</p>
+        <p className="text-sm font-semibold tracking-wide text-epic uppercase">Новый уровень!</p>
+        <p className="font-mono text-6xl font-semibold text-epic">{levelUp.to}</p>
         <p className="text-lg">
           {newRank ? (
             <>
-              Новое звание: <span className="font-extrabold">{rank}</span>
+              Новое звание: <span className="font-semibold">{rank}</span>
             </>
           ) : (
             <>
-              Звание: <span className="font-extrabold">{rank}</span>
+              Звание: <span className="font-semibold">{rank}</span>
             </>
           )}
         </p>

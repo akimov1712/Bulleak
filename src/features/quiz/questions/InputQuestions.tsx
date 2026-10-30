@@ -61,7 +61,7 @@ export function MatchQuestionView({
           <li
             key={pair.left}
             className={cn(
-              'grid gap-2 rounded-2xl border-2 p-3 sm:grid-cols-[1fr_1.2fr] sm:items-center',
+              'grid gap-2 rounded-2xl border p-3 sm:grid-cols-[1fr_1.2fr] sm:items-center',
               answering
                 ? 'border-border'
                 : ok
@@ -69,7 +69,7 @@ export function MatchQuestionView({
                   : 'border-bear bg-bear-soft',
             )}
           >
-            <label htmlFor={selectId} className="flex items-center gap-2 font-extrabold">
+            <label htmlFor={selectId} className="flex items-center gap-2 font-semibold">
               {!answering &&
                 (ok ? (
                   <Check className="size-5 text-bull" strokeWidth={3} aria-label="верно" />
@@ -144,7 +144,7 @@ export function OrderQuestionView({
             }}
             onDragEnd={() => setDragFrom(null)}
             className={cn(
-              'flex items-center gap-3 rounded-2xl border-2 bg-surface px-3 py-2.5 font-semibold',
+              'flex items-center gap-3 rounded-2xl border bg-surface px-3 py-2.5 font-semibold',
               answering && 'cursor-grab active:cursor-grabbing',
               dragFrom === i && 'opacity-50',
               answering
@@ -157,7 +157,7 @@ export function OrderQuestionView({
             {answering && (
               <GripVertical className="size-5 shrink-0 text-text-muted" aria-hidden="true" />
             )}
-            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 font-mono text-sm font-extrabold">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 font-mono text-sm font-semibold">
               {i + 1}
             </span>
             <span className="flex-1">{item}</span>

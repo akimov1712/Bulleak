@@ -42,7 +42,7 @@ export function LessonFooter({
           )}
         </div>
         <div className="flex-1">
-          <p className="text-lg font-extrabold">{completed ? 'Тест сдан!' : 'Проверь себя'}</p>
+          <p className="text-lg font-semibold">{completed ? 'Тест сдан!' : 'Проверь себя'}</p>
           <p className="text-text-muted">
             {completed
               ? `Лучший результат — ${formatPct(progress?.quizBest ?? 0, 0)}. Можно пересдать и улучшить.`
@@ -65,12 +65,12 @@ export function LessonFooter({
         {prev ? (
           <Link
             to={paths.lesson(prev.id)}
-            className="group flex items-center gap-3 rounded-2xl border-2 border-border p-4 hover:bg-surface-2"
+            className="group flex items-center gap-3 rounded-2xl border border-border p-4 hover:bg-surface-2"
           >
             <ArrowLeft className="size-5 shrink-0 text-text-muted" aria-hidden="true" />
             <span className="min-w-0">
               <span className="block text-xs font-bold text-text-muted">Предыдущий урок</span>
-              <span className="block truncate font-extrabold">{prev.title}</span>
+              <span className="block truncate font-semibold">{prev.title}</span>
             </span>
           </Link>
         ) : (
@@ -80,11 +80,11 @@ export function LessonFooter({
           (nextUnlocked ? (
             <Link
               to={paths.lesson(next.id)}
-              className="flex items-center justify-end gap-3 rounded-2xl border-2 border-border p-4 text-right hover:bg-surface-2"
+              className="flex items-center justify-end gap-3 rounded-2xl border border-border p-4 text-right hover:bg-surface-2"
             >
               <span className="min-w-0">
                 <span className="block text-xs font-bold text-text-muted">Следующий урок</span>
-                <span className="block truncate font-extrabold">{next.title}</span>
+                <span className="block truncate font-semibold">{next.title}</span>
               </span>
               <ArrowRight className="size-5 shrink-0 text-text-muted" aria-hidden="true" />
             </Link>
@@ -96,7 +96,7 @@ export function LessonFooter({
               <Trophy className="size-5" aria-hidden="true" />К экзамену модуля
             </Link>
           ) : (
-            <p className="flex items-center justify-end rounded-2xl border-2 border-dashed border-border p-4 text-right text-sm text-text-muted">
+            <p className="flex items-center justify-end rounded-2xl border border-dashed border-border p-4 text-right text-sm text-text-muted">
               {examModuleId
                 ? completed
                   ? 'Следующий модуль откроется после экзамена этого модуля'

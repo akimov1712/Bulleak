@@ -15,7 +15,7 @@ export function lazyBlock<P extends object>(
         fallback={
           <div
             aria-busy="true"
-            className="my-6 animate-pulse rounded-3xl bg-surface-2"
+            className="my-6 animate-pulse rounded-2xl bg-surface-2"
             style={{ minHeight }}
           />
         }

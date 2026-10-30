@@ -14,9 +14,9 @@ export function SimScenario({ id }: { id: string }) {
   return (
     <aside
       aria-label={`Сценарий тренажёра: ${scenario.title}`}
-      className="my-6 flex flex-col gap-3 rounded-3xl border-2 border-info/50 bg-info/10 p-5"
+      className="my-6 flex flex-col gap-3 rounded-2xl border border-info/50 bg-info/10 p-5"
     >
-      <p className="flex items-center gap-2 font-extrabold text-info">
+      <p className="flex items-center gap-2 font-semibold text-info">
         <CandlestickChart className="size-6" aria-hidden="true" />
         Практика в тренажёре: {scenario.title}
       </p>

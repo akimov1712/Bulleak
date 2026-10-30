@@ -128,7 +128,7 @@ export function CandleShapes() {
             />
             <foreignObject x={x + 2} y={y + 124} width={cellW - 4} height={70}>
               <div className="flex flex-col gap-0.5 text-center text-[13px] leading-tight">
-                <span className="font-extrabold text-text">{s.name}</span>
+                <span className="font-semibold text-text">{s.name}</span>
                 <span className="font-semibold text-text-muted">{s.meaning}</span>
               </div>
             </foreignObject>

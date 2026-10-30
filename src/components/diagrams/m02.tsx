@@ -195,7 +195,7 @@ export function OrderTypes() {
             <button
               type="button"
               onClick={() => setWalk(startWalk(START))}
-              className="shrink-0 rounded-full border-2 border-border px-3 py-1 font-bold text-text hover:border-text-muted"
+              className="shrink-0 rounded-full border border-border px-3 py-1 font-bold text-text hover:border-text-muted"
             >
               Сброс
             </button>

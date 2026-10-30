@@ -34,7 +34,7 @@ type NumberField = {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <Card className="flex flex-col gap-3">
-      <h2 className="text-lg font-extrabold">{title}</h2>
+      <h2 className="text-lg font-semibold">{title}</h2>
       {children}
     </Card>
   );
@@ -149,7 +149,7 @@ export function TradeForm({ draft, onChange, errors, setups }: TradeFormProps) {
           <p
             aria-live="polite"
             className={cn(
-              'text-2xl font-extrabold tabular-nums',
+              'text-2xl font-semibold tabular-nums',
               preview.pnl > 0 ? 'text-bull' : 'text-bear',
             )}
           >
@@ -208,7 +208,7 @@ export function TradeForm({ draft, onChange, errors, setups }: TradeFormProps) {
               rows={4}
               value={draft.notes}
               onChange={(e) => onChange({ notes: e.target.value })}
-              className="rounded-2xl border-2 border-border bg-surface p-3"
+              className="rounded-2xl border border-border bg-surface p-3"
             />
           )}
         </Field>

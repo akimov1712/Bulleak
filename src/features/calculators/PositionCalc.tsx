@@ -53,7 +53,7 @@ export function PositionCalc() {
               ]}
             />
             {result.margin > (balance ?? 0) && (
-              <p className="mt-3 rounded-2xl border-2 border-warn bg-warn-soft p-3 text-sm">
+              <p className="mt-3 rounded-2xl border border-warn bg-warn-soft p-3 text-sm">
                 Маржа больше баланса: при таком плече позицию не открыть. Отодвинь стоп или уменьши
                 риск — не повышай плечо ради размера.
               </p>

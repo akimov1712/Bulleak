@@ -37,14 +37,14 @@ export function FeedbackPanel({
       role="status"
       aria-live="assertive"
       className={cn(
-        'animate-[sheet-in_200ms_ease-out] rounded-t-3xl border-t-4 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:rounded-3xl md:border-4 md:pb-4',
+        'animate-[sheet-in_200ms_ease-out] rounded-t-3xl border-t-4 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:rounded-2xl md:border-4 md:pb-4',
         correct ? 'border-bull bg-bull-soft' : 'border-bear bg-bear-soft',
       )}
     >
       <div className="mx-auto flex max-w-2xl flex-col gap-3">
         <p
           className={cn(
-            'flex items-center gap-2 text-xl font-extrabold',
+            'flex items-center gap-2 text-xl font-semibold',
             correct ? 'text-bull' : 'text-bear',
           )}
         >

@@ -35,13 +35,13 @@ export function Switch({
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-          'relative h-8 w-14 shrink-0 rounded-full border-2 transition-colors disabled:opacity-50',
+          'relative h-8 w-14 shrink-0 rounded-full border transition-colors disabled:opacity-50',
           checked ? 'border-primary-shade bg-primary' : 'border-border bg-surface-2',
         )}
       >
         <span
           className={cn(
-            'absolute top-0.5 left-0.5 size-6 rounded-full bg-white shadow-[0_2px_0_0_rgb(0_0_0/0.15)] transition-transform',
+            'absolute top-0.5 left-0.5 size-6 rounded-full bg-white transition-transform',
             checked && 'translate-x-6',
           )}
         />

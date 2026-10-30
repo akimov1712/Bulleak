@@ -87,7 +87,7 @@ export function SimulatorStats() {
             {tiles.map(([label, value]) => (
               <Card key={label} padding="sm">
                 <dt className="text-sm font-bold text-text-muted">{label}</dt>
-                <dd className="text-lg font-extrabold tabular-nums">{value}</dd>
+                <dd className="text-lg font-semibold tabular-nums">{value}</dd>
               </Card>
             ))}
           </dl>
@@ -101,7 +101,7 @@ export function SimulatorStats() {
             ))}
           {s.balanceCurve.length > 2 && (
             <Card className="flex flex-col gap-2">
-              <h2 className="font-extrabold">Виртуальный баланс</h2>
+              <h2 className="font-semibold">Виртуальный баланс</h2>
               <EquityCurves
                 curves={[s.balanceCurve]}
                 baseline={s.balanceCurve[0]}
@@ -110,7 +110,7 @@ export function SimulatorStats() {
             </Card>
           )}
           <Card className="flex flex-col gap-2">
-            <h2 className="font-extrabold">Распределение результатов в R</h2>
+            <h2 className="font-semibold">Распределение результатов в R</h2>
             <Bars
               values={bins.map((b) => (b.from < 0 ? -b.count : b.count))}
               labels={bins.map(
@@ -147,12 +147,12 @@ function BacktestReportCard({ tag, trades }: { tag: string; trades: SimTrade[] }
   ];
   return (
     <Card className="flex flex-col gap-3">
-      <h2 className="font-extrabold">Отчёт бэктеста: {title}</h2>
+      <h2 className="font-semibold">Отчёт бэктеста: {title}</h2>
       <dl className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {tiles.map(([label, value]) => (
           <div key={label}>
             <dt className="text-sm font-bold text-text-muted">{label}</dt>
-            <dd className="text-lg font-extrabold tabular-nums">{value}</dd>
+            <dd className="text-lg font-semibold tabular-nums">{value}</dd>
           </div>
         ))}
       </dl>

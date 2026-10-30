@@ -27,12 +27,12 @@ export function TodayCard() {
       <Card className="flex items-center gap-5">
         <ProgressRing label="Цель дня" value={todayXp / goal} size={104} thickness={12} tone="xp">
           <span className="flex flex-col items-center leading-tight">
-            <span className="font-mono text-xl font-extrabold">{Math.min(todayXp, goal)}</span>
+            <span className="font-mono text-xl font-semibold">{Math.min(todayXp, goal)}</span>
             <span className="text-xs font-bold text-text-muted">из {goal} XP</span>
           </span>
         </ProgressRing>
         <div>
-          <h2 className="text-lg font-extrabold">Цель дня</h2>
+          <h2 className="text-lg font-semibold">Цель дня</h2>
           <p className="text-text-muted">
             {goalDone
               ? 'Выполнена! Можно отдохнуть или сделать ещё.'
@@ -43,7 +43,7 @@ export function TodayCard() {
 
       <Card className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-extrabold">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
             <Flame
               className={cn(
                 'size-6',
@@ -71,7 +71,7 @@ export function TodayCard() {
 
       <Card className="flex flex-col gap-2 md:col-span-2">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-lg font-extrabold">
+          <h2 className="text-lg font-semibold">
             Уровень {level.level} · {level.rank}
           </h2>
           <span className="font-mono text-sm font-bold text-text-muted">

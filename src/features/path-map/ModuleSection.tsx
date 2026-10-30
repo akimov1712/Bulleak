@@ -53,9 +53,7 @@ export function ModuleSection({
         to={paths.module(module.id)}
         className={cn(
           'flex w-full items-center gap-4 rounded-(--radius-card) p-4 text-on-mod transition-transform hover:-translate-y-0.5 md:p-5',
-          unlocked
-            ? cn(colors.bg, colors.shadow)
-            : 'bg-surface-2 text-text-muted shadow-[0_4px_0_0_var(--border)]',
+          unlocked ? cn(colors.bg, colors.shadow) : 'bg-surface-2 text-text-muted',
         )}
       >
         <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/30">
@@ -66,15 +64,15 @@ export function ModuleSection({
           )}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-xs font-extrabold tracking-wide uppercase">
+          <span className="block text-xs font-semibold tracking-wide uppercase">
             Модуль {module.index}
           </span>
-          <span id={`module-${module.id}`} className="block text-xl leading-tight font-extrabold">
+          <span id={`module-${module.id}`} className="block text-xl leading-tight font-semibold">
             {module.title}
           </span>
         </span>
         {unlocked && <ModuleCover moduleId={module.id} className="hidden w-20 sm:block" />}
-        <span className="shrink-0 rounded-full bg-white/30 px-3 py-1 font-mono text-sm font-extrabold">
+        <span className="shrink-0 rounded-full bg-white/30 px-3 py-1 font-mono text-sm font-semibold">
           {done}/{total}
         </span>
       </Link>
@@ -128,7 +126,7 @@ export function ModuleSection({
                   left: onLeft ? point.x - NODE_SIZE / 2 - 96 : point.x + NODE_SIZE / 2 + 12,
                 }}
               >
-                <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-xl border-2 border-border bg-surface px-2.5 py-0.5 text-xs font-extrabold whitespace-nowrap text-bull shadow-[0_3px_0_0_var(--border)]">
+                <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-xl border border-border bg-surface px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-bull">
                   {lessonStatus(ctx, currentLessonId) === 'read' ? 'К тесту!' : 'Начнём?'}
                 </span>
                 <Mascot mood="pointing" size={84} className={onLeft ? '' : '-scale-x-100'} />
@@ -150,10 +148,10 @@ export function ModuleSection({
                 to={paths.exam(module.id)}
                 aria-label={`Экзамен модуля ${module.index}${examPassed ? ' (сдан)' : ''}`}
                 className={cn(
-                  'grid place-items-center rounded-3xl border-4 transition-transform active:translate-y-1',
+                  'grid place-items-center rounded-2xl border-4 transition-transform active:translate-y-1',
                   examPassed
-                    ? 'border-xp-shade bg-xp text-on-xp shadow-[0_6px_0_0_var(--xp-shade)]'
-                    : 'border-xp bg-surface text-xp-shade shadow-[0_6px_0_0_var(--xp-shade)] motion-safe:animate-[node-bounce_2s_ease-in-out_infinite]',
+                    ? 'border-xp-shade bg-xp text-on-xp'
+                    : 'border-xp bg-surface text-xp-shade motion-safe:animate-[node-bounce_2s_ease-in-out_infinite]',
                 )}
                 style={{ width: EXAM_SIZE, height: EXAM_SIZE }}
               >
@@ -175,13 +173,13 @@ export function ModuleSection({
                     description: 'Он откроется после всех уроков модуля.',
                   })
                 }
-                className="grid place-items-center rounded-3xl border-4 border-border bg-surface-2 text-text-muted shadow-[0_6px_0_0_var(--border)]"
+                className="grid place-items-center rounded-2xl border-4 border-border bg-surface-2 text-text-muted"
                 style={{ width: EXAM_SIZE, height: EXAM_SIZE }}
               >
                 <Trophy className="size-10" aria-hidden="true" />
               </button>
             )}
-            <span className="text-xs font-extrabold text-text-muted">Экзамен</span>
+            <span className="text-xs font-semibold text-text-muted">Экзамен</span>
           </div>
         )}
       </div>

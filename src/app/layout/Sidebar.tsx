@@ -45,7 +45,7 @@ function SidebarGroup({ group, label }: { group: NavGroup; label: string }) {
     <div role="group" aria-labelledby={id} className="flex flex-col gap-0.5">
       <p
         id={id}
-        className="px-3 pb-1 text-[0.68rem] font-black tracking-[0.16em] text-on-ink-muted uppercase"
+        className="px-3 pb-1 text-[0.68rem] font-bold tracking-[0.16em] text-on-ink-muted uppercase"
       >
         {label}
       </p>

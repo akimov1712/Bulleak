@@ -12,7 +12,7 @@ beforeEach(() => {
 describe('settingsStore', () => {
   it('starts with defaults', () => {
     const s = useSettings.getState();
-    expect(s.theme).toBe('system');
+    expect(s.theme).toBe('dark');
     expect(s.dailyGoalXp).toBe(50);
   });
 
@@ -30,7 +30,7 @@ describe('settingsStore', () => {
     );
     await useSettings.persist.rehydrate();
     const s = useSettings.getState();
-    expect(s.theme).toBe('system');
+    expect(s.theme).toBe('dark');
     expect(s.dailyGoalXp).toBe(50);
     expect(s.sound).toBe(true);
   });
@@ -63,6 +63,7 @@ describe('useResolvedTheme', () => {
   });
 
   it('resolves system to light when matchMedia is unavailable', () => {
+    useSettings.getState().update({ theme: 'system' });
     const { result } = renderHook(() => useResolvedTheme());
     expect(result.current).toBe('light');
   });

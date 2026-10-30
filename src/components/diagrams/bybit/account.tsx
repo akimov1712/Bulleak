@@ -43,8 +43,8 @@ export function BybitKycLevels() {
               key={l.n}
               className={
                 active === l.n
-                  ? 'rounded-xl border-2 border-xp-shade bg-xp/10 p-3'
-                  : 'rounded-xl border-2 border-border p-3'
+                  ? 'rounded-xl border border-xp-shade bg-xp/10 p-3'
+                  : 'rounded-xl border border-border p-3'
               }
             >
               <div className="mb-2 flex items-center gap-2">
@@ -55,13 +55,13 @@ export function BybitKycLevels() {
                   aria-label={`Пояснение ${l.n}: уровень ${l.name}`}
                   className={
                     active === l.n
-                      ? "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-xp text-xs font-extrabold text-on-xp"
-                      : "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-info text-xs font-extrabold text-surface"
+                      ? "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-xp text-xs font-semibold text-on-xp"
+                      : "relative before:absolute before:-inset-2.5 before:content-[''] inline-flex size-6 items-center justify-center rounded-full bg-info text-xs font-semibold text-surface"
                   }
                 >
                   {l.n}
                 </button>
-                <span className="font-extrabold">{l.name}</span>
+                <span className="font-semibold">{l.name}</span>
               </div>
               <ul className="mb-2 flex list-disc flex-col gap-0.5 pl-4 text-xs text-text-muted">
                 {l.needs.map((x) => (

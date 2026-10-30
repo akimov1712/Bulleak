@@ -30,21 +30,21 @@ export function Mockup({ screen, children, hotspots, checked }: MockupProps) {
     <div
       role="group"
       aria-label={`Упрощённая схема экрана Bybit «${screen}» с пояснениями`}
-      className="overflow-hidden rounded-2xl border-2 border-border bg-surface"
+      className="overflow-hidden rounded-2xl border border-border bg-surface"
     >
-      <div className="flex items-center gap-2 border-b-2 border-border bg-surface-2 px-3 py-2">
+      <div className="flex items-center gap-2 border-b border-border bg-surface-2 px-3 py-2">
         <span className="size-2.5 rounded-full bg-bear/70" aria-hidden="true" />
         <span className="size-2.5 rounded-full bg-xp/80" aria-hidden="true" />
         <span className="size-2.5 rounded-full bg-bull/70" aria-hidden="true" />
         <span className="ml-2 truncate text-xs font-bold text-text-muted">Bybit · {screen}</span>
       </div>
       <div className="p-3 sm:p-4">{children(active, toggle)}</div>
-      <div className="border-t-2 border-border p-3" aria-live="polite" id={`${id}-note`}>
+      <div className="border-t border-border p-3" aria-live="polite" id={`${id}-note`}>
         {current ? (
           <div className="flex gap-3">
             <HotspotBadge n={current.n} active />
             <div className="text-sm">
-              <p className="font-extrabold">{current.title}</p>
+              <p className="font-semibold">{current.title}</p>
               <div className="text-text-muted">{current.text}</div>
             </div>
           </div>
@@ -73,7 +73,7 @@ export function HotspotBadge({
   className?: string;
 }) {
   const className = cn(
-    'inline-flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold',
+    'inline-flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
     active ? 'bg-xp text-on-xp ring-2 ring-xp-shade' : 'bg-info text-surface',
     extra,
   );

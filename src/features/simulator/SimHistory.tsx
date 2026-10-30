@@ -79,7 +79,7 @@ export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTrad
   return (
     <section aria-labelledby="sim-history-title" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 id="sim-history-title" className="flex items-center gap-2 text-2xl font-extrabold">
+        <h2 id="sim-history-title" className="flex items-center gap-2 text-2xl font-semibold">
           <History className="size-6 text-info" aria-hidden="true" />
           История сделок
         </h2>
@@ -113,7 +113,7 @@ export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTrad
             ].map(([label, value]) => (
               <Card key={label} padding="sm" className="flex flex-col">
                 <dt className="text-sm font-bold text-text-muted">{label}</dt>
-                <dd className="text-xl font-extrabold tabular-nums">{value}</dd>
+                <dd className="text-xl font-semibold tabular-nums">{value}</dd>
               </Card>
             ))}
           </dl>
@@ -123,7 +123,7 @@ export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTrad
                 <button
                   type="button"
                   onClick={() => setReview(t)}
-                  className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl border-2 border-border bg-surface px-4 py-2.5 text-left hover:border-info"
+                  className="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-2xl border border-border bg-surface px-4 py-2.5 text-left hover:border-info"
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate font-bold">{tradeTitle(t)}</span>
@@ -137,7 +137,7 @@ export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTrad
                   </span>
                   <span
                     className={cn(
-                      'font-extrabold tabular-nums',
+                      'font-semibold tabular-nums',
                       t.pnl > 0 ? 'text-bull' : 'text-bear',
                     )}
                   >

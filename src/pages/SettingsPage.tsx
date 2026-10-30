@@ -31,7 +31,7 @@ const dateFormat = new Intl.DateTimeFormat('ru-RU', {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <Card className="flex flex-col gap-4">
-      <h2 className="text-xl font-extrabold">{title}</h2>
+      <h2 className="text-xl font-semibold">{title}</h2>
       {children}
     </Card>
   );
@@ -207,7 +207,7 @@ function DataSection() {
           Скачать резервную копию
         </Button>
         <label htmlFor={fileId} className="cursor-pointer">
-          <span className="inline-flex min-h-11 items-center gap-2 rounded-2xl border-2 border-border bg-surface px-4 font-extrabold hover:border-info">
+          <span className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-border bg-surface px-4 font-semibold hover:border-info">
             <Upload className="size-5" aria-hidden="true" />
             Восстановить из файла
           </span>
@@ -224,7 +224,7 @@ function DataSection() {
         </label>
       </div>
       {importError && (
-        <p role="alert" className="rounded-2xl border-2 border-bear bg-bear-soft p-3 text-sm">
+        <p role="alert" className="rounded-2xl border border-bear bg-bear-soft p-3 text-sm">
           {importError} Текущие данные не изменены.
         </p>
       )}

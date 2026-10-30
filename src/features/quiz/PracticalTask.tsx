@@ -60,7 +60,7 @@ function PracticalForm({ scenario, index, total, onSubmit }: PracticalTaskProps)
       <p className="text-sm font-bold text-text-muted">
         Практическая часть · задача {index + 1} из {total}
       </p>
-      <h1 className="text-2xl font-extrabold">{scenario.title}</h1>
+      <h1 className="text-2xl font-semibold">{scenario.title}</h1>
       <LazyCandleChart
         dataset={name}
         from={{ index: Math.max(0, scenario.startIndex - 90) }}
@@ -71,7 +71,7 @@ function PracticalForm({ scenario, index, total, onSubmit }: PracticalTaskProps)
       <Card className="flex flex-col gap-4">
         <p>
           Вход по рынку:{' '}
-          <span className="font-extrabold tabular-nums">{formatNumber(entry, 2)}</span>
+          <span className="font-semibold tabular-nums">{formatNumber(entry, 2)}</span>
         </p>
         <Segmented<SimDecision | ''>
           label="Решение"

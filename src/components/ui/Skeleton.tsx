@@ -42,12 +42,12 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-3 rounded-(--radius-card) border-2 border-dashed border-border px-6 py-10 text-center',
+        'flex flex-col items-center gap-3 rounded-(--radius-card) border border-dashed border-border px-6 py-10 text-center',
         className,
       )}
     >
       {art}
-      <Heading className="text-xl font-extrabold">{title}</Heading>
+      <Heading className="text-xl font-semibold">{title}</Heading>
       {description && <div className="max-w-md text-text-muted">{description}</div>}
       {action && <div className="mt-2">{action}</div>}
     </div>

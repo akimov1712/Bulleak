@@ -79,7 +79,7 @@ export function Popover({
             ref={setFloating}
             style={floatingStyles}
             className={cn(
-              'z-50 max-w-[min(20rem,calc(100vw-1rem))] rounded-2xl border-2 border-border bg-surface p-3.5 text-sm text-text shadow-xl',
+              'z-50 max-w-[min(20rem,calc(100vw-1rem))] rounded-2xl border border-border bg-surface p-3.5 text-sm text-text shadow-xl',
               className,
             )}
             {...getFloatingProps()}

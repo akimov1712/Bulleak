@@ -30,7 +30,7 @@ export function TradeResult({ result, balance, onNext, onNewPoint }: TradeResult
       <div>
         <p className="text-sm font-bold text-text-muted">{OUTCOME_TITLE[result.outcome]}</p>
         <p
-          className={cn('text-3xl font-extrabold tabular-nums', win ? 'text-bull' : 'text-bear')}
+          className={cn('text-3xl font-semibold tabular-nums', win ? 'text-bull' : 'text-bear')}
           role="status"
         >
           {formatR(result.r)} · {formatUsd(result.pnl)}

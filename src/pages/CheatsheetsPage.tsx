@@ -57,7 +57,7 @@ function PreTradeChecklist() {
   return (
     <Card className="flex flex-col gap-3 break-inside-avoid">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-xl font-extrabold">
+        <h2 className="flex items-center gap-2 text-xl font-semibold">
           <ListChecks className="size-6 text-primary-shade" aria-hidden="true" />
           Чек-лист перед сделкой
         </h2>
@@ -106,10 +106,10 @@ function PreTradeChecklist() {
 function CheatsheetCard({ sheet }: { sheet: Cheatsheet }) {
   return (
     <Card className="flex flex-col gap-3 break-inside-avoid print:mb-4">
-      <h2 className="text-xl font-extrabold">{sheet.title}</h2>
+      <h2 className="text-xl font-semibold">{sheet.title}</h2>
       {sheet.sections.map((section) => (
         <section key={section.title} className="flex flex-col gap-1">
-          <h3 className="font-extrabold text-text-muted">{section.title}</h3>
+          <h3 className="font-semibold text-text-muted">{section.title}</h3>
           <ul className="list-disc space-y-1 pl-5 text-sm">
             {section.items.map((item) => (
               <li key={item}>{item}</li>
@@ -125,7 +125,7 @@ function LockedCard({ sheet }: { sheet: Cheatsheet }) {
   const module = courseIndex.getModule(sheet.module);
   return (
     <Card className="flex flex-col gap-2 border-dashed opacity-70 print:hidden">
-      <h2 className="flex items-center gap-2 text-xl font-extrabold">
+      <h2 className="flex items-center gap-2 text-xl font-semibold">
         <Lock className="size-5 text-text-muted" aria-hidden="true" />
         {sheet.title}
       </h2>

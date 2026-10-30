@@ -50,7 +50,7 @@ export function TableOfContents({ container }: { container: RefObject<HTMLElemen
 
   return (
     <nav aria-label="Содержание урока" className="sticky top-24 flex flex-col gap-1 text-sm">
-      <p className="mb-1 font-extrabold tracking-wide text-text-muted uppercase">Содержание</p>
+      <p className="mb-1 font-semibold tracking-wide text-text-muted uppercase">Содержание</p>
       {headings.map((h) => (
         <a
           key={h.id}

@@ -103,7 +103,7 @@ export function TrueFalseQuestionView({
           disabled={!answering}
           onSelect={() => onChange(o.value)}
         >
-          <span className="text-lg font-extrabold">{o.label}</span>
+          <span className="text-lg font-semibold">{o.label}</span>
         </OptionCard>
       ))}
     </div>

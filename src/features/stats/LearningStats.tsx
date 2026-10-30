@@ -78,14 +78,14 @@ export function LearningStats() {
         {tiles.map(([label, value]) => (
           <Card key={label} padding="sm">
             <dt className="text-sm font-bold text-text-muted">{label}</dt>
-            <dd className="text-lg font-extrabold tabular-nums">{value}</dd>
+            <dd className="text-lg font-semibold tabular-nums">{value}</dd>
           </Card>
         ))}
       </dl>
 
       <Card className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-extrabold">XP по дням</h2>
+          <h2 className="font-semibold">XP по дням</h2>
           <Segmented
             label="Период"
             hideLabel
@@ -106,12 +106,12 @@ export function LearningStats() {
       </Card>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="font-extrabold">Календарь активности</h2>
+        <h2 className="font-semibold">Календарь активности</h2>
         <Heatmap weeks={heatmap(progress.activity, today, 26)} />
       </Card>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="font-extrabold">Прогресс по модулям</h2>
+        <h2 className="font-semibold">Прогресс по модулям</h2>
         {courseIndex.modules.map((m) => {
           const c = moduleCompletion(ctx, m);
           return (
@@ -127,7 +127,7 @@ export function LearningStats() {
       </Card>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="font-extrabold">Точность по темам</h2>
+        <h2 className="font-semibold">Точность по темам</h2>
         {accuracy.length === 0 ? (
           <p className="text-text-muted">Появится после первых тестов.</p>
         ) : (
@@ -153,7 +153,7 @@ export function LearningStats() {
           role="region"
           aria-label="Последние тесты"
         >
-          <h2 className="font-extrabold">Последние тесты</h2>
+          <h2 className="font-semibold">Последние тесты</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-text-muted">

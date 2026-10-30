@@ -20,7 +20,7 @@ import type { GlossaryCategory, GlossaryTerm } from '@/types/glossary';
 
 const chip = (active: boolean) =>
   cn(
-    'rounded-full border-2 px-3 py-1 text-sm font-bold transition-colors',
+    'rounded-full border px-3 py-1 text-sm font-bold transition-colors',
     active ? 'border-info bg-info/15 text-info' : 'border-border bg-surface hover:border-info',
   );
 
@@ -120,7 +120,7 @@ function GlossaryList() {
               <button
                 key={letter}
                 type="button"
-                className="min-h-11 min-w-11 rounded-lg border-2 border-border px-2 text-sm font-extrabold hover:border-info"
+                className="min-h-11 min-w-11 rounded-lg border border-border px-2 text-sm font-semibold hover:border-info"
                 onClick={() =>
                   document
                     .getElementById(`letter-${letter}`)
@@ -133,7 +133,7 @@ function GlossaryList() {
           </nav>
           {groups.map(([letter, list]) => (
             <section key={letter} aria-labelledby={`letter-${letter}`} className="scroll-mt-20">
-              <h2 id={`letter-${letter}`} className="mb-2 text-xl font-extrabold">
+              <h2 id={`letter-${letter}`} className="mb-2 text-xl font-semibold">
                 {letter}
               </h2>
               <TermList terms={list} ctx={ctx} />
@@ -154,10 +154,10 @@ function TermList({ terms, ctx }: { terms: GlossaryTerm[]; ctx: UnlockContext })
         <li key={t.id}>
           <Link
             to={paths.glossary(t.id)}
-            className="flex h-full flex-col gap-1 rounded-2xl border-2 border-border bg-surface p-3 hover:border-info"
+            className="flex h-full flex-col gap-1 rounded-2xl border border-border bg-surface p-3 hover:border-info"
           >
             <span className="flex flex-wrap items-center gap-2">
-              <span className="font-extrabold">{t.term}</span>
+              <span className="font-semibold">{t.term}</span>
               {isAhead(ctx, t) && (
                 <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-bold text-text-muted">
                   впереди
@@ -232,7 +232,7 @@ function TermDetail({ term }: { term: GlossaryTerm }) {
       )}
       {related.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h2 className="font-extrabold">Связанные термины</h2>
+          <h2 className="font-semibold">Связанные термины</h2>
           <div className="flex flex-wrap gap-1.5">
             {related.map((r) => (
               <Link key={r.id} to={paths.glossary(r.id)} className={chip(false)}>

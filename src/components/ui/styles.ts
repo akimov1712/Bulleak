@@ -12,28 +12,19 @@ export interface ButtonStyleOptions {
 }
 
 const buttonBase =
-  'relative inline-flex select-none items-center justify-center gap-2 font-extrabold tracking-wide ' +
-  'rounded-(--radius-btn) transition-[transform,box-shadow,background-color] duration-100 ' +
+  'relative inline-flex select-none items-center justify-center gap-2 font-semibold ' +
+  'rounded-(--radius-btn) transition-[background-color,border-color,color,transform] duration-100 ' +
   'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50';
 
-// "3D" buttons: a solid bottom shadow that collapses on press.
-const press = 'active:not-disabled:translate-y-[4px] active:not-disabled:shadow-none';
+// Flat buttons: a slight scale on press instead of the old 3D shadow.
+const press = 'active:not-disabled:scale-[0.98]';
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: cn(
-    'bg-primary text-on-primary shadow-[0_4px_0_0_var(--primary-shade)] hover:brightness-105',
-    press,
-  ),
-  secondary: cn(
-    'border-2 border-border bg-surface text-text shadow-[0_4px_0_0_var(--border)] hover:bg-surface-2',
-    press,
-  ),
+  primary: cn('bg-primary text-on-primary hover:bg-primary-shade', press),
+  secondary: cn('border border-border bg-surface text-text hover:bg-surface-2', press),
   ghost: 'bg-transparent text-text hover:bg-surface-2 active:bg-border',
-  danger: cn(
-    'bg-bear text-on-bear shadow-[0_4px_0_0_color-mix(in_oklab,var(--bear),black_30%)] hover:brightness-105',
-    press,
-  ),
-  xp: cn('bg-xp text-on-xp shadow-[0_4px_0_0_var(--xp-shade)] hover:brightness-105', press),
+  danger: cn('bg-bear text-on-bear hover:brightness-110', press),
+  xp: cn('bg-xp text-on-xp hover:brightness-105', press),
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
@@ -64,17 +55,16 @@ export function cardClass({
   padding = 'md',
 }: { interactive?: boolean; padding?: CardPadding } = {}): string {
   return cn(
-    'rounded-(--radius-card) border-2 border-border bg-surface text-text',
-    'shadow-[0_4px_0_0_var(--border)]',
-    interactive &&
-      'cursor-pointer transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-[3px] active:shadow-none',
+    'rounded-(--radius-card) border border-border bg-surface text-text',
+    '',
+    interactive && 'cursor-pointer transition-colors duration-100 hover:border-text-muted/50',
     cardPaddings[padding],
   );
 }
 
 /** Text-like inputs (Input, NumberInput, Select). */
 export const inputClass =
-  'min-h-11 w-full rounded-xl border-2 border-border bg-surface px-3.5 text-base text-text ' +
+  'min-h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-base text-text ' +
   'placeholder:text-text-muted/70 transition-colors hover:border-text-muted/40 ' +
   'focus:border-info focus:ring-4 focus:ring-info/30 focus:outline-none aria-invalid:border-bear ' +
   'disabled:opacity-50';

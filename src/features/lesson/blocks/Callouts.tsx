@@ -37,10 +37,10 @@ function Callout({ tone, title, children }: CalloutProps & { tone: CalloutTone }
   const Icon = t.icon;
   return (
     <aside
-      className={cn('my-6 rounded-2xl border-2 border-l-[6px] px-4 py-3.5 md:px-5', t.box)}
+      className={cn('my-6 rounded-2xl border border-l-[6px] px-4 py-3.5 md:px-5', t.box)}
       aria-label={title ?? t.label}
     >
-      <p className={cn('mb-1 flex items-center gap-2 font-extrabold', t.title)}>
+      <p className={cn('mb-1 flex items-center gap-2 font-semibold', t.title)}>
         <Icon className="size-5 shrink-0" aria-hidden="true" />
         {title ?? t.label}
       </p>

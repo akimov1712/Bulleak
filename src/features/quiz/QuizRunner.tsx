@@ -102,17 +102,17 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
 
       <form onSubmit={check} className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5">
         <div>
-          <p className="mb-1 text-sm font-extrabold tracking-wide text-text-muted uppercase">
+          <p className="mb-1 text-sm font-semibold tracking-wide text-text-muted uppercase">
             {title} · {questionHint(question)}
           </p>
-          <h1 className="text-2xl leading-snug font-extrabold md:text-[1.75rem]">
+          <h1 className="text-2xl leading-snug font-semibold md:text-[1.75rem]">
             {question.prompt}
           </h1>
           {question.image && (
             <img
               src={`${import.meta.env.BASE_URL}${question.image.replace(/^\//, '')}`}
               alt=""
-              className="mt-4 w-full rounded-2xl border-2 border-border"
+              className="mt-4 w-full rounded-2xl border border-border"
             />
           )}
         </div>

@@ -7,7 +7,7 @@ export function CalcEmbed({ id }: { id: string }) {
     return (
       <p
         role="alert"
-        className="my-6 rounded-2xl border-2 border-dashed border-warn p-4 text-center text-sm text-warn"
+        className="my-6 rounded-2xl border border-dashed border-warn p-4 text-center text-sm text-warn"
       >
         Калькулятор «{id}» не найден
       </p>

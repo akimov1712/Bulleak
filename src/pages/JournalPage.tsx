@@ -149,7 +149,7 @@ function SideBadge({ side }: { side: JournalTrade['side'] }) {
   return (
     <span
       className={cn(
-        'rounded-full px-2 py-0.5 text-xs font-extrabold',
+        'rounded-full px-2 py-0.5 text-xs font-semibold',
         side === 'long' ? 'bg-bull-soft text-bull' : 'bg-bear-soft text-bear',
       )}
     >
@@ -177,7 +177,7 @@ function TradeList({ trades, onOpen }: { trades: JournalTrade[]; onOpen: (id: nu
           {trades.map((t) => (
             <tr
               key={t.id}
-              className="cursor-pointer border-t-2 border-border hover:bg-surface-2"
+              className="cursor-pointer border-t border-border hover:bg-surface-2"
               onClick={() => t.id !== undefined && onOpen(t.id)}
             >
               <td className="py-2">
@@ -205,7 +205,7 @@ function TradeList({ trades, onOpen }: { trades: JournalTrade[]; onOpen: (id: nu
           <li key={t.id}>
             <Link
               to={paths.journalEntry(t.id ?? '')}
-              className="flex flex-col gap-1 rounded-2xl border-2 border-border bg-surface p-3"
+              className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-3"
             >
               <span className="flex items-center justify-between gap-2">
                 <span className="font-bold">

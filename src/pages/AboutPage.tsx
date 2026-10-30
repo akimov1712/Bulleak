@@ -20,7 +20,7 @@ export function AboutPage() {
       </MascotSay>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="text-xl font-extrabold">Что внутри</h2>
+        <h2 className="text-xl font-semibold">Что внутри</h2>
         <ul className="list-disc space-y-1 pl-5 text-text-muted">
           <li>13 модулей и 62 урока: от основ криптовалют до выхода на реальный счёт.</li>
           <li>Тест после каждого урока, экзамены модулей и финальный экзамен.</li>
@@ -32,8 +32,8 @@ export function AboutPage() {
         </ul>
       </Card>
 
-      <Card className="flex flex-col gap-3 border-warn bg-warn-soft shadow-[0_4px_0_0_var(--warn)]">
-        <h2 className="flex items-center gap-2 text-xl font-extrabold text-warn">
+      <Card className="flex flex-col gap-3 border-warn bg-warn-soft">
+        <h2 className="flex items-center gap-2 text-xl font-semibold text-warn">
           <AlertTriangle className="size-6" aria-hidden="true" />
           Важно: риски
         </h2>
@@ -50,7 +50,7 @@ export function AboutPage() {
       </Card>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="text-xl font-extrabold">Источники и атрибуции</h2>
+        <h2 className="text-xl font-semibold">Источники и атрибуции</h2>
         <ul className="space-y-2 text-text-muted">
           <li>
             Исторические свечи — публичный API Bybit (
@@ -76,7 +76,7 @@ export function AboutPage() {
             </a>{' '}
             Lightweight Charts™ (лицензия Apache 2.0).
           </li>
-          <li>Иконки — Lucide (ISC). Шрифты — Nunito и JetBrains Mono (SIL OFL).</li>
+          <li>Иконки — Lucide (ISC). Шрифты — Inter и JetBrains Mono (SIL OFL).</li>
           <li>
             Иллюстрации, схемы и маскот нарисованы специально для курса. Источники фотографий
             перечислены в документации проекта.

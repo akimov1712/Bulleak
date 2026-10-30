@@ -7,28 +7,28 @@
 :root {
   color-scheme: light;
 
-  --bg: #f7f8fc;
+  --bg: #f5f6f8;
   --surface: #ffffff;
-  --surface-2: #eef1f8;
-  --border: #dde2ee;
-  --text: #1a1d2b;
-  --text-muted: #5c6480;
+  --surface-2: #eef0f3;
+  --border: #e1e4ea;
+  --text: #0d1117;
+  --text-muted: #596273;
 
-  --primary: #16c26a;
-  --primary-shade: #0e9a52;
-  --on-primary: #05301a;
-  --bull: #0a7f41;
-  --bull-soft: #e8f8ee;
-  --bear: #c62a40;
-  --bear-soft: #fdeef0;
+  --primary: #22c55e;
+  --primary-shade: #16a34a;
+  --on-primary: #04140a;
+  --bull: #0f7a3e;
+  --bull-soft: #e7f6ed;
+  --bear: #c42f43;
+  --bear-soft: #fcebee;
   --on-bear: #ffffff;
   --xp: #ffb020;
   --xp-shade: #d98e00;
   --on-xp: #3d2800;
   --on-mod: #14172a;
   --xp-text: #8f5a00;
-  --info: #1e56d0;
-  --info-soft: #dbe8ff;
+  --info: #1d5ad6;
+  --info-soft: #e3ecfd;
   --epic: #6d3fdc;
   --epic-soft: #ece4ff;
   --on-epic: #ffffff;
@@ -52,16 +52,16 @@
   --mod-red: #f0445a;
   --mod-red-shade: #c9283d;
 
-  --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(26 29 43 / 0.18);
+  --shadow-card: 0 1px 2px rgb(13 17 23 / 0.04);
 
   /* Navigation chrome (sidebar, mobile header): dark "ink" panel in both themes. */
-  --ink: #12162a;
-  --ink-2: #1c2140;
-  --ink-3: #272d52;
-  --ink-border: #2a3052;
-  --on-ink: #eef0f8;
-  --on-ink-muted: #9aa2c2;
-  --ink-accent: #2bd97f;
+  --ink: #ffffff;
+  --ink-2: #f0f2f5;
+  --ink-3: #e6e9ee;
+  --ink-border: #e1e4ea;
+  --on-ink: #0d1117;
+  --on-ink-muted: #596273;
+  --ink-accent: #0f7a3e;
 
   /* Mascot "Bullik": same character in both themes, only the outline adapts. */
   --mascot-body: #c9824b;
@@ -82,41 +82,44 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --bg: #0f1220;
-  --surface: #181c2e;
-  --surface-2: #222840;
-  --border: #2e3552;
-  --text: #eef0f8;
-  --text-muted: #9aa3c0;
+  --bg: #0a0d12;
+  --surface: #10141b;
+  --surface-2: #171c25;
+  --border: #212834;
+  --text: #e6e8ee;
+  --text-muted: #8a93a6;
 
-  --primary: #2bd97f;
-  --primary-shade: #1aa862;
-  --on-primary: #04281a;
-  --bull: #2bd97f;
-  --bull-soft: #123826;
-  --bear: #ff5c70;
-  --bear-soft: #3d1a22;
+  --primary: #22c55e;
+  --primary-shade: #16a34a;
+  --on-primary: #04140a;
+  --bull: #3be38d;
+  --bull-soft: #10261a;
+  --bear: #f0566a;
+  --bear-soft: #2a1318;
   --on-bear: #2a0409;
   --xp: #ffc247;
   --xp-shade: #d99a1a;
   --on-xp: #2e1f00;
   --xp-text: #ffc247;
   --info: #60a5fa;
-  --info-soft: #172a4a;
+  --info-soft: #14223a;
   --epic: #a78bfa;
   --epic-soft: #2a2150;
   --on-epic: #1c1238;
   --warn: #ffa14d;
   --warn-soft: #3d2610;
 
-  --shadow-card: 0 2px 0 0 var(--border), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-card: none;
 
-  --ink: #0a0d19;
-  --ink-2: #161a30;
-  --ink-3: #20253f;
-  --ink-border: #1f2440;
+  --ink: #0a0d12;
+  --ink-2: #141922;
+  --ink-3: #1c222d;
+  --ink-border: #212834;
 
   --mascot-outline: #0b0d17;
+  --on-ink: #e6e8ee;
+  --on-ink-muted: #8a93a6;
+  --ink-accent: #3be38d;
 }
 
 @theme inline {
@@ -177,10 +180,10 @@
 }
 
 @theme {
-  --font-sans: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
 
-  --radius-card: 1.25rem;
-  --radius-btn: 1rem;
+  --radius-card: 0.875rem;
+  --radius-btn: 0.625rem;
 }

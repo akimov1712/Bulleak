@@ -48,7 +48,7 @@ export function PathPage() {
             valueText={`${completed} из ${total}`}
             size="lg"
           />
-          <span className="shrink-0 font-mono text-sm font-extrabold text-text-muted">
+          <span className="shrink-0 font-mono text-sm font-semibold text-text-muted">
             {completed}/{total}
           </span>
         </div>
@@ -83,9 +83,9 @@ export function PathPage() {
             className={cn(
               'grid size-28 place-items-center rounded-full border-4',
               finalPassed
-                ? 'border-xp-shade bg-xp text-on-xp shadow-[0_8px_0_0_var(--xp-shade)]'
+                ? 'border-xp-shade bg-xp text-on-xp'
                 : finalOpen
-                  ? 'border-epic bg-epic-soft text-epic shadow-[0_8px_0_0_var(--epic)]'
+                  ? 'border-epic bg-epic-soft text-epic'
                   : 'cursor-not-allowed border-border bg-surface-2 text-text-muted',
             )}
           >
@@ -96,7 +96,7 @@ export function PathPage() {
             )}
           </Link>
           <div>
-            <h2 className="text-2xl font-extrabold">Финальный экзамен</h2>
+            <h2 className="text-2xl font-semibold">Финальный экзамен</h2>
             <p className="text-text-muted">
               {finalPassed
                 ? 'Курс пройден!'
@@ -108,7 +108,7 @@ export function PathPage() {
           {finalPassed && (
             <Link
               to={paths.certificate()}
-              className="flex min-h-11 items-center gap-2 font-extrabold text-info hover:underline"
+              className="flex min-h-11 items-center gap-2 font-semibold text-info hover:underline"
             >
               <Award className="size-5" aria-hidden="true" />
               Мой сертификат

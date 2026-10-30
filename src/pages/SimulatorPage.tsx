@@ -135,7 +135,7 @@ export function SimulatorPage() {
         subtitle={scenario ? 'Сценарий тренажёра' : 'Сделки вслепую на реальной истории Bybit'}
         actions={
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-2 rounded-2xl border-2 border-border bg-surface px-3 py-2 font-extrabold tabular-nums">
+            <span className="flex items-center gap-2 rounded-2xl border border-border bg-surface px-3 py-2 font-semibold tabular-nums">
               <Wallet className="size-5 text-info" aria-hidden="true" />
               <span className="sr-only">Виртуальный баланс:</span>
               {formatUsd(balance)}

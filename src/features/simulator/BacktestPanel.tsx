@@ -27,7 +27,7 @@ export function BacktestPanel({ strategy, decisionKey }: BacktestPanelProps) {
 
   return (
     <Card className="flex flex-col gap-3" aria-label={`Бэктест: ${strategy.title}`}>
-      <p className="flex items-center gap-2 font-extrabold">
+      <p className="flex items-center gap-2 font-semibold">
         <ClipboardList className="size-5 text-epic" aria-hidden="true" />
         Бэктест {strategy.title}
       </p>

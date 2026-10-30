@@ -32,7 +32,7 @@ export function BybitDemo() {
         <div className="mx-auto flex max-w-sm flex-col gap-2">
           <div
             className={cn(
-              'flex items-center gap-3 rounded-xl border-2 p-3',
+              'flex items-center gap-3 rounded-xl border p-3',
               active === 1 ? 'border-xp-shade bg-xp/10' : 'border-border',
             )}
           >
@@ -49,7 +49,7 @@ export function BybitDemo() {
           </div>
           <div
             className={cn(
-              'flex items-center gap-3 rounded-xl border-2 p-3',
+              'flex items-center gap-3 rounded-xl border p-3',
               active === 2 ? 'border-xp-shade bg-xp/10' : 'border-border',
             )}
           >
@@ -59,14 +59,14 @@ export function BybitDemo() {
               onClick={() => toggle(2)}
               label="Метка демо"
             />
-            <span className="rounded-full bg-warn-soft px-2.5 py-1 text-xs font-extrabold text-warn">
+            <span className="rounded-full bg-warn-soft px-2.5 py-1 text-xs font-semibold text-warn">
               Demo Trading
             </span>
             <span className="text-xs text-text-muted">ты в демо-режиме</span>
           </div>
           <div
             className={cn(
-              'flex flex-col gap-1 rounded-xl border-2 p-3',
+              'flex flex-col gap-1 rounded-xl border p-3',
               active === 3 ? 'border-xp-shade bg-xp/10' : 'border-border',
             )}
           >
@@ -88,7 +88,7 @@ export function BybitDemo() {
           </div>
           <div
             className={cn(
-              'flex items-center gap-3 rounded-xl border-2 p-3',
+              'flex items-center gap-3 rounded-xl border p-3',
               active === 4 ? 'border-xp-shade bg-xp/10' : 'border-border',
             )}
           >

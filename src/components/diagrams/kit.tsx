@@ -24,7 +24,7 @@ export function DiagramSvg({ width, height, title, children, className, footer }
   const id = useId().replace(/:/g, '');
   const arrow = `${id}-arrow`;
   return (
-    <div className={cn('rounded-2xl border-2 border-border bg-surface p-3', className)}>
+    <div className={cn('rounded-2xl border border-border bg-surface p-3', className)}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"

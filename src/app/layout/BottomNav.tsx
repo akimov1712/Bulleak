@@ -7,7 +7,7 @@ import { mobileBarNav, mobileMoreNav } from './nav';
 
 const itemClass = (active: boolean) =>
   cn(
-    'flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl text-[0.7rem] font-extrabold transition-colors',
+    'flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl text-[0.7rem] font-semibold transition-colors',
     active ? 'text-bull' : 'text-text-muted hover:text-text',
   );
 
@@ -21,7 +21,7 @@ export function BottomNav() {
     <>
       <nav
         aria-label="Основная навигация"
-        className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
       >
         <div className="mx-auto flex max-w-xl items-stretch gap-1 px-2 py-1">
           {mobileBarNav.map((item) => {
@@ -80,7 +80,7 @@ export function BottomNav() {
                   onClick={() => setMoreOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      'flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border-2 p-3 text-center text-sm font-extrabold',
+                      'flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border p-3 text-center text-sm font-semibold',
                       isActive
                         ? 'border-bull/50 bg-bull-soft text-bull'
                         : 'border-border bg-surface text-text hover:bg-surface-2',

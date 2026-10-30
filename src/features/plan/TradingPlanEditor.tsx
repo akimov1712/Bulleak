@@ -38,7 +38,7 @@ export function TradingPlanEditor() {
   return (
     <Card className="flex flex-col gap-4 print:border-0 print:p-0 print:shadow-none">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-2xl font-extrabold">Мой торговый план</h2>
+        <h2 className="text-2xl font-semibold">Мой торговый план</h2>
         <span className="text-sm text-text-muted">
           {saved
             ? `Сохранён ${dateFormat.format(saved.updatedAt)}${dirty ? ' · есть несохранённые правки' : ''}`
@@ -58,12 +58,12 @@ export function TradingPlanEditor() {
                   setSections((prev) => ({ ...prev, [section.id]: e.target.value }));
                   setDirty(true);
                 }}
-                className="rounded-2xl border-2 border-border bg-surface p-3"
+                className="rounded-2xl border border-border bg-surface p-3"
               />
             )}
           </Field>
           <div className="hidden print:block">
-            <h3 className="font-extrabold">
+            <h3 className="font-semibold">
               {i + 1}. {section.title}
             </h3>
             <p className="whitespace-pre-wrap">{sections[section.id]}</p>

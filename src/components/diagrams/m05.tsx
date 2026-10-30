@@ -184,7 +184,7 @@ export function IndicatorFamilies() {
             </Txt>
             {f.draw({ x: x + 10, y: y + 50, w: cellW - 20, h: 60 })}
             <foreignObject x={x + 6} y={y + 116} width={cellW - 12} height={42}>
-              <div className="text-center text-[13px] leading-tight font-extrabold text-text">
+              <div className="text-center text-[13px] leading-tight font-semibold text-text">
                 {f.question}
               </div>
             </foreignObject>

@@ -26,9 +26,9 @@ export function ForwardTestProgress() {
   return (
     <aside
       aria-label="Форвард-тест"
-      className="my-6 flex flex-col gap-3 rounded-3xl border-2 border-info/50 bg-info/10 p-5"
+      className="my-6 flex flex-col gap-3 rounded-2xl border border-info/50 bg-info/10 p-5"
     >
-      <p className="flex items-center gap-2 font-extrabold text-info">
+      <p className="flex items-center gap-2 font-semibold text-info">
         <Radar className="size-6" aria-hidden="true" />
         Форвард-тест: демо и тестнет
       </p>

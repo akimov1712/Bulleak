@@ -30,9 +30,9 @@ export function BacktestProgress({ strategy = 'tps' }: { strategy?: string }) {
   return (
     <aside
       aria-label={`Бэктест ${rules.title}`}
-      className="my-6 flex flex-col gap-3 rounded-3xl border-2 border-epic/50 bg-epic/10 p-5"
+      className="my-6 flex flex-col gap-3 rounded-2xl border border-epic/50 bg-epic/10 p-5"
     >
-      <p className="flex items-center gap-2 font-extrabold text-epic">
+      <p className="flex items-center gap-2 font-semibold text-epic">
         <FlaskConical className="size-6" aria-hidden="true" />
         Бэктест: {rules.title}
       </p>

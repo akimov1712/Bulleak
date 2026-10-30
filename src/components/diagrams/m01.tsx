@@ -252,7 +252,7 @@ export function OrderBook() {
                 onClick={() => setSize(size === v ? null : v)}
                 aria-pressed={size === v}
                 className={cn(
-                  'rounded-full border-2 px-3 py-1 font-bold transition-colors',
+                  'rounded-full border px-3 py-1 font-bold transition-colors',
                   size === v
                     ? 'border-xp-shade bg-xp text-on-xp'
                     : 'border-border bg-surface text-text hover:border-xp-shade',

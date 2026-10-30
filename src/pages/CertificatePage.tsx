@@ -122,10 +122,10 @@ export function CertificatePage() {
       <div
         ref={card}
         data-testid="certificate"
-        className="relative overflow-hidden rounded-3xl border-4 p-6 text-center sm:p-10"
+        className="relative overflow-hidden rounded-2xl border-4 p-6 text-center sm:p-10"
         style={{ background: '#fffdf5', borderColor: '#f5b400', color: '#1f2433' }}
       >
-        <p className="mb-4 flex items-center justify-center gap-2 text-xl font-black tracking-[-0.035em]">
+        <p className="mb-4 flex items-center justify-center gap-2 text-xl font-bold tracking-[-0.035em]">
           <LogoMark size={32} />
           <span>
             <span style={{ color: '#0a7f41' }}>{BRAND.name.slice(0, 4)}</span>
@@ -133,7 +133,7 @@ export function CertificatePage() {
           </span>
         </p>
         <p
-          className="text-sm font-extrabold tracking-[0.2em] uppercase"
+          className="text-sm font-semibold tracking-[0.2em] uppercase"
           style={{ color: '#8a6d00' }}
         >
           Сертификат
@@ -141,11 +141,11 @@ export function CertificatePage() {
         <p className="mt-2 text-lg font-bold" style={{ color: '#5b6275' }}>
           подтверждает, что
         </p>
-        <p className="mt-2 text-3xl font-extrabold break-words sm:text-4xl">{data.name}</p>
+        <p className="mt-2 text-3xl font-semibold break-words sm:text-4xl">{data.name}</p>
         <p className="mt-3 text-lg font-bold" style={{ color: '#5b6275' }}>
           прошёл(а) курс
         </p>
-        <p className="mt-1 text-2xl font-extrabold">«{COURSE_TITLE}»</p>
+        <p className="mt-1 text-2xl font-semibold">«{COURSE_TITLE}»</p>
         <div className="mx-auto my-4 w-fit">
           <Mascot mood="cheering" size={110} />
         </div>
@@ -162,7 +162,7 @@ export function CertificatePage() {
               <dt className="text-xs font-bold" style={{ color: '#5b6275' }}>
                 {label}
               </dt>
-              <dd className="font-extrabold">{value}</dd>
+              <dd className="font-semibold">{value}</dd>
             </div>
           ))}
         </dl>

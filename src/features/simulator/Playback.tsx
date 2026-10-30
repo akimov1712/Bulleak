@@ -27,7 +27,7 @@ export function Playback(props: PlaybackProps) {
   return (
     <Card className="flex flex-col gap-4" aria-label="Воспроизведение сделки">
       <div className="flex items-baseline justify-between gap-2">
-        <span className={cn('font-extrabold', props.side === 'long' ? 'text-bull' : 'text-bear')}>
+        <span className={cn('font-semibold', props.side === 'long' ? 'text-bull' : 'text-bear')}>
           {props.side === 'long' ? 'Long' : 'Short'} открыт
         </span>
         <span className="text-sm text-text-muted">Свечей прошло: {props.bars}</span>
@@ -36,7 +36,7 @@ export function Playback(props: PlaybackProps) {
         <span className="text-sm font-bold text-text-muted">Сейчас</span>
         <span
           className={cn(
-            'text-2xl font-extrabold tabular-nums',
+            'text-2xl font-semibold tabular-nums',
             positive ? 'text-bull' : 'text-bear',
           )}
         >

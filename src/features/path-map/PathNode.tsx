@@ -40,7 +40,7 @@ export const PathNode = forwardRef<HTMLDivElement, PathNodeProps>(function PathN
   const circle = cn(
     'relative grid place-items-center rounded-full border-4 transition-transform active:translate-y-1',
     locked
-      ? 'border-border bg-surface-2 text-text-muted shadow-[0_6px_0_0_var(--border)]'
+      ? 'border-border bg-surface-2 text-text-muted'
       : cn(colors.bg, 'border-white/40 text-on-mod'),
     status === 'completed' && 'border-xp',
     isCurrent && !locked && 'motion-safe:animate-[node-bounce_2s_ease-in-out_infinite]',
@@ -85,10 +85,10 @@ export const PathNode = forwardRef<HTMLDivElement, PathNodeProps>(function PathN
           placement="right"
           content={
             <div className="flex w-60 flex-col gap-2">
-              <p className="text-xs font-extrabold tracking-wide text-text-muted uppercase">
+              <p className="text-xs font-semibold tracking-wide text-text-muted uppercase">
                 Урок {moduleIndex}.{lesson.index} · ~{lesson.minutes} мин
               </p>
-              <p className="font-extrabold">{lesson.title}</p>
+              <p className="font-semibold">{lesson.title}</p>
               <p className="text-text-muted">{lesson.summary}</p>
               <Link
                 to={status === 'read' ? paths.lessonQuiz(lesson.id) : paths.lesson(lesson.id)}

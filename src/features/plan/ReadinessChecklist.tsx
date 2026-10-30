@@ -75,7 +75,7 @@ export function ReadinessChecklist() {
   return (
     <Card className="my-6 flex flex-col gap-4" aria-label="Проверка готовности">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-xl font-extrabold">Готовность к реальному счёту</h2>
+        <h2 className="text-xl font-semibold">Готовность к реальному счёту</h2>
         <span className="font-bold tabular-nums">
           {passed}/{r.items.length}
         </span>

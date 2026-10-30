@@ -43,7 +43,7 @@ function StreakDetails() {
   const { streak, value, atRisk, activeToday } = useStreakState();
   return (
     <div className="flex w-64 flex-col gap-3">
-      <p className="font-extrabold">
+      <p className="font-semibold">
         {value > 0
           ? `${value} ${plural(value, ['день', 'дня', 'дней'])} подряд`
           : 'Начни серию сегодня'}
@@ -67,12 +67,12 @@ function GoalDetails() {
   return (
     <div className="flex w-60 items-center gap-4">
       <ProgressRing label="Цель дня" value={todayXp / goal} size={72} thickness={8} tone="xp">
-        <span className="font-mono text-xs font-extrabold">
+        <span className="font-mono text-xs font-semibold">
           {Math.min(todayXp, goal)}/{goal}
         </span>
       </ProgressRing>
       <div className="flex flex-col gap-1">
-        <p className="font-extrabold">Цель дня</p>
+        <p className="font-semibold">Цель дня</p>
         <p className="text-sm text-text-muted">
           {todayXp >= goal ? 'Выполнена — отлично!' : `Ещё ${goal - todayXp} XP до цели`}
         </p>
@@ -86,7 +86,7 @@ function LevelDetails() {
   const info = levelFromXp(useProgress((s) => s.xp));
   return (
     <div className="flex w-60 flex-col gap-2">
-      <p className="font-extrabold">
+      <p className="font-semibold">
         Уровень {info.level} · {info.rank}
       </p>
       <ProgressBar label="До следующего уровня" value={info.progress} tone="epic" />
@@ -120,7 +120,7 @@ function XpFlash() {
       // Fading decoration: excluded from contrast checks (e2e/a11y.spec.ts).
       data-transient=""
       className={cn(
-        'pointer-events-none absolute -top-1 right-1 rounded-full bg-xp px-1.5 font-mono text-xs font-extrabold text-on-xp',
+        'pointer-events-none absolute -top-1 right-1 rounded-full bg-xp px-1.5 font-mono text-xs font-semibold text-on-xp',
         !reduced && 'animate-[xp-fly_900ms_ease-out_forwards]',
       )}
     >
@@ -200,7 +200,7 @@ function LevelBadge({ level, size = 'md' }: { level: number; size?: 'md' | 'lg' 
       </svg>
       <span
         className={cn(
-          'relative font-mono font-black text-on-epic',
+          'relative font-mono font-bold text-on-epic',
           size === 'lg' ? 'text-base' : 'text-sm',
         )}
       >
@@ -213,7 +213,7 @@ function LevelBadge({ level, size = 'md' }: { level: number; size?: 'md' | 'lg' 
 /* ---------- Mobile header ---------- */
 
 const chipClass =
-  'relative flex min-h-11 items-center gap-1.5 rounded-xl px-1.5 font-mono text-[0.95rem] font-extrabold tabular-nums text-on-ink transition-colors hover:bg-ink-2';
+  'relative flex min-h-11 items-center gap-1.5 rounded-xl px-1.5 font-mono text-[0.95rem] font-semibold tabular-nums text-on-ink transition-colors hover:bg-ink-2';
 
 export function StreakChip({ side = 'bottom' }: { side?: Side }) {
   const { value, atRisk, activeToday } = useStreakState();
@@ -291,7 +291,7 @@ export function ProgressPanel({ action }: { action?: ReactNode }) {
           >
             <LevelBadge level={info.level} size="lg" />
             <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="truncate font-extrabold text-on-ink">{name || 'Трейдер'}</span>
+              <span className="truncate font-semibold text-on-ink">{name || 'Трейдер'}</span>
               <span className="truncate text-xs font-bold text-on-ink-muted">
                 Ур. {info.level} · {info.rank}
               </span>
@@ -317,7 +317,7 @@ export function ProgressPanel({ action }: { action?: ReactNode }) {
           <button type="button" className={tileClass} aria-label={streakLabel(value)}>
             <FlameBadge active={activeToday} atRisk={atRisk} />
             <span className="flex flex-col leading-none">
-              <span className="font-mono font-extrabold text-on-ink tabular-nums">{value}</span>
+              <span className="font-mono font-semibold text-on-ink tabular-nums">{value}</span>
               <span className="mt-1 text-[0.65rem] font-bold text-on-ink-muted">
                 {plural(value, ['день', 'дня', 'дней'])}
               </span>
@@ -328,7 +328,7 @@ export function ProgressPanel({ action }: { action?: ReactNode }) {
           <button type="button" className={tileClass} aria-label={`Опыт: ${xp} XP`}>
             <GoalRing value={todayXp / goal} />
             <span className="flex flex-col leading-none">
-              <span className="font-mono font-extrabold text-on-ink tabular-nums">
+              <span className="font-mono font-semibold text-on-ink tabular-nums">
                 {formatNumber(xp, 0)}
               </span>
               <span className="mt-1 text-[0.65rem] font-bold text-on-ink-muted">XP</span>

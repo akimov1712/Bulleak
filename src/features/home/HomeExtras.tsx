@@ -16,7 +16,7 @@ export function RecentAchievements() {
   return (
     <section aria-labelledby="recent-achievements" className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 id="recent-achievements" className="text-xl font-extrabold">
+        <h2 id="recent-achievements" className="text-xl font-semibold">
           Достижения
         </h2>
         <Link
@@ -28,7 +28,7 @@ export function RecentAchievements() {
         </Link>
       </div>
       {recent.length === 0 ? (
-        <p className="rounded-2xl border-2 border-dashed border-border p-4 text-text-muted">
+        <p className="rounded-2xl border border-dashed border-border p-4 text-text-muted">
           Пока пусто — первое достижение ждёт тебя в первом уроке.
         </p>
       ) : (
@@ -36,13 +36,13 @@ export function RecentAchievements() {
           {recent.map((a) => (
             <li
               key={a.id}
-              className="flex items-center gap-3 rounded-2xl border-2 border-epic/40 bg-epic-soft p-3"
+              className="flex items-center gap-3 rounded-2xl border border-epic/40 bg-epic-soft p-3"
             >
               <span className="text-3xl" aria-hidden="true">
                 {a.icon}
               </span>
               <span className="min-w-0">
-                <span className="block truncate font-extrabold">{a.title}</span>
+                <span className="block truncate font-semibold">{a.title}</span>
                 <span className="block truncate text-xs text-text-muted">{a.description}</span>
               </span>
             </li>
@@ -77,7 +77,7 @@ export function QuickLinks() {
             <Icon className="size-6" aria-hidden="true" />
           </span>
           <span>
-            <span className="block font-extrabold">{title}</span>
+            <span className="block font-semibold">{title}</span>
             <span className="block text-sm text-text-muted">{text}</span>
           </span>
         </Link>
@@ -90,13 +90,13 @@ export function BackupReminder({ onSnooze }: { onSnooze: () => void }) {
   return (
     <div
       role="note"
-      className="flex flex-col gap-3 rounded-2xl border-2 border-info bg-info-soft p-4 sm:flex-row sm:items-center"
+      className="flex flex-col gap-3 rounded-2xl border border-info bg-info-soft p-4 sm:flex-row sm:items-center"
     >
       <Save className="size-6 shrink-0 text-info" aria-hidden="true" />
       <p className="flex-1">
         Прогресс хранится только в этом браузере. Сделай резервную копию — это займёт секунду.
       </p>
-      <Link to={paths.settings()} className="font-extrabold text-info hover:underline">
+      <Link to={paths.settings()} className="font-semibold text-info hover:underline">
         Сделать копию
       </Link>
       <button

@@ -56,10 +56,10 @@ export function ToolsPage() {
             <li key={c.id}>
               <Link
                 to={paths.tools(c.id)}
-                className="flex h-full flex-col gap-2 rounded-(--radius-card) border-2 border-border bg-surface p-4 transition-colors hover:border-info"
+                className="flex h-full flex-col gap-2 rounded-(--radius-card) border border-border bg-surface p-4 transition-colors hover:border-info"
               >
                 <Icon className="size-7 text-primary-shade" aria-hidden="true" />
-                <span className="text-lg font-extrabold">{c.title}</span>
+                <span className="text-lg font-semibold">{c.title}</span>
                 <span className="text-sm text-text-muted">{c.description}</span>
               </Link>
             </li>

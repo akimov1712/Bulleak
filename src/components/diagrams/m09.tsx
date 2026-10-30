@@ -261,7 +261,7 @@ export function CorrelatedRisk() {
           <Note x={208} y={68} w={134} h={100} className="text-center">
             <div>Рынок падает —</div>
             <div>стопы срабатывают вместе</div>
-            <div className="mt-1 text-[18px] font-extrabold text-bear">≈ −3 % разом</div>
+            <div className="mt-1 text-[18px] font-semibold text-bear">≈ −3 % разом</div>
           </Note>
           <Note x={10} y={196} w={340} h={64}>
             Лимит курса: суммарный открытый риск ≤ 3 %.{' '}

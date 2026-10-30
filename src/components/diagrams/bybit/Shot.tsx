@@ -50,7 +50,7 @@ export function BybitShot({
     <div
       role="group"
       aria-label={`Скриншот Bybit «${screen}»${hotspots.length > 0 ? ' с пояснениями' : ''}`}
-      className="mx-auto overflow-hidden rounded-2xl border-2 border-border bg-surface"
+      className="mx-auto overflow-hidden rounded-2xl border border-border bg-surface"
       style={maxWidth ? { maxWidth } : undefined}
     >
       <div className="relative bg-ink">
@@ -80,12 +80,12 @@ export function BybitShot({
         ))}
       </div>
       {hotspots.length > 0 && (
-        <div className="border-t-2 border-border p-3" aria-live="polite" id={`${id}-note`}>
+        <div className="border-t border-border p-3" aria-live="polite" id={`${id}-note`}>
           {current ? (
             <div className="flex gap-3">
               <HotspotBadge n={current.n} active />
               <div className="text-sm">
-                <p className="font-extrabold">{current.title}</p>
+                <p className="font-semibold">{current.title}</p>
                 <div className="text-text-muted">{current.text}</div>
               </div>
             </div>

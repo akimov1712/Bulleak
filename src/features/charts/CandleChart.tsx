@@ -135,7 +135,7 @@ export function CandleChart(props: CandleChartProps) {
                 aria-checked={dataset === tf}
                 onClick={() => setDataset(tf)}
                 className={cn(
-                  'rounded-full border-2 px-3 py-1 text-sm font-extrabold transition-colors',
+                  'rounded-full border px-3 py-1 text-sm font-semibold transition-colors',
                   dataset === tf
                     ? 'border-info bg-info/15 text-info'
                     : 'border-border bg-surface text-text-muted hover:border-info',
@@ -152,7 +152,7 @@ export function CandleChart(props: CandleChartProps) {
         fallback={(error, reset) => (
           <div
             role="alert"
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-border bg-surface p-4 text-center text-sm text-text-muted"
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-surface p-4 text-center text-sm text-text-muted"
             style={{ height: placeholderHeight }}
           >
             <p>График не загрузился: {error.message}</p>
@@ -378,10 +378,10 @@ function ChartBody(
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border-2 border-border bg-surface"
+      className="relative overflow-hidden rounded-2xl border border-border bg-surface"
       data-testid="candle-chart"
     >
-      <div className="flex flex-col gap-0.5 border-b-2 border-border px-3 py-1.5">
+      <div className="flex flex-col gap-0.5 border-b border-border px-3 py-1.5">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <span className="text-xs font-bold text-text-muted">{legend}</span>
           {interactive && (
@@ -475,7 +475,7 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
     layout: {
       background: { color: p.surface },
       textColor: p.muted,
-      fontFamily: "'Nunito Variable', Nunito, system-ui, sans-serif",
+      fontFamily: "'Inter Variable', Inter, system-ui, sans-serif",
       attributionLogo: true,
       panes: { separatorColor: p.border },
     },

@@ -30,7 +30,7 @@ export function MascotSay({
       <Mascot mood={mood} size={size} />
       <div
         className={cn(
-          'relative rounded-2xl border-2 border-border bg-surface px-4 py-3 font-semibold text-text shadow-[0_3px_0_0_var(--border)]',
+          'relative rounded-2xl border border-border bg-surface px-4 py-3 font-semibold text-text',
           layout === 'side' ? 'mb-6' : 'text-center',
         )}
       >
@@ -40,8 +40,8 @@ export function MascotSay({
           className={cn(
             'absolute size-3.5 rotate-45 border-border bg-surface',
             layout === 'side'
-              ? '-left-[9px] bottom-4 border-b-2 border-l-2'
-              : 'left-1/2 -bottom-[9px] -translate-x-1/2 border-r-2 border-b-2',
+              ? '-left-[9px] bottom-4 border-b border-l'
+              : 'left-1/2 -bottom-[9px] -translate-x-1/2 border-r border-b',
           )}
         />
       </div>

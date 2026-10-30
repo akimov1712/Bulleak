@@ -79,7 +79,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
         note={
           weak.length > 0 ? (
             <section className="w-full text-left" aria-label="Что повторить">
-              <h2 className="mb-2 text-lg font-extrabold">Что повторить</h2>
+              <h2 className="mb-2 text-lg font-semibold">Что повторить</h2>
               <ul className="flex flex-col gap-2">
                 {weak.map(({ lessonId, mistakes }) => {
                   const lesson = courseIndex.getLesson(lessonId);
@@ -87,7 +87,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
                     <li key={lessonId}>
                       <Link
                         to={paths.lesson(lessonId)}
-                        className="flex items-center justify-between gap-3 rounded-2xl border-2 border-border bg-surface px-4 py-3 font-bold hover:border-info"
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3 font-bold hover:border-info"
                       >
                         <span>{lesson?.title ?? lessonId}</span>
                         <span className="shrink-0 text-sm text-bear">
@@ -143,7 +143,7 @@ function ModuleExam({ module }: { module: CourseModule }) {
         Экзамен модуля «{module.title}». Объяснения покажу в конце — отвечай уверенно!
       </MascotSay>
       <Card className="flex flex-col gap-4">
-        <h1 className="text-2xl font-extrabold">Экзамен модуля</h1>
+        <h1 className="text-2xl font-semibold">Экзамен модуля</h1>
         <ul className="flex flex-col gap-3">
           <li className="flex items-center gap-3">
             <ClipboardCheck className="size-6 text-info" aria-hidden="true" />

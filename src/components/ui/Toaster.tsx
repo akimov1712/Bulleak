@@ -21,7 +21,7 @@ function ToastItem({ item }: { item: Toast }) {
   return (
     <div
       className={cn(
-        'pointer-events-auto flex w-full items-start gap-3 rounded-2xl border-2 p-3.5 text-text shadow-lg',
+        'pointer-events-auto flex w-full items-start gap-3 rounded-2xl border p-3.5 text-text shadow-lg',
         tones[item.tone],
       )}
     >
@@ -31,7 +31,7 @@ function ToastItem({ item }: { item: Toast }) {
         </span>
       )}
       <div className="min-w-0 flex-1">
-        <p className="font-extrabold">{item.title}</p>
+        <p className="font-semibold">{item.title}</p>
         {item.description && <p className="text-sm text-text-muted">{item.description}</p>}
       </div>
       <button

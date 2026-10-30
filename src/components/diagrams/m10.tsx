@@ -226,7 +226,7 @@ export function ProcessOutcomeMatrix() {
           <g key={q.title}>
             <Box x={x} y={y} w={w} h={h} tone={q.tone} soft />
             <Note x={x + 8} y={y + 8} w={w - 16} h={h - 12}>
-              <div className="mb-1 text-[14px] font-extrabold">{q.title}</div>
+              <div className="mb-1 text-[14px] font-semibold">{q.title}</div>
               <div className="text-[12px] text-text-muted">{q.text}</div>
             </Note>
           </g>

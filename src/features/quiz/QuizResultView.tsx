@@ -47,7 +47,7 @@ export function QuizResultView({
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center">
       <Mascot mood={result.passed ? 'cheering' : 'sad'} size={150} />
-      <h1 className="text-3xl font-extrabold">
+      <h1 className="text-3xl font-semibold">
         {result.passed
           ? stars === 3
             ? 'Идеально!'
@@ -64,7 +64,7 @@ export function QuizResultView({
         tone={result.passed ? 'primary' : 'bear'}
       >
         <span className="flex flex-col items-center">
-          <span className="font-mono text-3xl font-extrabold">{formatPct(result.ratio, 0)}</span>
+          <span className="font-mono text-3xl font-semibold">{formatPct(result.ratio, 0)}</span>
           <span className="text-xs font-bold text-text-muted">
             {result.correct} из {result.total}
           </span>
@@ -87,13 +87,13 @@ export function QuizResultView({
 
       {mistakes.length > 0 && (
         <section className="mt-6 w-full text-left" aria-label="Разбор ошибок">
-          <h2 className="mb-3 text-xl font-extrabold">
+          <h2 className="mb-3 text-xl font-semibold">
             Разбор: {mistakes.length} {plural(mistakes.length, ['ошибка', 'ошибки', 'ошибок'])}
           </h2>
           <ol className="flex flex-col gap-3">
             {mistakes.map((q) => (
-              <li key={q.id} className="rounded-2xl border-2 border-bear/50 bg-surface p-4">
-                <p className="font-extrabold">{q.prompt}</p>
+              <li key={q.id} className="rounded-2xl border border-bear/50 bg-surface p-4">
+                <p className="font-semibold">{q.prompt}</p>
                 <p className="mt-2 text-sm">
                   <span className="font-bold text-bull">Правильно: </span>
                   {correctAnswerText(q)}

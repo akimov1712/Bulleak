@@ -277,11 +277,11 @@ export function SimChart(props: SimChartProps) {
         data-testid="sim-chart"
         role="group"
         aria-label="График тренажёра: видны только свечи до текущего момента"
-        className="overflow-hidden rounded-2xl border-2 border-border bg-surface"
+        className="overflow-hidden rounded-2xl border border-border bg-surface"
         style={{ height, touchAction: 'pan-y' }}
       />
       <ChartControls
-        className="absolute top-2 left-2 z-10 rounded-xl border-2 border-border bg-surface/90 backdrop-blur-sm"
+        className="absolute top-2 left-2 z-10 rounded-xl border border-border bg-surface/90 backdrop-blur-sm"
         getChart={() => builtRef.current?.api ?? null}
         total={shownBars}
         onReset={() => {
@@ -316,7 +316,7 @@ function buildChart(
     layout: {
       background: { color: p.surface },
       textColor: p.muted,
-      fontFamily: "'Nunito Variable', Nunito, system-ui, sans-serif",
+      fontFamily: "'Inter Variable', Inter, system-ui, sans-serif",
       attributionLogo: true,
       panes: { separatorColor: p.border },
     },

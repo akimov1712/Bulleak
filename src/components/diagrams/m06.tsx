@@ -407,7 +407,7 @@ export function DivergenceTypes() {
               <div className="text-center text-[12px] leading-tight">
                 <div
                   className={
-                    dv.tone === 'bull' ? 'font-extrabold text-bull' : 'font-extrabold text-bear'
+                    dv.tone === 'bull' ? 'font-semibold text-bull' : 'font-semibold text-bear'
                   }
                 >
                   {dv.name}

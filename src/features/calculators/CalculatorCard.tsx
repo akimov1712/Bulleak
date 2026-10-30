@@ -27,7 +27,7 @@ export function CalculatorCard(props: CalculatorCardProps) {
     <Card className="flex flex-col gap-4" role="group" aria-labelledby={`${id}-title`}>
       <div className="flex items-center gap-2">
         <Icon className="size-5 text-primary-shade" aria-hidden="true" />
-        <h3 id={`${id}-title`} className="text-lg font-extrabold">
+        <h3 id={`${id}-title`} className="text-lg font-semibold">
           {props.title}
         </h3>
       </div>
@@ -42,7 +42,7 @@ export function CalculatorCard(props: CalculatorCardProps) {
         )}
       </div>
       {props.howTo && (
-        <details className="rounded-2xl border-2 border-border bg-surface-2 p-3 text-sm">
+        <details className="rounded-2xl border border-border bg-surface-2 p-3 text-sm">
           <summary className="cursor-pointer font-bold">Как считается</summary>
           <div className="mt-2 flex flex-col gap-2">{props.howTo}</div>
         </details>
@@ -94,7 +94,7 @@ export function ResultValue({
   return (
     <div>
       <p className="text-sm font-bold text-text-muted">{label}</p>
-      <p className="text-3xl font-extrabold break-words tabular-nums">{value}</p>
+      <p className="text-3xl font-semibold break-words tabular-nums">{value}</p>
       {sub && <p className="text-sm text-text-muted">{sub}</p>}
     </div>
   );

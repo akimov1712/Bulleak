@@ -27,12 +27,12 @@ export function ContinueCard({ step }: { step: NextStep }) {
           <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/30">
             <ModuleIcon name={module?.icon ?? ''} className="size-7" />
           </span>
-          <p className="text-sm font-extrabold tracking-wide uppercase">
+          <p className="text-sm font-semibold tracking-wide uppercase">
             {fresh ? 'Начни отсюда' : 'Продолжить'} · Модуль {module?.index}. {module?.title}
           </p>
         </div>
         <div>
-          <p className="text-2xl leading-tight font-extrabold md:text-3xl">{step.lesson.title}</p>
+          <p className="text-2xl leading-tight font-semibold md:text-3xl">{step.lesson.title}</p>
           <p className="mt-1 font-semibold opacity-90">
             {step.status === 'read'
               ? 'Урок прочитан — остался тест'
@@ -43,7 +43,7 @@ export function ContinueCard({ step }: { step: NextStep }) {
           to={
             step.status === 'read' ? paths.lessonQuiz(step.lesson.id) : paths.lesson(step.lesson.id)
           }
-          className="self-start rounded-(--radius-btn) bg-surface px-6 py-3 text-lg font-extrabold text-text shadow-[0_4px_0_0_rgb(0_0_0/0.2)] transition-transform active:translate-y-1 active:shadow-none"
+          className="self-start rounded-(--radius-btn) bg-surface px-6 py-3 text-lg font-semibold text-text transition-colors hover:bg-surface-2"
         >
           {step.status === 'read'
             ? 'Пройти тест'
@@ -83,11 +83,11 @@ export function ContinueCard({ step }: { step: NextStep }) {
   return (
     <section
       aria-label="Продолжить обучение"
-      className="flex flex-col gap-4 rounded-(--radius-card) border-2 border-xp-shade bg-surface p-5 shadow-[0_4px_0_0_var(--xp-shade)] md:p-6"
+      className="flex flex-col gap-4 rounded-(--radius-card) border border-xp-shade bg-surface p-5 md:p-6"
     >
       <div className="flex items-center gap-3 text-xp-shade">
         {icon}
-        <p className="text-2xl font-extrabold text-text">{title}</p>
+        <p className="text-2xl font-semibold text-text">{title}</p>
       </div>
       <p className="text-text-muted">{text}</p>
       <Link to={to} className={cn(buttonClass({ variant: 'xp', size: 'lg' }), 'self-start')}>

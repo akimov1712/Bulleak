@@ -60,12 +60,10 @@ export function CompoundingCalc() {
             />
             <EquityCurves curves={[result.balances]} label="Рост депозита по месяцам" height={96} />
             {level && (
-              <div
-                className={cn('flex gap-3 rounded-2xl border-2 p-3 text-sm', VERDICT[level].tone)}
-              >
+              <div className={cn('flex gap-3 rounded-2xl border p-3 text-sm', VERDICT[level].tone)}>
                 <AlertTriangle className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
                 <div>
-                  <p className="font-extrabold">{VERDICT[level].title}</p>
+                  <p className="font-semibold">{VERDICT[level].title}</p>
                   <p>{VERDICT[level].text}</p>
                 </div>
               </div>
@@ -111,7 +109,7 @@ export function CompoundingCalc() {
             onClick={() => set({ monthlyPct: p })}
             aria-pressed={inputs.monthlyPct === p}
             className={cn(
-              'rounded-full border-2 px-3 py-1 font-bold transition-colors',
+              'rounded-full border px-3 py-1 font-bold transition-colors',
               inputs.monthlyPct === p
                 ? 'border-primary-shade bg-primary text-on-primary'
                 : 'border-border bg-surface hover:border-primary-shade',

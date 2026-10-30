@@ -46,7 +46,7 @@ export function DrawdownCalc() {
                 ['Рост, чтобы отыграть серию', `+${formatNumber(streakRecovery, 1)}%`],
               ]}
             />
-            <p className="mt-3 rounded-2xl border-2 border-border bg-surface-2 p-3 text-sm">
+            <p className="mt-3 rounded-2xl border border-border bg-surface-2 p-3 text-sm">
               Правило курса: при просадке −10% риск на сделку уменьшить вдвое, при −15% — пауза и
               разбор сделок.
             </p>

@@ -12,7 +12,7 @@ const INDICATOR_LABEL: Record<keyof SimIndicators, string> = {
 
 const chip = (active: boolean) =>
   cn(
-    'inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
+    'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
     active ? 'border-info bg-info/15 text-info' : 'border-border bg-surface hover:border-info',
   );
 

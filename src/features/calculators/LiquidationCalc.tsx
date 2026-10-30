@@ -85,12 +85,12 @@ export function LiquidationCalc() {
             />
             {stop !== null &&
               (stopTooFar ? (
-                <p className="mt-3 rounded-2xl border-2 border-bear bg-bear-soft p-3 text-sm">
+                <p className="mt-3 rounded-2xl border border-bear bg-bear-soft p-3 text-sm">
                   <b>Стоп дальше ликвидации.</b> Позицию закроют принудительно раньше, чем сработает
                   стоп: уменьши плечо или придвинь стоп.
                 </p>
               ) : (
-                <p className="mt-3 rounded-2xl border-2 border-border bg-surface-2 p-3 text-sm">
+                <p className="mt-3 rounded-2xl border border-border bg-surface-2 p-3 text-sm">
                   Стоп сработает раньше ликвидации — так и должно быть.
                 </p>
               ))}

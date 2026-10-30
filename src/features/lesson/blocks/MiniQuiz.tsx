@@ -29,13 +29,13 @@ export function MiniQuiz({ question }: { question: Question }) {
   return (
     <section
       aria-labelledby={titleId}
-      className="my-8 rounded-(--radius-card) border-2 border-info bg-surface p-5 shadow-[0_4px_0_0_var(--info)]"
+      className="my-8 rounded-(--radius-card) border border-info bg-surface p-5"
     >
-      <p className="mb-1 flex items-center gap-2 text-sm font-extrabold tracking-wide text-info uppercase">
+      <p className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-wide text-info uppercase">
         <HelpCircle className="size-5" aria-hidden="true" />
         Мини-проверка
       </p>
-      <h3 id={titleId} className="mb-4 text-lg font-extrabold">
+      <h3 id={titleId} className="mb-4 text-lg font-semibold">
         {question.prompt}
       </h3>
       <QuestionView
@@ -59,7 +59,7 @@ export function MiniQuiz({ question }: { question: Question }) {
               role="status"
               className={cn('rounded-2xl p-3', verdict ? 'bg-bull-soft' : 'bg-bear-soft')}
             >
-              <p className={cn('font-extrabold', verdict ? 'text-bull' : 'text-bear')}>
+              <p className={cn('font-semibold', verdict ? 'text-bull' : 'text-bear')}>
                 {verdict ? 'Верно!' : `Правильный ответ: ${correctAnswerText(question)}`}
               </p>
               <p className="mt-1 text-text-muted">{question.explanation}</p>

@@ -93,7 +93,7 @@ export function FeesCalc() {
             {riskShare !== null && (
               <p
                 className={cn(
-                  'mt-3 rounded-2xl border-2 p-3 text-sm',
+                  'mt-3 rounded-2xl border p-3 text-sm',
                   riskShare > 20 ? 'border-warn bg-warn-soft' : 'border-border bg-surface-2',
                 )}
               >

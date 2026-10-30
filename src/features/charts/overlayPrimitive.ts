@@ -173,7 +173,7 @@ export class OverlayPrimitive implements ISeriesPrimitive<Time> {
     private items: OverlayItems,
     /** Backdrop behind labels, e.g. the chart surface colour with some transparency. */
     readonly labelBackground = 'rgba(255, 255, 255, 0.85)',
-    readonly font = "600 12px 'Nunito Variable', Nunito, system-ui, sans-serif",
+    readonly font = "600 12px 'Inter Variable', Inter, system-ui, sans-serif",
   ) {}
 
   attached(param: SeriesAttachedParameter<Time>) {

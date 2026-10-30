@@ -11,7 +11,7 @@ export function H2({ children, className, ...rest }: ComponentProps<'h2'>) {
       id={slugify(textOf(children))}
       data-toc
       className={cn(
-        'mt-12 mb-4 scroll-mt-24 text-2xl font-extrabold tracking-tight md:text-[1.75rem]',
+        'mt-12 mb-4 scroll-mt-24 text-2xl font-semibold tracking-tight md:text-[1.75rem]',
         className,
       )}
       {...rest}
@@ -25,7 +25,7 @@ export function H3({ children, className, ...rest }: ComponentProps<'h3'>) {
   return (
     <h3
       id={slugify(textOf(children))}
-      className={cn('mt-8 mb-3 scroll-mt-24 text-xl font-extrabold', className)}
+      className={cn('mt-8 mb-3 scroll-mt-24 text-xl font-semibold', className)}
       {...rest}
     >
       {children}
@@ -47,7 +47,7 @@ export function Ol({ className, ...rest }: ComponentProps<'ol'>) {
   return (
     <ol
       className={cn(
-        'my-4 list-decimal space-y-2 pl-6 marker:font-extrabold marker:text-primary',
+        'my-4 list-decimal space-y-2 pl-6 marker:font-semibold marker:text-primary',
         className,
       )}
       {...rest}
@@ -60,7 +60,7 @@ export function Li({ className, ...rest }: ComponentProps<'li'>) {
 }
 
 export function Strong({ className, ...rest }: ComponentProps<'strong'>) {
-  return <strong className={cn('font-extrabold text-text', className)} {...rest} />;
+  return <strong className={cn('font-semibold text-text', className)} {...rest} />;
 }
 
 export function A({ className, href, children, ...rest }: ComponentProps<'a'>) {
@@ -97,7 +97,7 @@ export function Table({ className, ...rest }: ComponentProps<'table'>) {
       tabIndex={0}
       role="region"
       aria-label="Таблица"
-      className="my-6 overflow-x-auto rounded-2xl border-2 border-border"
+      className="my-6 overflow-x-auto rounded-2xl border border-border"
     >
       <table
         className={cn('w-full border-collapse text-left text-[0.95rem]', className)}
@@ -111,7 +111,7 @@ export function Th({ className, ...rest }: ComponentProps<'th'>) {
   return (
     <th
       className={cn(
-        'border-b-2 border-border bg-surface-2 px-4 py-2.5 font-extrabold whitespace-nowrap',
+        'border-b border-border bg-surface-2 px-4 py-2.5 font-semibold whitespace-nowrap',
         className,
       )}
       {...rest}
@@ -148,5 +148,5 @@ export function Code({ className, ...rest }: ComponentProps<'code'>) {
 }
 
 export function Hr() {
-  return <hr className="my-10 border-t-2 border-dashed border-border" />;
+  return <hr className="my-10 border-t border-dashed border-border" />;
 }

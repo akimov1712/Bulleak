@@ -57,7 +57,7 @@ export function RiskRewardCalc() {
             />
             <p
               className={cn(
-                'mt-3 rounded-2xl border-2 p-3 text-sm',
+                'mt-3 rounded-2xl border p-3 text-sm',
                 result.rr < 1 ? 'border-warn bg-warn-soft' : 'border-border bg-surface-2',
               )}
             >
