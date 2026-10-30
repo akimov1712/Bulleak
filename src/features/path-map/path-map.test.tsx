@@ -6,25 +6,6 @@ import { routes } from '@/app/routes';
 import { useProgress } from '@/store/progressStore';
 import { useUi } from '@/store/uiStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
-import { AMPLITUDE, COLUMN_WIDTH, nodeOffset, nodePoints, pathThrough, ROW_HEIGHT } from './layout';
-
-describe('path layout', () => {
-  it('zigzags within the column and keeps rows evenly spaced', () => {
-    const pts = nodePoints(8);
-    for (const p of pts) {
-      expect(Math.abs(p.x - COLUMN_WIDTH / 2)).toBeLessThanOrEqual(AMPLITUDE);
-    }
-    expect((pts[1]?.y ?? 0) - (pts[0]?.y ?? 0)).toBe(ROW_HEIGHT);
-    expect(nodeOffset(0)).toBe(0);
-    expect(new Set(pts.map((p) => p.x)).size).toBeGreaterThan(2);
-  });
-
-  it('draws one curve segment per gap', () => {
-    expect(pathThrough([])).toBe('');
-    expect(pathThrough(nodePoints(1))).toMatch(/^M [\d.]+ [\d.]+$/);
-    expect(pathThrough(nodePoints(4)).match(/ C /g)).toHaveLength(3);
-  });
-});
 
 // The app shell (RootLayout) already renders the Toaster.
 const renderMap = () =>
@@ -44,18 +25,34 @@ describe('PathPage', () => {
       await screen.findByRole('heading', { level: 1, name: 'Карта курса' }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /^Модуль \d+/ })).toHaveLength(13);
-    expect(
-      screen.getByRole('button', { name: /^Урок 0\.1: Добро пожаловать/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Урок 0\.1: Добро пожаловать/ })).toHaveAttribute(
+      'href',
+      '/lesson/m00-l01',
+    );
     expect(screen.getByRole('button', { name: /^Урок 0\.2: .*\(закрыт\)$/ })).toBeInTheDocument();
-    expect(screen.getByText('Начнём?')).toBeInTheDocument();
+    expect(screen.getByText('Следующий урок')).toBeInTheDocument();
+    // Only the module in progress is expanded; closed modules show their header.
+    expect(screen.getByRole('button', { name: 'Уроки модуля 0' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Уроки модуля 5' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
   });
 
-  it('opens a popover with the lesson action for an available node', async () => {
+  it('expands a collapsed module on demand', async () => {
     const user = userEvent.setup();
     renderMap();
-    await user.click(await screen.findByRole('button', { name: /^Урок 0\.1:/ }));
-    expect(await screen.findByRole('link', { name: 'Начать урок' })).toHaveAttribute(
+    await user.click(await screen.findByRole('button', { name: 'Уроки модуля 1' }));
+    expect(screen.getByRole('button', { name: /^Урок 1\.1: .*\(закрыт\)$/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Экзамен модуля 1 (закрыт)' })).toBeInTheDocument();
+  });
+
+  it('continues from the summary card', async () => {
+    renderMap();
+    expect(await screen.findByRole('link', { name: 'Продолжить · урок 0.1' })).toHaveAttribute(
       'href',
       '/lesson/m00-l01',
     );
@@ -79,7 +76,7 @@ describe('PathPage', () => {
     });
     renderMap();
     expect(await screen.findByRole('img', { name: '2 из 3 звёзд' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Урок 0\.2: Реалистичные/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Урок 0\.2: Реалистичные/ })).toBeInTheDocument();
     expect(within(screen.getByRole('main')).getByText('1/62')).toBeInTheDocument();
   });
 

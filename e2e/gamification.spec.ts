@@ -29,11 +29,10 @@ test.describe('rewards after a lesson (E4)', () => {
     await expect(page.getByRole('button', { name: /^Профиль: уровень 2,/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Серия: 1 день подряд' })).toBeVisible();
 
-    // Map: first node completed with 3 stars, second open
+    // Map: first lesson completed with 3 stars, second open
     await page.goto('./#/path');
     await expect(page.getByRole('img', { name: '3 из 3 звёзд' }).first()).toBeVisible();
-    await page.getByRole('button', { name: /^Урок 0\.2: Реалистичные/ }).click();
-    await expect(page.getByRole('link', { name: 'Начать урок' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Урок 0\.2: Реалистичные/ })).toHaveAttribute(
       'href',
       '#/lesson/m00-l02',
     );

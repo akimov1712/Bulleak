@@ -5,12 +5,15 @@ import { PageHeader } from '@/app/layout/PageHeader';
 import { paths } from '@/app/paths';
 import { courseIndex } from '@/content/courseIndex';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { buttonClass, cardClass } from '@/components/ui/styles';
 import { cn } from '@/lib/cn';
 import {
   courseCompletion,
   currentLesson,
   isExamPassed,
   isFinalAvailable,
+  isModuleFinished,
+  lessonStatus,
 } from '@/lib/progress/unlock';
 import { ModuleSection } from '@/features/path-map/ModuleSection';
 import { useUnlockContext } from '@/hooks/useUnlock';
@@ -22,13 +25,15 @@ export function PathPage() {
   const ctx = useUnlockContext();
   const lessons = useProgress((s) => s.lessons);
   const current = currentLesson(ctx);
+  const currentModule = current ? courseIndex.getModule(current.moduleId) : undefined;
   const { done: completed, total } = courseCompletion(ctx);
+  const modulesDone = courseIndex.modules.filter((m) => isModuleFinished(ctx, m)).length;
   const finalOpen = isFinalAvailable(ctx);
   const finalPassed = isExamPassed(ctx, 'final');
 
   // Scroll the current lesson into view once on arrival.
-  const [currentEl, setCurrentEl] = useState<HTMLDivElement | null>(null);
-  const currentRef = useCallback((el: HTMLDivElement | null) => setCurrentEl(el), []);
+  const [currentEl, setCurrentEl] = useState<HTMLLIElement | null>(null);
+  const currentRef = useCallback((el: HTMLLIElement | null) => setCurrentEl(el), []);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     if (!currentEl || scrolled) return;
@@ -38,83 +43,111 @@ export function PathPage() {
   }, [currentEl, scrolled]);
 
   return (
-    <div className="flex flex-col gap-10">
-      <div>
-        <PageHeader title="Карта курса" subtitle="13 модулей · 62 урока" />
-        <div className="flex items-center gap-3">
-          <ProgressBar
-            label="Пройдено уроков"
-            value={completed / total}
-            valueText={`${completed} из ${total}`}
-            size="lg"
-          />
-          <span className="shrink-0 font-mono text-sm font-semibold text-text-muted">
-            {completed}/{total}
-          </span>
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Карта курса" subtitle="13 модулей · 62 урока · экзамены и финал" />
+
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex flex-col gap-3">
+          {courseIndex.modules.map((module) => (
+            <ModuleSection
+              key={module.id}
+              module={module}
+              ctx={ctx}
+              lessons={lessons}
+              currentLessonId={current?.id}
+              currentRef={currentRef}
+            />
+          ))}
         </div>
-      </div>
 
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-14">
-        {courseIndex.modules.map((module) => (
-          <ModuleSection
-            key={module.id}
-            module={module}
-            ctx={ctx}
-            lessons={lessons}
-            currentLessonId={current?.id}
-            currentRef={currentRef}
-          />
-        ))}
-
-        <section aria-label="Финал" className="flex flex-col items-center gap-4 pb-6 text-center">
-          <Link
-            to={paths.finalExam()}
-            aria-disabled={!finalOpen}
-            aria-label={
-              finalPassed
-                ? 'Финальный экзамен: сдан'
-                : finalOpen
-                  ? 'Финальный экзамен: открыт'
-                  : 'Финальный экзамен: закрыт'
-            }
-            onClick={(e) => {
-              if (!finalOpen) e.preventDefault();
-            }}
-            className={cn(
-              'grid size-28 place-items-center rounded-full border-4',
-              finalPassed
-                ? 'border-xp-shade bg-xp text-on-xp'
-                : finalOpen
-                  ? 'border-epic bg-epic-soft text-epic'
-                  : 'cursor-not-allowed border-border bg-surface-2 text-text-muted',
+        <aside className="flex flex-col gap-3 lg:sticky lg:top-20 lg:order-last max-lg:order-first">
+          <section aria-label="Прогресс курса" className={cn(cardClass(), 'flex flex-col gap-3')}>
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-semibold">Прогресс</h2>
+              <span className="font-mono text-sm text-text-muted tabular-nums">
+                {completed}/{total}
+              </span>
+            </div>
+            <ProgressBar
+              label="Пройдено уроков"
+              value={completed / total}
+              valueText={`${completed} из ${total}`}
+              size="sm"
+            />
+            <dl className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <dt className="text-xs text-text-muted">Уроков</dt>
+                <dd className="font-mono tabular-nums">{Math.round((completed / total) * 100)}%</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-text-muted">Модулей</dt>
+                <dd className="font-mono tabular-nums">{modulesDone} / 13</dd>
+              </div>
+            </dl>
+            {current && currentModule && (
+              <Link
+                to={
+                  lessonStatus(ctx, current.id) === 'read'
+                    ? paths.lessonQuiz(current.id)
+                    : paths.lesson(current.id)
+                }
+                className={buttonClass({ fullWidth: true })}
+              >
+                Продолжить · урок {currentModule.index}.{current.index}
+              </Link>
             )}
+          </section>
+
+          <section
+            aria-label="Финал"
+            className={cn(cardClass(), 'flex flex-col gap-3', finalPassed && 'border-xp/60')}
           >
-            {finalOpen || finalPassed ? (
-              <GraduationCap className="size-14" aria-hidden="true" />
-            ) : (
-              <Lock className="size-10" aria-hidden="true" />
-            )}
-          </Link>
-          <div>
-            <h2 className="text-2xl font-semibold">Финальный экзамен</h2>
-            <p className="text-text-muted">
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'grid size-10 shrink-0 place-items-center rounded-(--radius-btn)',
+                  finalPassed
+                    ? 'bg-xp text-on-xp'
+                    : finalOpen
+                      ? 'bg-epic-soft text-epic'
+                      : 'bg-surface-2 text-text-muted',
+                )}
+              >
+                {finalOpen || finalPassed ? (
+                  <GraduationCap className="size-5" aria-hidden="true" />
+                ) : (
+                  <Lock className="size-4" aria-hidden="true" />
+                )}
+              </span>
+              <h2 className="font-semibold">Финальный экзамен</h2>
+            </div>
+            <p className="text-sm text-text-muted">
               {finalPassed
                 ? 'Курс пройден!'
                 : finalOpen
                   ? 'Все модули сданы — время финала!'
                   : 'Откроется после экзаменов всех модулей.'}
             </p>
-          </div>
-          {finalPassed && (
-            <Link
-              to={paths.certificate()}
-              className="flex min-h-11 items-center gap-2 font-semibold text-info hover:underline"
-            >
-              <Award className="size-5" aria-hidden="true" />
-              Мой сертификат
-            </Link>
-          )}
-        </section>
+            {(finalOpen || finalPassed) && (
+              <Link
+                to={paths.finalExam()}
+                aria-label={finalPassed ? 'Финальный экзамен: сдан' : 'Финальный экзамен: открыт'}
+                className={buttonClass({ variant: 'secondary', fullWidth: true })}
+              >
+                {finalPassed ? 'Пересдать финал' : 'К финалу'}
+              </Link>
+            )}
+            {finalPassed && (
+              <Link
+                to={paths.certificate()}
+                className="flex min-h-11 items-center gap-2 text-sm font-semibold text-info hover:underline"
+              >
+                <Award className="size-4" aria-hidden="true" />
+                Мой сертификат
+              </Link>
+            )}
+          </section>
+        </aside>
       </div>
     </div>
   );

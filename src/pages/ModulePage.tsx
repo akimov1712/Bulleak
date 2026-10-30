@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router';
-import { Check, ChevronRight, Clock, Lock, PlayCircle, Trophy } from 'lucide-react';
+import { ChevronRight, Clock, Lock, Trophy } from 'lucide-react';
 import { courseIndex } from '@/content/courseIndex';
 import { cn } from '@/lib/cn';
 import { formatPct, plural } from '@/lib/format';
@@ -7,18 +7,18 @@ import {
   isExamAvailable,
   isExamPassed,
   isModuleUnlocked,
+  currentLesson,
   lessonStatus,
   moduleCompletion,
   starsForScore,
 } from '@/lib/progress/unlock';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { ModuleIcon } from '@/components/ui/ModuleIcon';
-import { ModuleCover } from '@/components/covers/ModuleCover';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { EmptyState } from '@/components/ui/Skeleton';
-import { buttonClass } from '@/components/ui/styles';
+import { buttonClass, cardClass } from '@/components/ui/styles';
 import { Mascot } from '@/components/mascot/Mascot';
-import { Stars } from '@/components/ui/Stars';
+import { LessonRow } from '@/features/path-map/CourseRows';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useProgress } from '@/store/progressStore';
@@ -54,12 +54,13 @@ export function ModulePage() {
   const examOpen = isExamAvailable(ctx, module.id);
   const examPassed = isExamPassed(ctx, module.id);
   const minutes = module.lessons.reduce((sum, l) => sum + l.minutes, 0);
+  const current = currentLesson(ctx);
 
   return (
     <div className="flex flex-col gap-6">
       <nav
         aria-label="Хлебные крошки"
-        className="flex items-center gap-1 text-sm font-bold text-text-muted"
+        className="flex items-center gap-1 text-sm font-medium text-text-muted"
       >
         <Link to={paths.path()} className="inline-flex min-h-11 items-center hover:text-text">
           Карта курса
@@ -68,102 +69,72 @@ export function ModulePage() {
         <span>Модуль {module.index}</span>
       </nav>
 
-      <header
-        className={cn('rounded-(--radius-card) p-5 text-on-mod md:p-7', colors.bg, colors.shadow)}
-      >
+      <header className="flex flex-col gap-4">
         <div className="flex items-start gap-4">
-          <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-white/30">
-            <ModuleIcon name={module.icon} className="size-8" />
-          </div>
+          <span
+            className={cn(
+              'grid size-12 shrink-0 place-items-center rounded-(--radius-btn) border border-border bg-surface',
+              unlocked ? colors.text : 'text-text-muted',
+            )}
+          >
+            <ModuleIcon name={module.icon} className="size-6" />
+          </span>
           <div className="min-w-0">
-            <p className="text-sm font-semibold tracking-wide uppercase">Модуль {module.index}</p>
-            <h1 className="text-3xl leading-tight font-semibold md:text-4xl">{module.title}</h1>
+            <p className="font-mono text-xs text-text-muted">
+              Модуль {String(module.index).padStart(2, '0')}
+            </p>
+            <h1 className="text-2xl leading-tight font-semibold tracking-tight md:text-3xl">
+              {module.title}
+            </h1>
+            <p className="mt-1 text-text-muted">{module.description}</p>
           </div>
-          <ModuleCover moduleId={module.id} className="ml-auto w-24 sm:w-36 md:w-44" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between text-sm text-text-muted">
+            <span>
+              {completion.done} из {completion.total}{' '}
+              {plural(completion.total, ['урока', 'уроков', 'уроков'])} пройдено
+            </span>
+            <span className="flex items-center gap-1 font-mono text-xs">
+              <Clock className="size-3.5" aria-hidden="true" />~{minutes} мин
+            </span>
+          </div>
+          <ProgressBar
+            label="Прогресс модуля"
+            value={completion.ratio}
+            valueText={`${completion.done} из ${completion.total}`}
+            size="sm"
+          />
         </div>
       </header>
 
-      <p className="text-lg text-text-muted">{module.description}</p>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between text-sm font-bold text-text-muted">
-          <span>
-            {completion.done} из {completion.total}{' '}
-            {plural(completion.total, ['урока', 'уроков', 'уроков'])} пройдено
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="size-4" aria-hidden="true" />~{minutes} мин
-          </span>
-        </div>
-        <ProgressBar
-          label="Прогресс модуля"
-          value={completion.ratio}
-          valueText={`${completion.done} из ${completion.total}`}
-        />
-      </div>
-
       {!unlocked && previous && (
-        <p className="flex items-center gap-3 rounded-2xl border border-dashed border-border p-4 text-text-muted">
+        <p className="flex items-center gap-3 rounded-(--radius-card) border border-dashed border-border p-4 text-sm text-text-muted">
           <Lock className="size-5 shrink-0" aria-hidden="true" />
           Модуль откроется после {previous.hasExam ? 'экзамена' : 'прохождения'} модуля{' '}
           {previous.index} «{previous.title}».
         </p>
       )}
 
-      <ol className="flex flex-col gap-3" aria-label="Уроки модуля">
+      <ol
+        className={cn(cardClass({ padding: 'none' }), 'overflow-hidden py-1')}
+        aria-label="Уроки модуля"
+      >
         {module.lessons.map((lesson) => {
           const status = lessonStatus(ctx, lesson.id);
-          const lp = lessonsProgress[lesson.id];
-          const stars = starsForScore(lp?.quizBest ?? 0, status === 'completed');
-          const body = (
-            <>
-              <span
-                className={cn(
-                  'grid size-11 shrink-0 place-items-center rounded-full border',
-                  status === 'completed' && 'border-bull bg-bull text-bull-soft',
-                  (status === 'available' || status === 'read') &&
-                    cn(colors.bg, 'border-transparent text-on-mod'),
-                  status === 'locked' && 'border-border bg-surface-2 text-text-muted',
-                )}
-              >
-                {status === 'completed' ? (
-                  <Check className="size-5" strokeWidth={2.8} aria-hidden="true" />
-                ) : status === 'locked' ? (
-                  <Lock className="size-5" strokeWidth={2.8} aria-hidden="true" />
-                ) : (
-                  <PlayCircle className="size-5" strokeWidth={2.8} aria-hidden="true" />
-                )}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-xs font-semibold tracking-wide text-text-muted uppercase">
-                  Урок {module.index}.{lesson.index} · ~{lesson.minutes} мин
-                  {status === 'read' && ' · остался тест'}
-                </span>
-                <span className="block font-semibold">{lesson.title}</span>
-                <span className="mt-0.5 block text-sm text-text-muted">{lesson.summary}</span>
-              </span>
-              {status === 'completed' && <Stars count={stars} size="size-5" />}
-            </>
-          );
           return (
-            <li key={lesson.id}>
-              {status === 'locked' ? (
-                <div
-                  aria-disabled="true"
-                  className="flex items-center gap-4 rounded-2xl border border-border p-4 opacity-60"
-                >
-                  {body}
-                  <span className="sr-only">(закрыт)</span>
-                </div>
-              ) : (
-                <Link
-                  to={paths.lesson(lesson.id)}
-                  className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 transition-transform hover:-translate-y-0.5"
-                >
-                  {body}
-                </Link>
+            <LessonRow
+              key={lesson.id}
+              lesson={lesson}
+              moduleIndex={module.index}
+              status={status}
+              stars={starsForScore(
+                lessonsProgress[lesson.id]?.quizBest ?? 0,
+                status === 'completed',
               )}
-            </li>
+              isCurrent={lesson.id === current?.id}
+              withSummary
+            />
           );
         })}
       </ol>
@@ -172,20 +143,21 @@ export function ModulePage() {
         <section
           aria-label="Экзамен модуля"
           className={cn(
-            'flex flex-col gap-4 rounded-(--radius-card) border p-5 sm:flex-row sm:items-center',
-            examPassed ? 'border-xp bg-surface' : 'border-dashed border-border',
+            cardClass(),
+            'flex flex-col gap-4 sm:flex-row sm:items-center',
+            examPassed ? 'border-xp/60' : !examOpen && 'border-dashed',
           )}
         >
           <Trophy
             className={cn(
-              'size-12 shrink-0',
-              examPassed ? 'fill-xp text-xp-shade' : 'text-text-muted',
+              'size-8 shrink-0',
+              examPassed ? 'fill-xp text-xp' : examOpen ? 'text-xp' : 'text-text-muted',
             )}
             aria-hidden="true"
           />
           <div className="flex-1">
-            <h2 className="text-xl font-semibold">Экзамен модуля</h2>
-            <p className="text-text-muted">
+            <h2 className="font-semibold">Экзамен модуля</h2>
+            <p className="text-sm text-text-muted">
               {examPassed
                 ? `Сдан! Лучший результат — ${formatPct(examProgress?.best ?? 0, 0)}.`
                 : examOpen
@@ -196,7 +168,7 @@ export function ModulePage() {
           {examOpen && (
             <Link
               to={paths.exam(module.id)}
-              className={buttonClass({ variant: examPassed ? 'secondary' : 'xp', size: 'lg' })}
+              className={buttonClass({ variant: examPassed ? 'secondary' : 'primary' })}
             >
               {examPassed ? 'Пересдать' : 'Сдать экзамен'}
             </Link>

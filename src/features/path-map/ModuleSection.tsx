@@ -1,15 +1,13 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { Lock, Trophy } from 'lucide-react';
+import { ChevronDown, Lock } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { moduleColors } from '@/components/ui/moduleColors';
 import { ModuleIcon } from '@/components/ui/ModuleIcon';
-import { ModuleCover } from '@/components/covers/ModuleCover';
-import { Mascot } from '@/components/mascot/Mascot';
+import { cardClass } from '@/components/ui/styles';
 import { paths } from '@/app/paths';
-import { toast } from '@/store/uiStore';
 import {
-  isExamAvailable,
-  isExamPassed,
+  isModuleFinished,
   isModuleUnlocked,
   lessonStatus,
   moduleCompletion,
@@ -18,19 +16,17 @@ import {
 } from '@/lib/progress/unlock';
 import type { CourseModule, LessonId } from '@/types/course';
 import type { LessonProgress } from '@/types/progress';
-import { COLUMN_WIDTH, NODE_SIZE, nodePoints, pathThrough, ROW_HEIGHT } from './layout';
-import { PathNode } from './PathNode';
+import { ExamRow, LessonRow } from './CourseRows';
 
 interface ModuleSectionProps {
   module: CourseModule;
   ctx: UnlockContext;
   lessons: Partial<Record<LessonId, LessonProgress>>;
   currentLessonId?: LessonId;
-  currentRef: (el: HTMLDivElement | null) => void;
+  currentRef: (el: HTMLLIElement | null) => void;
 }
 
-const EXAM_SIZE = 88;
-
+/** One module of the course map: header with progress and a list of lessons and the exam. */
 export function ModuleSection({
   module,
   ctx,
@@ -38,151 +34,94 @@ export function ModuleSection({
   currentLessonId,
   currentRef,
 }: ModuleSectionProps) {
-  const colors = moduleColors[module.color];
   const unlocked = isModuleUnlocked(ctx, module.id);
-  const { done, total } = moduleCompletion(ctx, module);
-  const points = nodePoints(module.lessons.length + (module.hasExam ? 1 : 0));
-  const height = (points.at(-1)?.y ?? 0) + EXAM_SIZE / 2 + 32;
-  const examPoint = module.hasExam ? points.at(-1) : undefined;
-  const examOpen = isExamAvailable(ctx, module.id);
-  const examPassed = isExamPassed(ctx, module.id);
+  const finished = isModuleFinished(ctx, module);
+  const { done, total, ratio } = moduleCompletion(ctx, module);
+  const hasCurrent = module.lessons.some((l) => l.id === currentLessonId);
+  // Modules in progress are open; finished and closed ones are collapsed to their header.
+  const [expanded, setExpanded] = useState(hasCurrent || (unlocked && !finished));
+  const listId = `module-${module.id}-lessons`;
 
   return (
-    <section aria-labelledby={`module-${module.id}`} className="flex flex-col items-center gap-6">
-      <Link
-        to={paths.module(module.id)}
-        className={cn(
-          'flex w-full items-center gap-4 rounded-(--radius-card) p-4 text-on-mod transition-transform hover:-translate-y-0.5 md:p-5',
-          unlocked ? cn(colors.bg, colors.shadow) : 'bg-surface-2 text-text-muted',
-        )}
-      >
-        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/30">
+    <section
+      aria-labelledby={`module-${module.id}`}
+      className={cn(cardClass({ padding: 'none' }), 'overflow-hidden')}
+    >
+      <div className="flex items-center gap-4 p-4 md:px-5">
+        <span
+          className={cn(
+            'grid size-10 shrink-0 place-items-center rounded-(--radius-btn) border border-border bg-surface-2',
+            unlocked ? moduleColors[module.color].text : 'text-text-muted',
+          )}
+        >
           {unlocked ? (
-            <ModuleIcon name={module.icon} className="size-7" />
+            <ModuleIcon name={module.icon} className="size-5" />
           ) : (
-            <Lock className="size-6" aria-hidden="true" />
+            <Lock className="size-4" aria-hidden="true" />
           )}
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-xs font-semibold tracking-wide uppercase">
-            Модуль {module.index}
+        <Link to={paths.module(module.id)} className="group min-w-0 flex-1">
+          <span className="block font-mono text-xs text-text-muted">
+            Модуль {String(module.index).padStart(2, '0')}
           </span>
-          <span id={`module-${module.id}`} className="block text-xl leading-tight font-semibold">
+          <span
+            id={`module-${module.id}`}
+            className="block truncate font-semibold group-hover:underline"
+          >
             {module.title}
           </span>
-        </span>
-        {unlocked && <ModuleCover moduleId={module.id} className="hidden w-20 sm:block" />}
-        <span className="shrink-0 rounded-full bg-white/30 px-3 py-1 font-mono text-sm font-semibold">
-          {done}/{total}
-        </span>
-      </Link>
-
-      <div className="relative" style={{ width: COLUMN_WIDTH, height }}>
-        <svg className="absolute inset-0" width={COLUMN_WIDTH} height={height} aria-hidden="true">
-          <path
-            d={pathThrough(points)}
-            fill="none"
-            stroke="var(--border)"
-            strokeWidth={8}
-            strokeLinecap="round"
-            strokeDasharray="2 16"
-          />
-        </svg>
-
-        {module.lessons.map((lesson, i) => {
-          const point = points[i];
-          if (!point) return null;
-          const status = lessonStatus(ctx, lesson.id);
-          const lp = lessons[lesson.id];
-          const isCurrent = lesson.id === currentLessonId;
-          return (
-            <PathNode
-              key={lesson.id}
-              ref={isCurrent ? currentRef : undefined}
-              lesson={lesson}
-              moduleIndex={module.index}
-              status={status}
-              stars={starsForScore(lp?.quizBest ?? 0, status === 'completed')}
-              color={module.color}
-              isCurrent={isCurrent}
-              x={point.x}
-              y={point.y}
-            />
-          );
-        })}
-
-        {currentLessonId &&
-          module.lessons.some((l) => l.id === currentLessonId) &&
-          (() => {
-            const i = module.lessons.findIndex((l) => l.id === currentLessonId);
-            const point = points[i];
-            if (!point) return null;
-            const onLeft = point.x > COLUMN_WIDTH / 2;
-            return (
-              <div
-                className="pointer-events-none absolute"
-                style={{
-                  top: point.y - 40,
-                  left: onLeft ? point.x - NODE_SIZE / 2 - 96 : point.x + NODE_SIZE / 2 + 12,
-                }}
-              >
-                <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-xl border border-border bg-surface px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-bull">
-                  {lessonStatus(ctx, currentLessonId) === 'read' ? 'К тесту!' : 'Начнём?'}
-                </span>
-                <Mascot mood="pointing" size={84} className={onLeft ? '' : '-scale-x-100'} />
-              </div>
-            );
-          })()}
-
-        {examPoint && (
-          <div
-            className="absolute flex flex-col items-center gap-1"
-            style={{
-              left: examPoint.x - EXAM_SIZE / 2,
-              top: examPoint.y - EXAM_SIZE / 2 + ROW_HEIGHT * 0.1,
-              width: EXAM_SIZE,
-            }}
-          >
-            {examOpen || examPassed ? (
-              <Link
-                to={paths.exam(module.id)}
-                aria-label={`Экзамен модуля ${module.index}${examPassed ? ' (сдан)' : ''}`}
-                className={cn(
-                  'grid place-items-center rounded-2xl border-4 transition-transform active:translate-y-1',
-                  examPassed
-                    ? 'border-xp-shade bg-xp text-on-xp'
-                    : 'border-xp bg-surface text-xp-shade motion-safe:animate-[node-bounce_2s_ease-in-out_infinite]',
-                )}
-                style={{ width: EXAM_SIZE, height: EXAM_SIZE }}
-              >
-                <Trophy
-                  className={cn('size-10', examPassed && 'fill-current')}
-                  aria-hidden="true"
-                />
-              </Link>
-            ) : (
-              <button
-                type="button"
-                tabIndex={-1}
-                aria-label={`Экзамен модуля ${module.index} (закрыт)`}
-                onClick={() =>
-                  toast({
-                    tone: 'info',
-                    icon: '🏆',
-                    title: 'Экзамен пока закрыт',
-                    description: 'Он откроется после всех уроков модуля.',
-                  })
-                }
-                className="grid place-items-center rounded-2xl border-4 border-border bg-surface-2 text-text-muted"
-                style={{ width: EXAM_SIZE, height: EXAM_SIZE }}
-              >
-                <Trophy className="size-10" aria-hidden="true" />
-              </button>
+        </Link>
+        <span className="hidden w-32 flex-col items-end gap-1.5 sm:flex">
+          <span
+            className={cn(
+              'font-mono text-xs tabular-nums',
+              finished ? 'text-bull' : 'text-text-muted',
             )}
-            <span className="text-xs font-semibold text-text-muted">Экзамен</span>
-          </div>
-        )}
+          >
+            {finished ? 'пройден' : `${done} / ${total}`}
+          </span>
+          <span className="h-1 w-full overflow-hidden rounded-full bg-surface-2" aria-hidden="true">
+            <span
+              className="block h-full rounded-full bg-primary"
+              style={{ width: `${(finished ? 1 : ratio) * 100}%` }}
+            />
+          </span>
+        </span>
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={listId}
+          aria-label={`Уроки модуля ${module.index}`}
+          onClick={() => setExpanded((v) => !v)}
+          className="grid size-9 shrink-0 place-items-center rounded-(--radius-btn) text-text-muted transition-colors hover:bg-surface-2 hover:text-text"
+        >
+          <ChevronDown
+            className={cn('size-4 transition-transform', expanded && 'rotate-180')}
+            aria-hidden="true"
+          />
+        </button>
       </div>
+
+      {expanded && (
+        <ol id={listId} className="border-t border-border py-1" aria-label={module.title}>
+          {module.lessons.map((lesson) => {
+            const status = lessonStatus(ctx, lesson.id);
+            const isCurrent = lesson.id === currentLessonId;
+            return (
+              <LessonRow
+                key={lesson.id}
+                ref={isCurrent ? currentRef : undefined}
+                lesson={lesson}
+                moduleIndex={module.index}
+                status={status}
+                stars={starsForScore(lessons[lesson.id]?.quizBest ?? 0, status === 'completed')}
+                isCurrent={isCurrent}
+              />
+            );
+          })}
+          {module.hasExam && <ExamRow module={module} ctx={ctx} />}
+        </ol>
+      )}
     </section>
   );
 }
