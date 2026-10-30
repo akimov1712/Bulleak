@@ -1,4 +1,5 @@
-import { Outlet } from 'react-router';
+import { Outlet, useMatches } from 'react-router';
+import { cn } from '@/lib/cn';
 import { useApplyTheme } from '@/hooks/useTheme';
 import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { Toaster } from '@/components/ui/Toaster';
@@ -12,7 +13,15 @@ import { StorageBanner } from './StorageBanner';
 import { UpdatePrompt } from './UpdatePrompt';
 
 /** App shell: sidebar on desktop, top bar + bottom nav on mobile. */
+/** Pages with wide charts (lesson, simulator) declare `handle: { wide: true }` in routes. */
+function useWidePage(): boolean {
+  return useMatches().some(
+    (m) => typeof m.handle === 'object' && m.handle !== null && 'wide' in m.handle,
+  );
+}
+
 export function RootLayout() {
+  const wide = useWidePage();
   useApplyTheme();
   useApplyMotion();
   return (
@@ -43,7 +52,10 @@ export function RootLayout() {
         <main
           id="main"
           tabIndex={-1}
-          className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-8 outline-none md:px-8 md:pt-8"
+          className={cn(
+            'mx-auto w-full flex-1 px-4 pt-6 pb-8 outline-none md:px-8 md:pt-8',
+            wide ? 'max-w-[1600px]' : 'max-w-6xl',
+          )}
         >
           <Outlet />
         </main>

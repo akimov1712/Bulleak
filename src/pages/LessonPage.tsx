@@ -93,7 +93,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
   return (
     <>
       <ReadingProgress target={articleRef} />
-      <div className="mt-6 grid gap-10 xl:grid-cols-[minmax(0,70ch)_13rem]">
+      <div className="mt-6 grid gap-10 2xl:grid-cols-[minmax(0,1fr)_14rem]">
         <article ref={articleRef} className="min-w-0 text-[1.0625rem] md:text-lg">
           <nav
             aria-label="Хлебные крошки"
@@ -110,7 +110,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
               Модуль {module.index}. {module.title}
             </Link>
           </nav>
-          <header className="mb-2">
+          <header className="mb-2 max-w-[72ch]">
             <p className="mb-1 flex items-center gap-2 text-sm font-extrabold tracking-wide text-text-muted uppercase">
               <span
                 className={cn('size-2.5 rounded-full', moduleColors[module.color].bg)}
@@ -162,7 +162,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             examOpen={isExamAvailable(ctx, module.id)}
           />
         </article>
-        <aside className="hidden xl:block">
+        <aside className="hidden 2xl:block">
           <TableOfContents container={articleRef} />
         </aside>
       </div>

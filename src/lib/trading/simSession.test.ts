@@ -12,6 +12,7 @@ import {
   startAtMoment,
   SIM_FUTURE,
   SIM_HISTORY,
+  SIM_LOOKBACK,
   skipAhead,
   visibleWindow,
   windowStart,
@@ -53,13 +54,15 @@ describe('visibleWindow', () => {
     }
   });
 
-  it('shows up to 200 candles of history, and keeps the left edge during playback', () => {
-    expect(visibleWindow(candles, 640, 640)).toHaveLength(SIM_HISTORY);
-    expect(windowStart(640)).toBe(441);
+  it('shows up to SIM_LOOKBACK candles of history, and keeps the left edge during playback', () => {
+    const long = Array.from({ length: 3000 }, (_, t) => ({ t, o: 1, h: 1, l: 1, c: 1, v: 1 }));
+    expect(visibleWindow(long, 2000, 2000)).toHaveLength(SIM_LOOKBACK);
+    expect(windowStart(2000)).toBe(2000 - SIM_LOOKBACK + 1);
+    expect(visibleWindow(candles, 640, 640)).toHaveLength(641);
     expect(visibleWindow(candles, 10, 10)).toHaveLength(11);
-    const playing = visibleWindow(candles, 640, 660);
-    expect(playing[0]?.t).toBe(441);
-    expect(playing.at(-1)?.t).toBe(660);
+    const playing = visibleWindow(long, 2000, 2020);
+    expect(playing[0]?.t).toBe(2000 - SIM_LOOKBACK + 1);
+    expect(playing.at(-1)?.t).toBe(2020);
   });
 });
 

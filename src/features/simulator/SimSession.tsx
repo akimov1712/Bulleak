@@ -306,7 +306,7 @@ export function SimSession(props: SimSessionProps) {
         lineCount={lines.length}
         onClearLines={() => setLines([])}
       />
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <SimChart
           candles={candles}
           anchor={anchor}
@@ -331,7 +331,7 @@ export function SimSession(props: SimSessionProps) {
                 }
               : undefined
           }
-          height={wide ? 580 : 420}
+          height={wide ? 540 : 420}
         />
         <div className="flex flex-col gap-4">
           {strategy && <BacktestPanel strategy={strategy} decisionKey={anchor} />}

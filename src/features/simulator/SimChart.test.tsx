@@ -83,11 +83,12 @@ describe('SimChart', () => {
     for (const s of mocks.series) expect(lastTime(s)).toBeLessThanOrEqual(cursorTime(300));
     const main = mocks.series[0];
     expect(lastTime(main as FakeSeries)).toBe(cursorTime(300));
-    expect(main?.data).toHaveLength(200);
+    // the whole history up to the cursor (≤ SIM_LOOKBACK), never a candle after it
+    expect(main?.data).toHaveLength(301);
 
     rerender(<SimChart {...props} cursor={305} />);
     for (const s of mocks.series) expect(lastTime(s)).toBeLessThanOrEqual(cursorTime(305));
     expect(lastTime(main as FakeSeries)).toBe(cursorTime(305));
-    expect(main?.data).toHaveLength(205);
+    expect(main?.data).toHaveLength(306);
   });
 });

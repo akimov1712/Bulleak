@@ -9,10 +9,13 @@ export function LessonContent({ id }: { id: LessonId }) {
   const Content = use(lessonContentPromise(id));
   return (
     <MDXProvider components={mdxComponents}>
-      {/* The promise is cached per lesson, so `Content` is the same module-level MDX component
-          on every render — no remounting, which is what static-components guards against. */}
-      {/* eslint-disable-next-line react-hooks/static-components */}
-      <Content />
+      {/* Text keeps a readable line length; charts ([data-wide]) use the whole width. */}
+      <div className="lesson-flow">
+        {/* The promise is cached per lesson, so `Content` is the same module-level MDX component
+            on every render — no remounting, which is what static-components guards against. */}
+        {/* eslint-disable-next-line react-hooks/static-components */}
+        <Content />
+      </div>
     </MDXProvider>
   );
 }

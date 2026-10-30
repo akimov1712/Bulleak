@@ -22,8 +22,14 @@ export function pickStart(length: number, rng: Rng): number | null {
   return randomInt(rng, min, max);
 }
 
-/** First index shown: up to SIM_HISTORY candles ending at `cursor`. */
-export const windowStart = (cursor: number) => Math.max(0, cursor - SIM_HISTORY + 1);
+/**
+ * Candles of history the chart may scroll back through. The view opens on the latest candles;
+ * the rest is there to scroll and zoom out (SIM_HISTORY is only the minimum for a start).
+ */
+export const SIM_LOOKBACK = 1500;
+
+/** First index shown: up to SIM_LOOKBACK candles ending at `cursor`. */
+export const windowStart = (cursor: number) => Math.max(0, cursor - SIM_LOOKBACK + 1);
 
 /** Candles the chart may show: from `windowStart(fromCursor)` up to and including `cursor`. */
 export function visibleWindow(

@@ -26,6 +26,8 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'lesson/:lessonId',
+        // Wide page: charts span the whole content width (see RootLayout).
+        handle: { wide: true },
         lazy: () => import('@/pages/LessonPage').then((m) => ({ Component: m.LessonPage })),
       },
       {
@@ -38,6 +40,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'simulator/:scenarioId?',
+        handle: { wide: true },
         lazy: () => import('@/pages/SimulatorPage').then((m) => ({ Component: m.SimulatorPage })),
       },
       {

@@ -142,11 +142,11 @@ export function SimChart(props: SimChartProps) {
     const setScroll = (enabled: boolean) =>
       built.api.applyOptions({
         handleScroll: enabled
-          ? { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
+          ? { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
           : false,
         handleScale: enabled
           ? {
-              mouseWheel: false,
+              mouseWheel: true,
               pinch: true,
               axisPressedMouseMove: true,
               axisDoubleClickReset: true,
@@ -220,7 +220,7 @@ export function SimChart(props: SimChartProps) {
       const saved = savedRangeRef.current;
       savedRangeRef.current = null;
       if (saved && saved.from === from) built.api.timeScale().setVisibleLogicalRange(saved.range);
-      else built.api.timeScale().fitContent();
+      else showLatest(built.api, to - from);
     }
     shownRef.current = { from, to };
   }, [candles, anchor, cursor, indicatorsKey, palette, intraday]);
@@ -284,10 +284,24 @@ export function SimChart(props: SimChartProps) {
         className="absolute top-2 left-2 z-10 rounded-xl border-2 border-border bg-surface/90 backdrop-blur-sm"
         getChart={() => builtRef.current?.api ?? null}
         total={shownBars}
-        onReset={() => builtRef.current?.api.timeScale().fitContent()}
+        onReset={() => {
+          const api = builtRef.current?.api;
+          if (api) showLatest(api, shownBars - 1);
+        }}
       />
     </div>
   );
+}
+
+/** Bars in the opening view; older history is a scroll (or zoom-out) away. */
+const OPEN_BARS = 140;
+
+/** Opening view: the latest OPEN_BARS candles with room on the right for the trade. */
+function showLatest(api: IChartApi, lastLogical: number) {
+  api.timeScale().setVisibleLogicalRange({
+    from: Math.max(-0.5, lastLogical - OPEN_BARS),
+    to: lastLogical + 6,
+  });
 }
 
 function buildChart(
@@ -319,14 +333,15 @@ function buildChart(
     },
     crosshair: { mode: 0 },
     localization: { locale: 'ru-RU' },
+    // Wheel / trackpad: zoom and scroll right on the chart.
     handleScroll: {
-      mouseWheel: false,
+      mouseWheel: true,
       pressedMouseMove: true,
       horzTouchDrag: true,
       vertTouchDrag: false,
     },
     handleScale: {
-      mouseWheel: false,
+      mouseWheel: true,
       pinch: true,
       axisPressedMouseMove: true,
       axisDoubleClickReset: true,

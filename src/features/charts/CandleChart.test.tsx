@@ -163,6 +163,7 @@ describe('CandleChart', () => {
     render(
       <CandleChart
         dataset="BTCUSDT-60"
+        interactive={false}
         bars={50}
         volume
         indicators={[{ type: 'ema', period: 20 }, { type: 'rsi' }, { type: 'macd' }]}
@@ -203,18 +204,23 @@ describe('CandleChart', () => {
       expect.objectContaining({ time: (190 * H) / 1000, text: 'Вход' }),
     ]);
     expect(candles?.primitives).toHaveLength(1);
-    // Pannable and zoomable by default, but the mouse wheel still scrolls the page.
-    expect(chart.options.handleScroll).toMatchObject({
-      pressedMouseMove: true,
-      mouseWheel: false,
-    });
-    expect(chart.options.handleScale).toMatchObject({ pinch: true, mouseWheel: false });
+    expect(chart.options.handleScroll).toBe(false);
+  });
+
+  it('pannable by default: wheel / pinch zoom and the history before the period', () => {
+    render(<CandleChart dataset="BTCUSDT-60" from={{ index: 150 }} to={{ index: 199 }} />);
+    const chart = lastChart();
+    expect(chart.options.handleScroll).toMatchObject({ pressedMouseMove: true, mouseWheel: true });
+    expect(chart.options.handleScale).toMatchObject({ pinch: true, mouseWheel: true });
+    // all 150 earlier candles are loaded to scroll back to; nothing after the period
+    expect(chart.series[0]?.data).toHaveLength(200);
   });
 
   it('keeps sloped line endpoints outside the window instead of clamping them', () => {
     render(
       <CandleChart
         dataset="BTCUSDT-60"
+        interactive={false}
         from={{ index: 150 }}
         to={{ index: 199 }}
         annotations={[
@@ -239,14 +245,18 @@ describe('CandleChart', () => {
       <CandleChart dataset="BTCUSDT-60" bars={10} interactive onPick={onPick} />,
     );
     const chart = lastChart();
-    expect(chart.options.handleScroll).toMatchObject({ vertTouchDrag: false, mouseWheel: false });
-    chart.click({ point: { x: 1, y: 100 }, logical: 3.4, paneIndex: 0 });
+    expect(chart.options.handleScroll).toMatchObject({ vertTouchDrag: false });
+    // Logical indexes count from the first loaded candle (the history starts at 0 here).
+    chart.click({ point: { x: 1, y: 100 }, logical: 193.4, paneIndex: 0 });
     expect(onPick).toHaveBeenCalledWith({ index: 193, time: 193 * H, price: 900 });
-    chart.click({ point: { x: 1, y: 100 }, logical: 3, paneIndex: 1 });
-    chart.click({ logical: 3 });
+    chart.click({ point: { x: 1, y: 100 }, logical: 193, paneIndex: 1 });
+    chart.click({ logical: 193 });
     expect(onPick).toHaveBeenCalledTimes(1);
-    chart.dblClick({ point: { x: 1, y: 200 }, logical: 5, paneIndex: 0 });
+    chart.dblClick({ point: { x: 1, y: 200 }, logical: 195, paneIndex: 0 });
     expect(onPick).toHaveBeenLastCalledWith({ index: 195, time: 195 * H, price: 800 });
+    // A click in the history before the period picks the period's first candle, not history.
+    chart.click({ point: { x: 1, y: 100 }, logical: 20, paneIndex: 0 });
+    expect(onPick).toHaveBeenLastCalledWith({ index: 190, time: 190 * H, price: 900 });
     unmount();
     expect(chart.remove).toHaveBeenCalled();
   });

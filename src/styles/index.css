@@ -78,3 +78,8 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Lesson body: readable line length for text, full width for charts (data-wide). */
+.lesson-flow > :not([data-wide]) {
+  max-width: 72ch;
+}

@@ -14,7 +14,8 @@ export function LazyCandleChart(props: CandleChartProps) {
     <Suspense
       fallback={
         <div
-          style={{ height: chartCardHeight(props.height ?? 400, props.ohlc !== false) }}
+          data-wide=""
+          style={{ height: chartCardHeight(props.height ?? 440, props.ohlc !== false) }}
           className={props.className}
         >
           <Skeleton className="h-full w-full rounded-2xl" />

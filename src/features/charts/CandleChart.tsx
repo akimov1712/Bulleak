@@ -101,7 +101,9 @@ const TYPE_LABEL: Record<ChartType, string> = { candles: 'Свечи', bars: 'Б
 
 const PANE_HEIGHT = 110;
 /** Candle pane height when a lesson does not set one. */
-export const DEFAULT_HEIGHT = 400;
+export const DEFAULT_HEIGHT = 440;
+/** Candles of history loaded before the lesson's period: scroll left to see what came before. */
+export const CONTEXT_BARS = 500;
 const OVERLAY_TONES: Tone[] = ['info', 'warn', 'epic', 'primary'];
 
 /** Candle chart with annotations; handles loading and errors itself. */
@@ -120,7 +122,7 @@ export function CandleChart(props: CandleChartProps) {
   const placeholderHeight = chartCardHeight(total, props.ohlc !== false);
   const timeframes = props.timeframes ?? [];
   return (
-    <figure className={props.className}>
+    <figure className={props.className} data-wide="">
       {timeframes.length > 1 && (
         <div role="radiogroup" aria-label="Таймфрейм" className="mb-2 flex gap-1.5">
           {timeframes.map((tf) => {
@@ -194,7 +196,6 @@ export function CandleChart(props: CandleChartProps) {
               dataset={dataset}
               totalHeight={expanded}
               interactive
-              wheel
               onPick={undefined}
             />
           </Suspense>
@@ -215,8 +216,6 @@ export function CandleChart(props: CandleChartProps) {
 function ChartBody(
   props: CandleChartProps & {
     totalHeight: number;
-    /** Large view: the mouse wheel zooms too. */
-    wheel?: boolean;
     onExpand?: () => void;
   },
 ) {
@@ -236,7 +235,8 @@ function ChartBody(
   const annotationsKey = JSON.stringify(props.annotations ?? []);
   const indicatorsKey = JSON.stringify(props.indicators ?? []);
   const interactive = props.interactive ?? true;
-  const wheel = props.wheel ?? false;
+  // Pannable charts also get the history before the period (never candles after it).
+  const dataStart = interactive ? Math.max(0, start - CONTEXT_BARS) : start;
   const volume = props.volume ?? false;
   const volumeSpikes = props.volumeSpikes ?? 0;
   const logScale = props.logScale ?? false;
@@ -259,13 +259,12 @@ function ChartBody(
     const indicators = JSON.parse(indicatorsKey) as IndicatorSpec[];
     const chart = buildChart(el, {
       candles,
-      start,
+      start: dataStart,
       end,
       indicators,
       volume,
       volumeSpikes,
       interactive,
-      wheel,
       intraday: interval !== 'D',
       palette,
       chartType,
@@ -275,11 +274,12 @@ function ChartBody(
       const pick = onPickRef.current;
       if (!pick || !param.point || param.logical === undefined || (param.paneIndex ?? 0) !== 0)
         return;
-      const idx = Math.min(end - start, Math.max(0, Math.round(param.logical)));
-      const candle = candles[start + idx];
+      // Only candles of the lesson's period can be picked, not the history before it.
+      const index = Math.min(end, Math.max(start, dataStart + Math.round(param.logical)));
+      const candle = candles[index];
       const price = chart.mainSeries.coordinateToPrice(param.point.y);
       if (!candle || price === null) return;
-      pick({ index: start + idx, time: candle.t, price });
+      pick({ index, time: candle.t, price });
     };
     chart.api.subscribeClick(handleClick);
     // A quick second click is reported as a double click only; treat it as a click too
@@ -290,8 +290,8 @@ function ChartBody(
         setHovered(null);
         return;
       }
-      const idx = Math.round(param.logical);
-      setHovered(idx >= 0 && idx <= end - start ? start + idx : null);
+      const index = dataStart + Math.round(param.logical);
+      setHovered(index >= dataStart && index <= end ? index : null);
     };
     chart.api.subscribeCrosshairMove(handleMove);
     chartRef.current = chart;
@@ -304,7 +304,9 @@ function ChartBody(
       if (!entry || entry.contentRect.width === 0 || (interactive && fitted)) return;
       fitted = true;
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => chart.api.timeScale().fitContent());
+      frame = requestAnimationFrame(() =>
+        showPeriod(chart.api, start - dataStart, end - dataStart),
+      );
     });
     observer.observe(el);
     return () => {
@@ -322,11 +324,11 @@ function ChartBody(
     candles,
     start,
     end,
+    dataStart,
     indicatorsKey,
     volume,
     volumeSpikes,
     interactive,
-    wheel,
     interval,
     palette,
     chartType,
@@ -340,7 +342,7 @@ function ChartBody(
     if (!chart) return;
     const clear = applyAnnotations(chart, {
       candles,
-      start,
+      start: dataStart,
       end,
       annotations: JSON.parse(annotationsKey) as Annotation[],
       palette,
@@ -354,6 +356,7 @@ function ChartBody(
     start,
     end,
     annotationsKey,
+    dataStart,
     indicatorsKey,
     volume,
     volumeSpikes,
@@ -386,7 +389,10 @@ function ChartBody(
               className="ml-auto"
               getChart={() => chartRef.current?.api ?? null}
               total={end - start + 1}
-              onReset={() => chartRef.current?.api.timeScale().fitContent()}
+              onReset={() => {
+                const api = chartRef.current?.api;
+                if (api) showPeriod(api, start - dataStart, end - dataStart);
+              }}
               onExpand={props.onExpand}
             />
           )}
@@ -434,6 +440,11 @@ function ChartBody(
   );
 }
 
+/** Initial view: the lesson's period (logical indexes in the loaded data) plus a small margin. */
+function showPeriod(api: IChartApi, from: number, to: number) {
+  api.timeScale().setVisibleLogicalRange({ from: from - 0.5, to: to + 2 });
+}
+
 interface BuildOptions {
   candles: Candle[];
   start: number;
@@ -442,7 +453,6 @@ interface BuildOptions {
   volume: boolean;
   volumeSpikes: number;
   interactive: boolean;
-  wheel: boolean;
   intraday: boolean;
   palette: Palette;
   chartType: ChartType;
@@ -487,12 +497,12 @@ function buildChart(el: HTMLElement, o: BuildOptions): BuiltChart {
     },
     crosshair: { mode: 0 },
     localization: { locale: 'ru-RU' },
-    // The wheel scrolls the page; it zooms only in the large view.
+    // Wheel / trackpad zoom and scroll right on the chart (the learner asked for it).
     handleScroll: o.interactive
-      ? { mouseWheel: o.wheel, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
+      ? { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false }
       : false,
     handleScale: o.interactive
-      ? { mouseWheel: o.wheel, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true }
+      ? { mouseWheel: true, pinch: true, axisPressedMouseMove: true, axisDoubleClickReset: true }
       : false,
   });
 
