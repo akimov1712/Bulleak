@@ -27,6 +27,9 @@ interface UiState {
   pushRewards: (rewards: Rewards) => void;
   /** Remove and return the oldest rewards. */
   shiftRewards: () => Rewards | undefined;
+  /** Site search (⌘K) is open. */
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
 }
 
 const MAX_TOASTS = 4;
@@ -54,6 +57,8 @@ export const useUi = create<UiState>()((set, get) => ({
     if (first) set({ rewardsQueue: rest });
     return first;
   },
+  searchOpen: false,
+  setSearchOpen: (open) => set({ searchOpen: open }),
 }));
 
 /** Imperative shortcut usable outside React components. */

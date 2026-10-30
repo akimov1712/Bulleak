@@ -55,20 +55,38 @@ test('navigation reaches sections on every screen size', async ({ page, isMobile
     await expect(page.getByRole('heading', { level: 1, name: 'Глоссарий' })).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
   } else {
-    await page.getByRole('link', { name: 'Статистика' }).click();
+    const nav = page.getByRole('navigation', { name: 'Основная навигация' });
+    await nav.getByRole('button', { name: 'Прогресс' }).click();
+    await nav.getByRole('link', { name: 'Статистика' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Статистика' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Статистика' })).toHaveCount(0);
+    await page.getByRole('button', { name: /^Профиль:/ }).click();
     await page.getByRole('link', { name: 'О курсе' }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'О курсе' })).toBeVisible();
   }
 });
 
-test('theme toggle switches and persists', async ({ page }) => {
-  await page.emulateMedia({ colorScheme: 'light' });
+test('search opens with Ctrl+K and jumps to a term', async ({ page }) => {
   await page.goto('./');
-  await page.getByRole('button', { name: 'Включить тёмную тему' }).click();
+  await page.keyboard.press('Control+k');
+  const search = page.getByRole('combobox', { name: 'Поиск по курсу' });
+  await expect(search).toBeFocused();
+  await search.fill('плечо');
+  await expect(page.getByRole('option').first()).toContainText('плечо', { ignoreCase: true });
+  await search.press('Enter');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page).toHaveURL(/#\/(glossary|lesson|tools)\//);
+});
+
+test('theme toggle switches and persists', async ({ page }) => {
+  await page.goto('./');
+  // Dark by default (design «Терминал»).
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: /^Профиль:/ }).click();
+  await page.getByRole('button', { name: 'Включить светлую тему' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
 
 for (const [hash, heading] of pages) {

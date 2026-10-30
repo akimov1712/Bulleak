@@ -14,26 +14,19 @@ export function Wordmark({ className, onInk = false }: { className?: string; onI
   );
 }
 
-/** Brand logo linking home, drawn on the dark navigation chrome. */
-export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
+/** Brand logo linking home, for the top bar. */
+export function Logo({ className }: { className?: string }) {
   return (
     <Link
       to={paths.home()}
-      className={cn('flex min-h-11 items-center gap-2.5 rounded-xl text-on-ink', className)}
+      className={cn(
+        'flex h-10 shrink-0 items-center gap-2 rounded-(--radius-btn) text-text',
+        className,
+      )}
       aria-label={`${BRAND.name} — на главную`}
     >
-      <LogoMark size={compact ? 34 : 40} className="shrink-0" />
-      <span className="flex flex-col">
-        <Wordmark
-          onInk
-          className={cn('leading-none', compact ? 'text-xl max-[419px]:sr-only' : 'text-[1.55rem]')}
-        />
-        {!compact && (
-          <span className="mt-1 text-[0.7rem] leading-none font-bold text-on-ink-muted">
-            {BRAND.tagline}
-          </span>
-        )}
-      </span>
+      <LogoMark size={30} className="shrink-0" />
+      <Wordmark className="text-[1.2rem] leading-none max-[379px]:sr-only" />
     </Link>
   );
 }

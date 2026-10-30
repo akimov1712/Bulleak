@@ -30,7 +30,7 @@ export function ReadingProgress({ target }: { target: RefObject<HTMLElement | nu
 
   return (
     <div
-      className="sticky top-16 z-20 -mx-4 h-1.5 bg-surface-2 md:-mx-8"
+      className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-4 h-1 bg-surface-2 md:-mx-8"
       role="progressbar"
       aria-label="Прочитано"
       aria-valuemin={0}

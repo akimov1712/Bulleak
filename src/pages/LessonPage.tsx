@@ -93,7 +93,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
   return (
     <>
       <ReadingProgress target={articleRef} />
-      <div className="mt-6 grid gap-10 2xl:grid-cols-[minmax(0,1fr)_14rem]">
+      <div className="mt-6 grid gap-10 xl:grid-cols-[minmax(0,1fr)_15rem]">
         <article ref={articleRef} className="min-w-0 text-[1.0625rem] md:text-lg">
           <nav
             aria-label="Хлебные крошки"
@@ -162,7 +162,7 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             examOpen={isExamAvailable(ctx, module.id)}
           />
         </article>
-        <aside className="hidden 2xl:block">
+        <aside className="hidden xl:block">
           <TableOfContents container={articleRef} />
         </aside>
       </div>

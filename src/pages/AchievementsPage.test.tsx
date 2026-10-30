@@ -47,12 +47,13 @@ describe('AchievementsPage', () => {
   it('filters by category', async () => {
     const user = userEvent.setup();
     renderPage();
-    await user.click(await screen.findByRole('button', { name: 'Практика' }));
+    const main = await screen.findByRole('main');
+    await user.click(await within(main).findByRole('button', { name: 'Практика' }));
     const items = within(screen.getByRole('list', { name: 'Список достижений' })).getAllByRole(
       'listitem',
     );
     expect(items).toHaveLength(12);
-    expect(screen.getByRole('button', { name: 'Практика' })).toHaveAttribute(
+    expect(within(main).getByRole('button', { name: 'Практика' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );

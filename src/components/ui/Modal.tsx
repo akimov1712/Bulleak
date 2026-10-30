@@ -21,6 +21,8 @@ export interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'full';
   /** Prevent closing by Esc/backdrop (e.g. for confirmations in progress). */
   dismissible?: boolean;
+  /** No header and padding, panel near the top (search palette); closes by Esc/backdrop. */
+  bare?: boolean;
   className?: string;
 }
 
@@ -42,6 +44,7 @@ export function Modal({
   variant = 'center',
   size = 'md',
   dismissible = true,
+  bare = false,
   className,
 }: ModalProps) {
   const titleId = useId();
@@ -102,7 +105,9 @@ export function Modal({
         'fixed inset-0 z-50 flex bg-black/50 backdrop-blur-[2px]',
         variant === 'sheet'
           ? 'items-end justify-center'
-          : cn('items-center justify-center', size === 'full' ? 'p-2' : 'p-4'),
+          : bare
+            ? 'items-start justify-center p-4 pt-[12dvh]'
+            : cn('items-center justify-center', size === 'full' ? 'p-2' : 'p-4'),
       )}
       onMouseDown={(e) => {
         if (dismissible && e.target === e.currentTarget) onClose();
@@ -123,20 +128,31 @@ export function Modal({
           className,
         )}
       >
-        <div className="flex items-center justify-between gap-3 px-5 pt-4">
-          <h2 id={titleId} className={cn('text-xl font-semibold', hideTitle && 'sr-only')}>
-            {title}
-          </h2>
-          {dismissible && (
-            <IconButton
-              label="Закрыть"
-              icon={<X className="size-5" />}
-              onClick={onClose}
-              className="-mr-2 ml-auto"
-            />
-          )}
-        </div>
-        <div className="overflow-y-auto px-5 pt-2 pb-5">{children}</div>
+        {bare ? (
+          <>
+            <h2 id={titleId} className="sr-only">
+              {title}
+            </h2>
+            {children}
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between gap-3 px-5 pt-4">
+              <h2 id={titleId} className={cn('text-xl font-semibold', hideTitle && 'sr-only')}>
+                {title}
+              </h2>
+              {dismissible && (
+                <IconButton
+                  label="Закрыть"
+                  icon={<X className="size-5" />}
+                  onClick={onClose}
+                  className="-mr-2 ml-auto"
+                />
+              )}
+            </div>
+            <div className="overflow-y-auto px-5 pt-2 pb-5">{children}</div>
+          </>
+        )}
         {footer && (
           <div className="flex flex-wrap justify-end gap-3 border-t border-border px-5 py-4">
             {footer}

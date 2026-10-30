@@ -14,11 +14,10 @@ beforeEach(() => {
 });
 
 describe('Hud', () => {
-  it('starts at zero streak, zero XP, level 1', () => {
+  it('starts at zero streak and zero XP', () => {
     render(<Hud />);
     expect(screen.getByRole('button', { name: 'Серия: 0 дней подряд' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Опыт: 0 XP' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Уровень 1, Новичок' })).toBeInTheDocument();
   });
 
   it('updates live and shows the "+XP" flash after earning XP', () => {

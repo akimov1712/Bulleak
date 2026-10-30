@@ -5,14 +5,13 @@ import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { Toaster } from '@/components/ui/Toaster';
 import { RewardsPresenter } from '@/features/gamification/RewardsPresenter';
 import { ScrollToTop } from './ScrollToTop';
-import { Sidebar } from './Sidebar';
-import { TopBar } from './TopBar';
+import { TopNav } from './TopNav';
 import { BottomNav } from './BottomNav';
 import { Footer } from './Footer';
 import { StorageBanner } from './StorageBanner';
 import { UpdatePrompt } from './UpdatePrompt';
 
-/** App shell: sidebar on desktop, top bar + bottom nav on mobile. */
+/** App shell: top bar with section menus; on phones also a bottom nav. */
 /** Pages with wide charts (lesson, simulator) declare `handle: { wide: true }` in routes. */
 function useWidePage(): boolean {
   return useMatches().some(
@@ -25,7 +24,7 @@ export function RootLayout() {
   useApplyTheme();
   useApplyMotion();
   return (
-    <div className="flex min-h-dvh">
+    <div className="flex min-h-dvh flex-col">
       <a
         href="#main"
         // The hash belongs to the router: move focus by hand instead of navigating to "#main".
@@ -42,13 +41,10 @@ export function RootLayout() {
       <ScrollToTop />
       {/* Navigation chrome is not printed (cheat sheets, certificate). */}
       <div className="contents print:hidden">
-        <Sidebar />
+        <StorageBanner />
+        <TopNav />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="contents print:hidden">
-          <StorageBanner />
-          <TopBar />
-        </div>
         <main
           id="main"
           tabIndex={-1}

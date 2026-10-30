@@ -8,7 +8,7 @@ test.describe('rewards after a lesson (E4)', () => {
   }) => {
     await page.goto('./#/lesson/m00-l01/quiz');
     await expect(page.getByRole('button', { name: 'Опыт: 0 XP' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Уровень 1, Новичок' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Профиль: уровень 1, Новичок' })).toBeVisible();
 
     await runLessonQuiz(page, quiz.questions, quiz.questions.length);
     await expect(page.getByRole('heading', { name: 'Идеально!' })).toBeVisible();
@@ -26,7 +26,7 @@ test.describe('rewards after a lesson (E4)', () => {
       .getByRole('button', { name: /^Опыт: \d+ XP$/ })
       .getAttribute('aria-label');
     expect(Number(xpLabel?.match(/\d+/)?.[0])).toBeGreaterThanOrEqual(120);
-    await expect(page.getByRole('button', { name: /^Уровень 2,/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Профиль: уровень 2,/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Серия: 1 день подряд' })).toBeVisible();
 
     // Map: first node completed with 3 stars, second open
