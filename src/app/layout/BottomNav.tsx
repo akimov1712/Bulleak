@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router';
 import { LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Modal } from '@/components/ui/Modal';
-import { mobileBarNav, NAV_SECTIONS, secondaryNav } from './nav';
+import { mobileBarNav, NAV_SECTIONS, secondaryNav, sectionOf } from './nav';
 
 const itemClass = (active: boolean) =>
   cn(
@@ -28,7 +28,9 @@ const barPaths = new Set(mobileBarNav.map((item) => item.to));
 export function BottomNav() {
   const [moreOpen, setMoreOpen] = useState(false);
   const { pathname } = useLocation();
+  // Lessons, modules and exams belong to «Курс», not to «Ещё».
   const moreActive =
+    sectionOf(pathname) !== 'learn' &&
     !barPaths.has(pathname) &&
     !mobileBarNav.some((item) => !item.end && pathname.startsWith(`${item.to}/`));
 

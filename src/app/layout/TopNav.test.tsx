@@ -120,4 +120,11 @@ describe('BottomNav', () => {
       'page',
     );
   });
+
+  it('does not mark «Ещё» on lesson pages', () => {
+    renderAt('/lesson/m01-l02', <BottomNav />);
+    expect(screen.getByRole('button', { name: 'Ещё' }).querySelector('span')).toHaveClass(
+      'opacity-0',
+    );
+  });
 });
