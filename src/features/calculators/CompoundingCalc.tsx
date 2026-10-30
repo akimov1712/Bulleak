@@ -2,6 +2,7 @@ import { AlertTriangle, TrendingUp } from 'lucide-react';
 import { compound, realism, type RealismLevel } from '@/lib/trading/compounding';
 import { formatNumber, formatUsd } from '@/lib/format';
 import { cn } from '@/lib/cn';
+import { chipClass } from '@/components/ui/styles';
 import { CalculatorCard, NumberField, ResultValue } from './CalculatorCard';
 import { EquityCurves } from './EquityCurves';
 import { useCalculator } from './useCalculator';
@@ -108,12 +109,7 @@ export function CompoundingCalc() {
             type="button"
             onClick={() => set({ monthlyPct: p })}
             aria-pressed={inputs.monthlyPct === p}
-            className={cn(
-              'rounded-full border px-3 py-1 font-bold transition-colors',
-              inputs.monthlyPct === p
-                ? 'border-primary-shade bg-primary text-on-primary'
-                : 'border-border bg-surface hover:border-primary-shade',
-            )}
+            className={chipClass(inputs.monthlyPct === p)}
           >
             {p}% в месяц
           </button>

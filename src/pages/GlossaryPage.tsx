@@ -11,18 +11,14 @@ import { courseIndex } from '@/content/courseIndex';
 import { GLOSSARY_CATEGORIES, getTerm, glossary } from '@/content/glossary';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { cn } from '@/lib/cn';
+import { chipClass } from '@/components/ui/styles';
 import { plural } from '@/lib/format';
 import { alphabetGroups, searchTerms } from '@/lib/glossary/search';
 import { lessonStatus, type UnlockContext } from '@/lib/progress/unlock';
 import { useProgress } from '@/store/progressStore';
 import type { GlossaryCategory, GlossaryTerm } from '@/types/glossary';
 
-const chip = (active: boolean) =>
-  cn(
-    'rounded-full border px-3 py-1 text-sm font-bold transition-colors',
-    active ? 'border-info bg-info/15 text-info' : 'border-border bg-surface hover:border-info',
-  );
+const chip = chipClass;
 
 /** Term not studied yet (its lesson is not completed) — still readable, marked «впереди». */
 const isAhead = (ctx: UnlockContext, term: GlossaryTerm) =>

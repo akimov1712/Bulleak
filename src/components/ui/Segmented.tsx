@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn';
+import { chipClass } from './styles';
 
 export interface SegmentedProps<T extends string> {
   label: string;
@@ -23,7 +24,7 @@ export function Segmented<T extends string>({
 }: SegmentedProps<T>) {
   return (
     <div className={cn('flex flex-col gap-1', className)}>
-      {!hideLabel && <span className="text-sm font-bold text-text-muted">{label}</span>}
+      {!hideLabel && <span className="text-xs font-medium text-text-muted">{label}</span>}
       <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <button
@@ -33,12 +34,7 @@ export function Segmented<T extends string>({
             aria-checked={value === o.value}
             disabled={disabled}
             onClick={() => onChange(o.value)}
-            className={cn(
-              'rounded-full border px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
-              value === o.value
-                ? 'border-primary-shade bg-primary text-on-primary'
-                : 'border-border bg-surface hover:border-primary-shade',
-            )}
+            className={chipClass(value === o.value)}
           >
             {o.label}
           </button>

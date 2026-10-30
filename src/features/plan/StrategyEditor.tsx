@@ -45,7 +45,7 @@ export function StrategyEditor() {
   return (
     <Card className="flex flex-col gap-4 break-inside-avoid print:border-0 print:p-0 print:shadow-none">
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-semibold">Моя стратегия</h2>
+        <h2 className="text-xl font-semibold">Моя стратегия</h2>
         <p className="text-sm text-text-muted print:hidden">
           Начни с правил TPS и поменяй то, что проверил на бэктесте. Эти правила станут чек-листом в
           режиме бэктеста тренажёра.

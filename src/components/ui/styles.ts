@@ -62,6 +62,16 @@ export function cardClass({
   );
 }
 
+/** Toggle chip (filters, indicators, single choice): the selected one is tinted green. */
+export function chipClass(active: boolean): string {
+  return cn(
+    'inline-flex min-h-8 items-center justify-center gap-1.5 rounded-(--radius-btn) border px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+    active
+      ? 'border-bull/50 bg-bull-soft text-bull'
+      : 'border-border bg-surface text-text-muted hover:border-text-muted/40 hover:text-text',
+  );
+}
+
 /** Text-like inputs (Input, NumberInput, Select). */
 export const inputClass =
   'min-h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-base text-text ' +

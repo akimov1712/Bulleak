@@ -1,5 +1,5 @@
 import { Eraser, PenLine } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { chipClass } from '@/components/ui/styles';
 import type { SimIndicators } from './SimChart';
 
 const INDICATOR_LABEL: Record<keyof SimIndicators, string> = {
@@ -10,11 +10,7 @@ const INDICATOR_LABEL: Record<keyof SimIndicators, string> = {
   volume: 'Объём',
 };
 
-const chip = (active: boolean) =>
-  cn(
-    'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-bold transition-colors disabled:opacity-50',
-    active ? 'border-info bg-info/15 text-info' : 'border-border bg-surface hover:border-info',
-  );
+const chip = chipClass;
 
 export interface SimToolbarProps {
   indicators: SimIndicators;
@@ -43,7 +39,7 @@ export function SimToolbar(props: SimToolbarProps) {
           </button>
         ))}
       </div>
-      <span className="mx-1 h-6 w-0.5 bg-border" aria-hidden="true" />
+      <span className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
       <button
         type="button"
         aria-pressed={props.drawing}

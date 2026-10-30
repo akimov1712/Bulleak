@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { fillMarketOrder, spread } from '@/lib/trading/orderbook';
 import { formatNumber } from '@/lib/format';
 import { cn } from '@/lib/cn';
+import { chipClass } from '@/components/ui/styles';
 import { Arrow, Box, DiagramSvg, Txt } from './kit';
 import { strokeOf } from './tones';
 
@@ -251,12 +252,7 @@ export function OrderBook() {
                 type="button"
                 onClick={() => setSize(size === v ? null : v)}
                 aria-pressed={size === v}
-                className={cn(
-                  'rounded-full border px-3 py-1 font-bold transition-colors',
-                  size === v
-                    ? 'border-xp-shade bg-xp text-on-xp'
-                    : 'border-border bg-surface text-text hover:border-xp-shade',
-                )}
+                className={chipClass(size === v)}
               >
                 {formatNumber(v, 1)} BTC
               </button>

@@ -33,6 +33,7 @@ import {
 import { datasetInterval, INTERVAL_LABEL, type DatasetName } from '@/lib/trading/candles';
 import { formatNumber } from '@/lib/format';
 import { cn } from '@/lib/cn';
+import { chipClass } from '@/components/ui/styles';
 import type { Candle } from '@/types/trading';
 import {
   buildMarkers,
@@ -134,12 +135,7 @@ export function CandleChart(props: CandleChartProps) {
                 role="radio"
                 aria-checked={dataset === tf}
                 onClick={() => setDataset(tf)}
-                className={cn(
-                  'rounded-full border px-3 py-1 text-sm font-semibold transition-colors',
-                  dataset === tf
-                    ? 'border-info bg-info/15 text-info'
-                    : 'border-border bg-surface text-text-muted hover:border-info',
-                )}
+                className={chipClass(dataset === tf)}
               >
                 {INTERVAL_LABEL[interval]}
               </button>

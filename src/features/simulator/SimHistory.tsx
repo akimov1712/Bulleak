@@ -79,7 +79,7 @@ export function SimHistory({ initialFilter = 'free' }: { initialFilter?: SimTrad
   return (
     <section aria-labelledby="sim-history-title" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 id="sim-history-title" className="flex items-center gap-2 text-2xl font-semibold">
+        <h2 id="sim-history-title" className="flex items-center gap-2 text-xl font-semibold">
           <History className="size-6 text-info" aria-hidden="true" />
           История сделок
         </h2>
