@@ -60,7 +60,7 @@ export function PathPage() {
           ))}
         </div>
 
-        <aside className="flex flex-col gap-3 lg:sticky lg:top-20 lg:order-last max-lg:order-first">
+        <aside className="flex flex-col gap-3 lg:sticky lg:top-32 lg:order-last max-lg:order-first">
           <section aria-label="Прогресс курса" className={cn(cardClass(), 'flex flex-col gap-3')}>
             <div className="flex items-baseline justify-between">
               <h2 className="font-semibold">Прогресс</h2>

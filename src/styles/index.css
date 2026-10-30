@@ -79,7 +79,9 @@
   }
 }
 
-/* Lesson body: readable line length for text, full width for charts (data-wide). */
+/* Lesson body: one centred text column (~72 characters of body text) over the full-width
+   charts (data-wide). In rem, not ch, so larger headings line up with the text. */
 .lesson-flow > :not([data-wide]) {
-  max-width: 72ch;
+  max-width: 50rem;
+  margin-inline: auto;
 }

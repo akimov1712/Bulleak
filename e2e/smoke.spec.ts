@@ -56,10 +56,12 @@ test('navigation reaches sections on every screen size', async ({ page, isMobile
     await expect(page.getByRole('dialog')).toHaveCount(0);
   } else {
     const nav = page.getByRole('navigation', { name: 'Основная навигация' });
-    await nav.getByRole('button', { name: 'Прогресс' }).click();
     await nav.getByRole('link', { name: 'Статистика' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Статистика' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Статистика' })).toHaveCount(0);
+    await expect(nav.getByRole('link', { name: 'Статистика' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
     await page.getByRole('button', { name: /^Профиль:/ }).click();
     await page.getByRole('link', { name: 'О курсе' }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'О курсе' })).toBeVisible();

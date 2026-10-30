@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { TopNav } from './TopNav';
 import { BottomNav } from './BottomNav';
-import { sectionOf } from './nav';
+import { isItemActive, NAV_SECTIONS } from './nav';
 import { useProgress } from '@/store/progressStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
 import { useUi } from '@/store/uiStore';
@@ -19,58 +19,49 @@ beforeEach(() => {
 const renderAt = (path: string, ui = <TopNav />) =>
   render(<MemoryRouter initialEntries={[path]}>{ui}</MemoryRouter>);
 
-describe('sectionOf', () => {
-  it('maps pages, including ones not in the menus, to their section', () => {
-    expect(sectionOf('/')).toBe('learn');
-    expect(sectionOf('/lesson/m01-l02')).toBe('learn');
-    expect(sectionOf('/journal/12')).toBe('practice');
-    expect(sectionOf('/glossary/leverage')).toBe('reference');
-    expect(sectionOf('/certificate')).toBe('progress');
-    expect(sectionOf('/settings')).toBeNull();
-    // A prefix only matches whole path segments.
-    expect(sectionOf('/pathfinder')).toBeNull();
+describe('isItemActive', () => {
+  const byLabel = (label: string) => {
+    const item = NAV_SECTIONS.flatMap((s) => s.items).find((i) => i.label === label);
+    if (!item) throw new Error(label);
+    return item;
+  };
+
+  it('matches the page, its sub-pages and extra prefixes, by whole segments', () => {
+    expect(isItemActive(byLabel('Главная'), '/')).toBe(true);
+    expect(isItemActive(byLabel('Главная'), '/path')).toBe(false);
+    expect(isItemActive(byLabel('Карта курса'), '/lesson/m01-l02')).toBe(true);
+    expect(isItemActive(byLabel('Карта курса'), '/exam/m01')).toBe(true);
+    expect(isItemActive(byLabel('Журнал'), '/journal/12')).toBe(true);
+    expect(isItemActive(byLabel('Карта курса'), '/pathfinder')).toBe(false);
   });
 });
 
 describe('TopNav', () => {
-  it('shows the brand, sections and marks the current one', () => {
-    renderAt('/glossary');
+  it('shows every section as a tab, one click away, and marks the current one', () => {
+    renderAt('/lesson/m01-l02');
     expect(screen.getByRole('link', { name: 'Bulleak — на главную' })).toBeInTheDocument();
     const nav = screen.getByRole('navigation', { name: 'Основная навигация' });
-    const buttons = within(nav).getAllByRole('button');
-    expect(buttons.map((b) => b.textContent)).toEqual([
-      'Обучение',
-      'Практика',
-      'Справочник',
-      'Прогресс',
-    ]);
-    expect(within(nav).getByRole('button', { name: 'Справочник' })).toHaveAttribute(
-      'aria-current',
-      'true',
-    );
-  });
-
-  it('opens a section menu with its pages', async () => {
-    const user = userEvent.setup();
-    renderAt('/glossary');
-    const nav = screen.getByRole('navigation', { name: 'Основная навигация' });
-    const practice = within(nav).getByRole('button', { name: 'Практика' });
-    expect(practice).toHaveAttribute('aria-expanded', 'false');
-    await user.click(practice);
-    expect(practice).toHaveAttribute('aria-expanded', 'true');
-    const menu = within(nav).getByRole('list', { name: 'Практика' });
+    expect(within(nav).queryAllByRole('button')).toHaveLength(0);
     expect(
-      within(menu)
+      within(nav)
         .getAllByRole('link')
-        .map((a) => a.textContent),
+        .map((a) => a.getAttribute('aria-label') ?? a.textContent),
     ).toEqual([
-      expect.stringContaining('Тренажёр'),
-      expect.stringContaining('Журнал'),
-      expect.stringContaining('Инструменты'),
-      expect.stringContaining('Торговый план'),
+      'Главная',
+      'Карта курса',
+      'Тренажёр',
+      'Журнал',
+      'Инструменты',
+      'Торговый план',
+      'Глоссарий',
+      'Шпаргалки',
+      'Статистика',
+      'Достижения',
     ]);
-    await user.keyboard('{Escape}');
-    expect(practice).toHaveAttribute('aria-expanded', 'false');
+    expect(within(nav).getByRole('link', { name: 'Карта курса' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 
   it('shows streak and XP, and the profile menu holds level, settings and theme', async () => {
@@ -84,6 +75,10 @@ describe('TopNav', () => {
 
     await user.click(screen.getByRole('button', { name: 'Профиль: уровень 1, Новичок' }));
     expect(screen.getByRole('link', { name: 'Настройки' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Сертификат' })).toHaveAttribute(
+      'href',
+      '/certificate',
+    );
     await user.click(screen.getByRole('button', { name: 'Включить светлую тему' }));
     expect(useSettings.getState().theme).toBe('light');
   });

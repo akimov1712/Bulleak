@@ -19,11 +19,17 @@ import { paths } from '../paths';
 export interface NavItem {
   to: string;
   label: string;
+  /** Shorter tab label for narrow desktops (< xl). */
+  short?: string;
   icon: LucideIcon;
   /** One line under the label in the section menu. */
   description?: string;
   /** Match only the exact path (for "/"). */
   end?: boolean;
+  /** Other path prefixes that count as this page (lessons and exams for the course map). */
+  match?: string[];
+  /** Not shown as a tab in the top bar (reachable from the profile menu). */
+  hideInTabs?: boolean;
 }
 
 export type NavSectionId = 'learn' | 'practice' | 'reference' | 'progress';
@@ -32,8 +38,6 @@ export interface NavSection {
   id: NavSectionId;
   label: string;
   items: NavItem[];
-  /** Path prefixes that belong to the section (pages not in the menu: lessons, exams…). */
-  prefixes: string[];
 }
 
 const home: NavItem = {
@@ -46,8 +50,10 @@ const home: NavItem = {
 const coursePath: NavItem = {
   to: paths.path(),
   label: 'Карта курса',
+  short: 'Курс',
   icon: Map,
   description: '13 модулей: от основ до реальной торговли',
+  match: ['/module', '/lesson', '/exam'],
 };
 const simulator: NavItem = {
   to: paths.simulator(),
@@ -70,23 +76,22 @@ const tools: NavItem = {
 const plan: NavItem = {
   to: paths.plan(),
   label: 'Торговый план',
+  short: 'План',
   icon: ClipboardList,
   description: 'Правила входа, риска и выхода',
 };
 
-/** Top navigation sections, in display order. */
+/** Navigation groups, in display order (tabs on desktop, the «Ещё» sheet on phones). */
 export const NAV_SECTIONS: NavSection[] = [
   {
     id: 'learn',
     label: 'Обучение',
     items: [home, coursePath],
-    prefixes: ['/path', '/module', '/lesson', '/exam'],
   },
   {
     id: 'practice',
     label: 'Практика',
     items: [simulator, journal, tools, plan],
-    prefixes: ['/simulator', '/journal', '/tools', '/plan'],
   },
   {
     id: 'reference',
@@ -105,7 +110,6 @@ export const NAV_SECTIONS: NavSection[] = [
         description: 'Краткие выжимки пройденных модулей',
       },
     ],
-    prefixes: ['/glossary', '/cheatsheets'],
   },
   {
     id: 'progress',
@@ -128,19 +132,19 @@ export const NAV_SECTIONS: NavSection[] = [
         label: 'Сертификат',
         icon: GraduationCap,
         description: 'Откроется после финального экзамена',
+        hideInTabs: true,
       },
     ],
-    prefixes: ['/stats', '/achievements', '/certificate'],
   },
 ];
 
-/** Section that owns the current page ("/" counts as Обучение). */
-export function sectionOf(pathname: string): NavSectionId | null {
-  if (pathname === '/') return 'learn';
-  const match = NAV_SECTIONS.find((s) =>
-    s.prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`)),
-  );
-  return match?.id ?? null;
+const under = (pathname: string, prefix: string) =>
+  pathname === prefix || pathname.startsWith(`${prefix}/`);
+
+/** Whether a navigation item is the current page (its own path or one of `match`). */
+export function isItemActive(item: NavItem, pathname: string): boolean {
+  if (item.end) return pathname === item.to;
+  return [item.to, ...(item.match ?? [])].some((p) => under(pathname, p));
 }
 
 export const secondaryNav: NavItem[] = [

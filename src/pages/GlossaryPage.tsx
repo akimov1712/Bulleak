@@ -128,7 +128,11 @@ function GlossaryList() {
             ))}
           </nav>
           {groups.map(([letter, list]) => (
-            <section key={letter} aria-labelledby={`letter-${letter}`} className="scroll-mt-20">
+            <section
+              key={letter}
+              aria-labelledby={`letter-${letter}`}
+              className="scroll-mt-20 lg:scroll-mt-32"
+            >
               <h2 id={`letter-${letter}`} className="mb-2 text-xl font-semibold">
                 {letter}
               </h2>

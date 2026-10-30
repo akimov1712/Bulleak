@@ -11,7 +11,7 @@ export function H2({ children, className, ...rest }: ComponentProps<'h2'>) {
       id={slugify(textOf(children))}
       data-toc
       className={cn(
-        'mt-12 mb-4 scroll-mt-24 text-2xl font-semibold tracking-tight md:text-[1.75rem]',
+        'mt-12 mb-4 scroll-mt-24 lg:scroll-mt-32 text-2xl font-semibold tracking-tight md:text-[1.75rem]',
         className,
       )}
       {...rest}
@@ -25,7 +25,7 @@ export function H3({ children, className, ...rest }: ComponentProps<'h3'>) {
   return (
     <h3
       id={slugify(textOf(children))}
-      className={cn('mt-8 mb-3 scroll-mt-24 text-xl font-semibold', className)}
+      className={cn('mt-8 mb-3 scroll-mt-24 lg:scroll-mt-32 text-xl font-semibold', className)}
       {...rest}
     >
       {children}

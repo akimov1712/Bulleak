@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import { LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Modal } from '@/components/ui/Modal';
-import { mobileBarNav, NAV_SECTIONS, secondaryNav, sectionOf } from './nav';
+import { isItemActive, mobileBarNav, NAV_SECTIONS, secondaryNav } from './nav';
 
 const itemClass = (active: boolean) =>
   cn(
@@ -22,17 +22,12 @@ const Marker = ({ active }: { active: boolean }) => (
   />
 );
 
-const barPaths = new Set(mobileBarNav.map((item) => item.to));
-
 /** Phone/tablet navigation (< lg): 4 most used pages + "Ещё" with every section. */
 export function BottomNav() {
   const [moreOpen, setMoreOpen] = useState(false);
   const { pathname } = useLocation();
   // Lessons, modules and exams belong to «Курс», not to «Ещё».
-  const moreActive =
-    sectionOf(pathname) !== 'learn' &&
-    !barPaths.has(pathname) &&
-    !mobileBarNav.some((item) => !item.end && pathname.startsWith(`${item.to}/`));
+  const moreActive = !mobileBarNav.some((item) => isItemActive(item, pathname));
 
   return (
     <>
@@ -44,24 +39,20 @@ export function BottomNav() {
           {mobileBarNav.map((item) => {
             const Icon = item.icon;
             return (
-              <NavLink
+              <Link
                 key={item.to}
                 to={item.to}
-                end={item.end}
-                className={({ isActive }) => itemClass(isActive)}
+                aria-current={isItemActive(item, pathname) ? 'page' : undefined}
+                className={itemClass(isItemActive(item, pathname))}
               >
-                {({ isActive }) => (
-                  <>
-                    <Marker active={isActive} />
-                    <Icon
-                      className={cn('size-[1.35rem]', isActive && 'text-bull')}
-                      strokeWidth={2}
-                      aria-hidden="true"
-                    />
-                    {item.label}
-                  </>
-                )}
-              </NavLink>
+                <Marker active={isItemActive(item, pathname)} />
+                <Icon
+                  className={cn('size-[1.35rem]', isItemActive(item, pathname) && 'text-bull')}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+                {item.label}
+              </Link>
             );
           })}
           <button

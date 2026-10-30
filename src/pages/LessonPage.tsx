@@ -95,41 +95,43 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
       <ReadingProgress target={articleRef} />
       <div className="mt-6 grid gap-10 xl:grid-cols-[minmax(0,1fr)_15rem]">
         <article ref={articleRef} className="min-w-0 text-[1.0625rem] md:text-lg">
-          <nav
-            aria-label="Хлебные крошки"
-            className="mb-3 flex flex-wrap items-center gap-1 text-sm font-bold text-text-muted"
-          >
-            <Link to={paths.path()} className="inline-flex min-h-11 items-center hover:text-text">
-              Карта курса
-            </Link>
-            <ChevronRight className="size-4" aria-hidden="true" />
-            <Link
-              to={paths.module(module.id)}
-              className="inline-flex min-h-11 items-center hover:text-text"
+          <div className="mx-auto max-w-[50rem]">
+            <nav
+              aria-label="Хлебные крошки"
+              className="mb-3 flex flex-wrap items-center gap-1 text-sm font-bold text-text-muted"
             >
-              Модуль {module.index}. {module.title}
-            </Link>
-          </nav>
-          <header className="mb-2 max-w-[72ch]">
-            <p className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-wide text-text-muted uppercase">
-              <span
-                className={cn('size-2.5 rounded-full', moduleColors[module.color].bg)}
-                aria-hidden="true"
-              />
-              Урок {module.index}.{lesson.index}
-            </p>
-            <h1 className="text-3xl leading-tight font-semibold tracking-tight md:text-4xl">
-              {lesson.title}
-            </h1>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-              <Badge size="md">
-                <Clock className="size-4" aria-hidden="true" />~{lesson.minutes} мин
-              </Badge>
-              <Badge size="md" tone={badge.tone}>
-                {badge.label}
-              </Badge>
-            </div>
-          </header>
+              <Link to={paths.path()} className="inline-flex min-h-11 items-center hover:text-text">
+                Карта курса
+              </Link>
+              <ChevronRight className="size-4" aria-hidden="true" />
+              <Link
+                to={paths.module(module.id)}
+                className="inline-flex min-h-11 items-center hover:text-text"
+              >
+                Модуль {module.index}. {module.title}
+              </Link>
+            </nav>
+            <header className="mb-2">
+              <p className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-wide text-text-muted uppercase">
+                <span
+                  className={cn('size-2.5 rounded-full', moduleColors[module.color].bg)}
+                  aria-hidden="true"
+                />
+                Урок {module.index}.{lesson.index}
+              </p>
+              <h1 className="text-3xl leading-tight font-semibold tracking-tight md:text-4xl">
+                {lesson.title}
+              </h1>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                <Badge size="md">
+                  <Clock className="size-4" aria-hidden="true" />~{lesson.minutes} мин
+                </Badge>
+                <Badge size="md" tone={badge.tone}>
+                  {badge.label}
+                </Badge>
+              </div>
+            </header>
+          </div>
 
           <ErrorBoundary
             resetKey={lesson.id}
@@ -149,18 +151,20 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
             </Suspense>
           </ErrorBoundary>
 
-          <LessonFooter
-            lesson={lesson}
-            status={status}
-            progress={progress}
-            prev={prev}
-            next={next}
-            nextUnlocked={next ? isLessonUnlocked(ctx, next) : false}
-            examModuleId={
-              next && next.moduleId !== module.id && module.hasExam ? module.id : undefined
-            }
-            examOpen={isExamAvailable(ctx, module.id)}
-          />
+          <div className="mx-auto max-w-[50rem]">
+            <LessonFooter
+              lesson={lesson}
+              status={status}
+              progress={progress}
+              prev={prev}
+              next={next}
+              nextUnlocked={next ? isLessonUnlocked(ctx, next) : false}
+              examModuleId={
+                next && next.moduleId !== module.id && module.hasExam ? module.id : undefined
+              }
+              examOpen={isExamAvailable(ctx, module.id)}
+            />
+          </div>
         </article>
         <aside className="hidden xl:block">
           <TableOfContents container={articleRef} />

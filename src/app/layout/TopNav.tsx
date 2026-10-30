@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router';
+import { Fragment, lazy, Suspense, useEffect } from 'react';
+import { Link, NavLink, useLocation } from 'react-router';
 import { ChevronDown, Moon, Search, Sun } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { levelFromXp } from '@/lib/gamification/levels';
@@ -10,7 +10,7 @@ import { useSettings } from '@/store/settingsStore';
 import { useUi } from '@/store/uiStore';
 import { Dropdown } from './Dropdown';
 import { Logo } from './Logo';
-import { NAV_SECTIONS, secondaryNav, sectionOf, type NavItem, type NavSection } from './nav';
+import { isItemActive, NAV_SECTIONS, secondaryNav, type NavItem } from './nav';
 
 const CommandPalette = lazy(() =>
   import('@/features/search/CommandPalette').then((m) => ({ default: m.CommandPalette })),
@@ -18,85 +18,56 @@ const CommandPalette = lazy(() =>
 
 const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
-/** Link row in a section menu: icon, label and one-line description. */
-function MenuLink({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
+/** One tab of the second header row: icon (from xl) and label, brand line under the current one. */
+function Tab({ item, active }: { item: NavItem; active: boolean }) {
   const Icon = item.icon;
   return (
-    <NavLink
+    <Link
       to={item.to}
-      end={item.end}
-      onClick={onNavigate}
-      className={({ isActive }) =>
-        cn(
-          'group flex items-start gap-3 rounded-(--radius-btn) p-2.5 transition-colors hover:bg-surface-2',
-          isActive && 'bg-surface-2',
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <span
-            className={cn(
-              'grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-bg transition-colors',
-              isActive ? 'text-bull' : 'text-text-muted group-hover:text-text',
-            )}
-          >
-            <Icon className="size-[1.1rem]" aria-hidden="true" />
-          </span>
-          <span className="flex min-w-0 flex-col">
-            <span className="text-sm font-semibold">{item.label}</span>
-            {item.description && (
-              <span className="text-xs text-text-muted">{item.description}</span>
-            )}
-          </span>
-        </>
+      aria-label={item.short ? item.label : undefined}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'relative flex shrink-0 items-center gap-2 px-2.5 text-sm font-medium whitespace-nowrap transition-colors xl:px-3',
+        active ? 'text-text' : 'text-text-muted hover:text-text',
       )}
-    </NavLink>
+    >
+      <Icon className={cn('size-4 max-xl:hidden', active && 'text-bull')} aria-hidden="true" />
+      {item.short ? (
+        <>
+          <span className="xl:hidden">{item.short}</span>
+          <span className="max-xl:hidden">{item.label}</span>
+        </>
+      ) : (
+        item.label
+      )}
+      <span
+        aria-hidden="true"
+        className={cn(
+          'absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary transition-opacity',
+          active ? 'opacity-100' : 'opacity-0',
+        )}
+      />
+    </Link>
   );
 }
 
-function SectionMenu({ section, active }: { section: NavSection; active: boolean }) {
+/** Every section one click away (desktop): groups of tabs separated by thin dividers. */
+function SectionTabs({ pathname }: { pathname: string }) {
   return (
-    <Dropdown
-      hover
-      className="w-80"
-      trigger={(props, open) => (
-        <button
-          type="button"
-          {...props}
-          aria-current={active ? 'true' : undefined}
-          className={cn(
-            'relative flex h-9 items-center gap-1 rounded-(--radius-btn) px-3 text-sm font-medium transition-colors',
-            active || open ? 'text-text' : 'text-text-muted hover:text-text',
-            open && 'bg-surface-2',
-          )}
-        >
-          {section.label}
-          <ChevronDown
-            className={cn('size-3.5 transition-transform', open && 'rotate-180')}
-            aria-hidden="true"
-          />
-          {/* Current section: brand line along the bottom edge of the bar. */}
-          <span
-            aria-hidden="true"
-            className={cn(
-              'absolute inset-x-3 -bottom-[0.6875rem] h-0.5 rounded-full bg-primary transition-opacity',
-              active ? 'opacity-100' : 'opacity-0',
-            )}
-          />
-        </button>
-      )}
-    >
-      {(close) => (
-        <ul className="flex flex-col gap-0.5" aria-label={section.label}>
-          {section.items.map((item) => (
-            <li key={item.to}>
-              <MenuLink item={item} onNavigate={close} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </Dropdown>
+    <nav aria-label="Основная навигация" className="border-t border-border max-lg:hidden">
+      <div className="mx-auto flex h-11 w-full max-w-[1600px] items-stretch overflow-x-auto px-3 [scrollbar-width:none] sm:px-4 md:px-6">
+        {NAV_SECTIONS.map((section, i) => (
+          <Fragment key={section.id}>
+            {i > 0 && <span className="mx-1.5 my-3 w-px shrink-0 bg-border" aria-hidden="true" />}
+            {section.items
+              .filter((item) => !item.hideInTabs)
+              .map((item) => (
+                <Tab key={item.to} item={item} active={isItemActive(item, pathname)} />
+              ))}
+          </Fragment>
+        ))}
+      </div>
+    </nav>
   );
 }
 
@@ -149,7 +120,10 @@ function ProfileMenu() {
           </div>
           <div className="border-t border-border pt-2">
             <ul className="flex flex-col gap-0.5" aria-label="Профиль">
-              {secondaryNav.map((item) => {
+              {[
+                ...secondaryNav,
+                ...NAV_SECTIONS.flatMap((sec) => sec.items).filter((item) => item.hideInTabs),
+              ].map((item) => {
                 const Icon = item.icon;
                 return (
                   <li key={item.to}>
@@ -232,12 +206,11 @@ function useSearchShortcut() {
 }
 
 /**
- * Site header: logo, section menus (desktop), search, streak and XP, profile menu.
- * On phones the sections live in the bottom bar.
+ * Site header: logo, search, streak and XP, profile menu; on desktop a second row with every
+ * section as a tab. On phones the sections live in the bottom bar.
  */
 export function TopNav() {
   const { pathname } = useLocation();
-  const current = sectionOf(pathname);
   const searchOpen = useUi((s) => s.searchOpen);
   const setSearchOpen = useUi((s) => s.setSearchOpen);
   useSearchShortcut();
@@ -245,18 +218,14 @@ export function TopNav() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-bg/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 md:px-6">
-        <Logo className="mr-2 lg:mr-4" />
-        <nav aria-label="Основная навигация" className="flex items-center gap-0.5 max-lg:hidden">
-          {NAV_SECTIONS.map((s) => (
-            <SectionMenu key={s.id} section={s} active={current === s.id} />
-          ))}
-        </nav>
+        <Logo className="mr-2" />
         <div className="ml-auto flex items-center gap-1">
           <SearchButton />
           <Hud className="max-[339px]:hidden" />
           <ProfileMenu />
         </div>
       </div>
+      <SectionTabs pathname={pathname} />
       {searchOpen && (
         <Suspense fallback={null}>
           <CommandPalette open onClose={() => setSearchOpen(false)} />
