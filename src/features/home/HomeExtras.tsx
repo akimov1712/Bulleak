@@ -66,14 +66,14 @@ const QUICK = [
 
 export function QuickLinks() {
   return (
-    <nav aria-label="Быстрые ссылки" className="grid gap-3 sm:grid-cols-3">
+    <nav aria-label="Быстрые ссылки" className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
       {QUICK.map(({ to, icon: Icon, title, text }) => (
         <Link
           key={to}
           to={to}
           className={cardClass({ interactive: true, padding: 'sm' }) + ' flex items-center gap-3'}
         >
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-info-soft text-info">
+          <span className="grid size-11 shrink-0 place-items-center rounded-lg border border-border bg-surface-2 text-text-muted">
             <Icon className="size-6" aria-hidden="true" />
           </span>
           <span>

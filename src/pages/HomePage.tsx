@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { dayPart } from '@/lib/date';
 import { BACKUP_SNOOZE_MS, nextStep, shouldRemindBackup } from '@/lib/progress/nextStep';
-import { MascotSay } from '@/components/mascot/MascotSay';
 import { Onboarding } from '@/features/home/Onboarding';
 import { ContinueCard } from '@/features/home/ContinueCard';
 import { TodayCard } from '@/features/home/TodayCard';
+import { ModulesCard } from '@/features/home/ModulesCard';
+import { courseCompletion, currentLesson } from '@/lib/progress/unlock';
 import { BackupReminder, QuickLinks, RecentAchievements } from '@/features/home/HomeExtras';
 import { useUnlockContext } from '@/hooks/useUnlock';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -48,13 +49,14 @@ export function HomePage() {
   if (!profile.name) return <Onboarding />;
 
   const step = nextStep(ctx);
+  const { done, total } = courseCompletion(ctx);
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-semibold md:text-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
           {GREETING[dayPart(now)]}, {profile.name}!
         </h1>
-        <p className="text-lg text-text-muted">Шаг за шагом к своей стратегии.</p>
+        <p className="text-text-muted">Шаг за шагом к своей стратегии.</p>
       </div>
       {shouldRemindBackup(profile, xp, now, snoozedUntil) && (
         <BackupReminder
@@ -65,13 +67,17 @@ export function HomePage() {
           }}
         />
       )}
-      <ContinueCard step={step} />
-      <TodayCard />
+      <div className="grid gap-5 lg:grid-cols-12">
+        <div className="flex flex-col gap-5 lg:col-span-8">
+          <ContinueCard step={step} done={done} total={total} />
+          <ModulesCard ctx={ctx} current={currentLesson(ctx)?.moduleId} />
+        </div>
+        <div className="flex flex-col gap-5 lg:col-span-4">
+          <TodayCard />
+          <QuickLinks />
+        </div>
+      </div>
       <RecentAchievements />
-      <QuickLinks />
-      <MascotSay mood="thinking" className="mt-2">
-        Совет дня: один урок в день лучше, чем пять за выходные. Серия дней помогает не бросить.
-      </MascotSay>
     </div>
   );
 }
