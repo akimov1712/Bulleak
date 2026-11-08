@@ -6,6 +6,7 @@ import { openTestDatabase, type Database } from '../db';
 import { emailTokens, sessions, users } from '../db/schema';
 import { memoryLogger } from '../log';
 import { memoryMailer } from '../mail';
+import { memoryRateLimiter, type RateLimiter } from './rate-limit';
 import { hashToken, signAccessToken } from './tokens';
 
 let database: Database;
@@ -24,7 +25,7 @@ beforeEach(async () => {
 
 const SECRET = 'test-secret-test-secret-test-secret-00';
 
-function setup(env: Record<string, string> = {}) {
+function setup(env: Record<string, string> = {}, limiter?: RateLimiter) {
   const config = loadConfig({
     NODE_ENV: 'test',
     APP_ORIGIN: 'https://bulleak.test',
@@ -32,7 +33,7 @@ function setup(env: Record<string, string> = {}) {
     ...env,
   });
   mailer = memoryMailer();
-  return createApp({ config, logger: memoryLogger(), db: database.db, mailer });
+  return createApp({ config, logger: memoryLogger(), db: database.db, mailer, limiter });
 }
 
 let mailer: ReturnType<typeof memoryMailer>;
@@ -391,6 +392,92 @@ describe('e-mail flows', () => {
     expect((await post(app, '/auth/register', account)).status).toBe(201);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(logger.lines.some((l) => l.message === 'mail failed')).toBe(true);
+  });
+});
+
+describe('rate limits', () => {
+  const postFrom = (app: App, path: string, body: unknown, ip: string) =>
+    app.request(`${API_PREFIX}${path}`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://bulleak.test',
+        'X-Forwarded-For': `1.1.1.1, ${ip}`,
+      },
+    });
+
+  const proxied = { TRUST_PROXY: 'true' };
+  const wrong = { email: account.email, password: 'wrong-pass' };
+
+  it('blocks the sixth login attempt with Retry-After and CORS headers', async () => {
+    const app = setup(proxied);
+    for (let i = 0; i < 5; i += 1) {
+      expect((await postFrom(app, '/auth/login', wrong, '9.9.9.9')).status).toBe(401);
+    }
+    const blocked = await postFrom(app, '/auth/login', wrong, '9.9.9.9');
+    expect(blocked.status).toBe(429);
+    expect(Number(blocked.headers.get('Retry-After'))).toBeGreaterThan(0);
+    expect(blocked.headers.get('Access-Control-Allow-Origin')).toBe('https://bulleak.test');
+    expect((await errorOf(blocked)).code).toBe('rate_limited');
+  });
+
+  it('counts login per e-mail and address, and opens after the window', async () => {
+    let time = 1_000_000;
+    const app = setup(
+      proxied,
+      memoryRateLimiter(() => time),
+    );
+    for (let i = 0; i < 6; i += 1) await postFrom(app, '/auth/login', wrong, '9.9.9.9');
+    expect((await postFrom(app, '/auth/login', wrong, '8.8.8.8')).status).toBe(401);
+    expect(
+      (await postFrom(app, '/auth/login', { ...wrong, email: 'b@mail.test' }, '9.9.9.9')).status,
+    ).toBe(401);
+    expect((await postFrom(app, '/auth/login', wrong, '9.9.9.9')).status).toBe(429);
+    time += 15 * 60 * 1000;
+    expect((await postFrom(app, '/auth/login', wrong, '9.9.9.9')).status).toBe(401);
+  });
+
+  it('forgets failures after a successful login', async () => {
+    const app = setup(proxied);
+    await postFrom(app, '/auth/register', account, '7.7.7.7');
+    for (let i = 0; i < 4; i += 1) await postFrom(app, '/auth/login', wrong, '9.9.9.9');
+    expect((await postFrom(app, '/auth/login', account, '9.9.9.9')).status).toBe(200);
+    for (let i = 0; i < 5; i += 1) {
+      expect((await postFrom(app, '/auth/login', wrong, '9.9.9.9')).status).toBe(401);
+    }
+  });
+
+  it('limits registration per address', async () => {
+    const app = setup(proxied);
+    const attempt = (i: number) =>
+      postFrom(app, '/auth/register', { ...account, email: `u${i}@mail.test` }, '9.9.9.9');
+    for (let i = 0; i < 5; i += 1) expect((await attempt(i)).status).toBe(201);
+    expect((await attempt(5)).status).toBe(429);
+  });
+
+  it('limits forgot per e-mail, whether or not the account exists', async () => {
+    const app = setup();
+    const email = 'ghost@mail.test';
+    for (let i = 0; i < 3; i += 1) {
+      expect((await post(app, '/auth/forgot', { email })).status).toBe(200);
+    }
+    expect((await post(app, '/auth/forgot', { email })).status).toBe(429);
+  });
+
+  it('ignores X-Forwarded-For unless the proxy is trusted', async () => {
+    const app = setup();
+    for (let i = 0; i < 5; i += 1) await postFrom(app, '/auth/login', wrong, `9.9.9.${i}`);
+    expect((await postFrom(app, '/auth/login', wrong, '9.9.9.200')).status).toBe(429);
+  });
+});
+
+describe('security headers', () => {
+  it('are set on API responses', async () => {
+    const res = await setup().request(`${API_PREFIX}/health`);
+    expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(res.headers.get('Strict-Transport-Security')).toContain('max-age=');
+    expect(res.headers.get('Content-Security-Policy')).toContain("default-src 'none'");
   });
 });
 

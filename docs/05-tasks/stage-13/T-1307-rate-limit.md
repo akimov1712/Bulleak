@@ -1,7 +1,7 @@
 # T-1307 · Rate limit и заголовки безопасности
 
 - **Этап:** 13 Сервер и авторизация
-- **Статус:** ☐ не начата
+- **Статус:** ☑ готова
 
 ## Контекст (прочитать перед началом)
 - [ТЗ: аккаунты и бэкенд](../../04-features/accounts-backend.md)
@@ -11,7 +11,7 @@
 2. Заголовки безопасности, `429` с `Retry-After`.
 
 ## Критерии приёмки
-- [ ] Тесты лимитов и заголовков
-- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+- [x] Тесты лимитов и заголовков
+- [x] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
 
 **Коммит:** `feat(server): add rate limiting and security headers`

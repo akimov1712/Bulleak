@@ -8,6 +8,7 @@ export class HttpError extends Error {
     readonly code: ErrorCode,
     message: string,
     readonly fields?: Record<string, string>,
+    readonly headers?: Record<string, string>,
   ) {
     super(message);
     this.name = 'HttpError';
@@ -44,5 +45,13 @@ export const tokenInvalid = () =>
   new HttpError(401, 'token_invalid', 'Сессия истекла. Войди в аккаунт ещё раз.');
 export const linkInvalid = () =>
   new HttpError(400, 'token_invalid', 'Ссылка недействительна или устарела. Запроси новую.');
+export const rateLimited = (retryAfterSec: number) =>
+  new HttpError(
+    429,
+    'rate_limited',
+    `Слишком много попыток. Попробуй через ${Math.ceil(retryAfterSec / 60)} мин.`,
+    undefined,
+    { 'Retry-After': String(retryAfterSec) },
+  );
 export const payloadTooLarge = () =>
   new HttpError(413, 'payload_too_large', 'Слишком большой запрос');

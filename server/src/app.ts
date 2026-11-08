@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
+import { secureHeaders } from 'hono/secure-headers';
+import { memoryRateLimiter, type RateLimiter } from './auth/rate-limit';
 import { authRoutes } from './auth/routes';
 import type { Config } from './config';
 import type { Db } from './db';
@@ -13,13 +15,15 @@ export interface AppDeps {
   logger: Logger;
   db: Db;
   mailer: Mailer;
+  /** In-memory by default (one server process). */
+  limiter?: RateLimiter;
 }
 
 export const API_PREFIX = '/api/v1';
 export const VERSION = '0.1.0';
 
 /** The API as a Hono app (no network listener): main.ts serves it, tests call `app.request`. */
-export function createApp({ config, logger, db, mailer }: AppDeps) {
+export function createApp({ config, logger, db, mailer, limiter = memoryRateLimiter() }: AppDeps) {
   const app = new Hono();
 
   app.use(
@@ -30,6 +34,14 @@ export function createApp({ config, logger, db, mailer }: AppDeps) {
       allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       allowHeaders: ['Content-Type', 'Authorization'],
       maxAge: 600,
+    }),
+  );
+
+  // The API serves only JSON, so a page may not load or frame anything from it.
+  app.use(
+    '*',
+    secureHeaders({
+      contentSecurityPolicy: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
     }),
   );
 
@@ -56,7 +68,7 @@ export function createApp({ config, logger, db, mailer }: AppDeps) {
 
   app.get(`${API_PREFIX}/health`, (c) => c.json({ status: 'ok', version: VERSION }));
 
-  app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, apiPrefix: API_PREFIX }));
+  app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, limiter, apiPrefix: API_PREFIX }));
 
   app.notFound((c) => {
     const error = notFound();
@@ -67,7 +79,7 @@ export function createApp({ config, logger, db, mailer }: AppDeps) {
     const known = error instanceof HttpError ? error : null;
     if (!known) logger.error('unhandled error', { name: error.name, reason: error.message });
     const http = known ?? internal();
-    return c.json(http.toBody(), http.status);
+    return c.json(http.toBody(), http.status, http.headers);
   });
 
   return app;

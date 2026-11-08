@@ -23,6 +23,8 @@ const envSchema = z
     /** Without a key (outside production) letters are only written to the log. */
     RESEND_API_KEY: z.string().optional(),
     MAIL_FROM: z.string().optional(),
+    /** Behind a reverse proxy: take the client address from X-Forwarded-For. */
+    TRUST_PROXY: z.stringbool().default(false),
     /** Largest accepted request body, bytes. */
     BODY_LIMIT: z.coerce
       .number()
@@ -65,6 +67,7 @@ const envSchema = z
           : null,
       jwtSecret: secret,
       refreshTransport: env.REFRESH_TRANSPORT,
+      trustProxy: env.TRUST_PROXY,
       bodyLimit: env.BODY_LIMIT,
       database: databaseTarget(env.NODE_ENV, env.DATABASE_URL),
     };

@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono, type Context, type MiddlewareHandler } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import type { z } from 'zod';
@@ -23,6 +24,7 @@ import {
   emailTaken,
   invalidCredentials,
   linkInvalid,
+  rateLimited,
   tokenInvalid,
   unauthorized,
   validation,
@@ -30,6 +32,7 @@ import {
 } from '../errors';
 import { consumeEmailToken, issueEmailToken, peekEmailToken } from './email-tokens';
 import { hashPassword, verifyPassword } from './password';
+import { RATE_LIMITS, type RateLimit, type RateLimiter } from './rate-limit';
 import { createSession, revokeAllSessions, revokeSessionByToken, rotateSession } from './sessions';
 import { ACCESS_TTL_SEC, REFRESH_TTL_MS, signAccessToken, verifyAccessToken } from './tokens';
 
@@ -42,6 +45,7 @@ export interface AuthDeps {
   db: Db;
   logger: Logger;
   mailer: Mailer;
+  limiter: RateLimiter;
   /** Path the refresh cookie is limited to. */
   apiPrefix: string;
 }
@@ -72,8 +76,26 @@ export function requireAuth(secret: string): MiddlewareHandler<AuthedEnv> {
   };
 }
 
-export function authRoutes({ config, db, logger, mailer, apiPrefix }: AuthDeps) {
+export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: AuthDeps) {
   const app = new Hono<AuthedEnv>();
+
+  function clientIp(c: Context) {
+    if (config.trustProxy) {
+      // The last entry is the one our proxy added; earlier ones are whatever the client sent.
+      const forwarded = c.req.header('X-Forwarded-For')?.split(',').at(-1)?.trim();
+      if (forwarded) return forwarded;
+    }
+    try {
+      return getConnInfo(c).remote.address ?? 'unknown';
+    } catch {
+      return 'unknown';
+    }
+  }
+
+  function enforceLimit(key: string, rule: RateLimit) {
+    const { allowed, retryAfterSec } = limiter.hit(key, rule);
+    if (!allowed) throw rateLimited(retryAfterSec);
+  }
 
   /** In the background: a mail outage must not fail the request or reveal who has an account. */
   function sendInBackground(mail: Mail) {
@@ -110,6 +132,7 @@ export function authRoutes({ config, db, logger, mailer, apiPrefix }: AuthDeps) 
   }
 
   app.post('/auth/register', async (c) => {
+    enforceLimit(`register:${clientIp(c)}`, RATE_LIMITS.register);
     const body = await parseBody(c, registerBodySchema);
     if (isWeakPassword(body.password, body.email, body.name)) throw weakPassword();
     const passwordHash = await hashPassword(body.password);
@@ -132,9 +155,12 @@ export function authRoutes({ config, db, logger, mailer, apiPrefix }: AuthDeps) 
 
   app.post('/auth/login', async (c) => {
     const body = await parseBody(c, loginBodySchema);
+    const limitKey = `login:${body.email}:${clientIp(c)}`;
+    enforceLimit(limitKey, RATE_LIMITS.login);
     const [user] = await db.select().from(users).where(eq(users.email, body.email)).limit(1);
     const valid = await verifyPassword(user?.passwordHash, body.password);
     if (!user || !valid) throw invalidCredentials();
+    limiter.reset(limitKey);
     const refreshToken = await createSession(db, user.id, c.req.header('User-Agent'));
     return c.json(await respondWithSession(c, user, refreshToken));
   });
@@ -192,6 +218,7 @@ export function authRoutes({ config, db, logger, mailer, apiPrefix }: AuthDeps) 
       .where(eq(users.id, c.get('userId')))
       .limit(1);
     if (!user) throw unauthorized();
+    enforceLimit(`resend:${user.id}`, RATE_LIMITS.resendVerification);
     if (user.emailVerifiedAt === null) await sendVerification(user);
     return c.body(null, 204);
   });
@@ -199,6 +226,7 @@ export function authRoutes({ config, db, logger, mailer, apiPrefix }: AuthDeps) 
   // Always the same answer: the form must not reveal who has an account.
   app.post('/auth/forgot', async (c) => {
     const { email } = await parseBody(c, forgotBodySchema);
+    enforceLimit(`forgot:${email}`, RATE_LIMITS.forgot);
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (user) {
       const token = await issueEmailToken(db, user.id, 'reset');
