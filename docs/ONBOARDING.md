@@ -31,6 +31,12 @@ npm run check
 - В Claude Code (десктоп): `preview_start` с конфигурацией `web` из `.claude/launch.json` — Vite на порту 5173, слушает всю локальную сеть (`http://<IP-компьютера>:5173/`), HMR выключен (режим `pane`) — после правок перезагружать страницу.
 - Вручную: `npm run dev` → http://localhost:5173/
 
+## Запустить API (необязательно)
+```
+npm run dev:server
+```
+API поднимется на http://localhost:8787/api/v1. PostgreSQL ставить не нужно: локально работает PGlite. Подробности — [backend.md](02-architecture/backend.md).
+
 ## 5. Как продолжить работу (для Claude)
 1. Прочитать `CLAUDE.md` (правила) → `docs/README.md` (карта ТЗ) → `docs/PROGRESS.md` (где остановились, решения и отзывы пользователя).
 2. Взять следующую задачу из `docs/05-tasks/stage-XX/`, выполнить по Definition of Done.

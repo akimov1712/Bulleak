@@ -12,6 +12,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Fast, separate signal for the API: PGlite, no external services.
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck -w server
+      - run: npx eslint server shared
+      - run: npm run test -w server
+
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 30
