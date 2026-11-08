@@ -20,8 +20,8 @@
 | [T-1308](T-1308-server-ci.md) | CI сервера | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
 - [ ] `npm run e2e` и `npm run build` зелёные
 - [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
 - [ ] Тег `stage-13-done`

@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiErrorSchema, authResponseSchema } from '@bulleak/shared';
 import { API_PREFIX, createApp } from '../app';
 import { loadConfig } from '../config';
@@ -278,6 +278,13 @@ describe('e-mail flows', () => {
   const tokenIn = (text: string | undefined) => /token=([\w-]+)/.exec(text ?? '')?.[1] ?? '';
   const lastToken = () => tokenIn(mailer.sent.at(-1)?.text);
 
+  /** The reset letter is prepared in the background, after the response. */
+  async function requestReset(app: App) {
+    const before = mailer.sent.length;
+    await post(app, '/auth/forgot', { email: account.email });
+    await vi.waitFor(() => expect(mailer.sent).toHaveLength(before + 1));
+  }
+
   async function signUp(app: App) {
     return authResponseSchema.parse(await (await post(app, '/auth/register', account)).json());
   }
@@ -334,6 +341,7 @@ describe('e-mail flows', () => {
     expect(known.status).toBe(200);
     expect(unknown.status).toBe(200);
     expect(await known.json()).toEqual(await unknown.json());
+    await vi.waitFor(() => expect(mailer.sent).toHaveLength(1));
     expect(mailer.sent.map((m) => m.to)).toEqual(['trader@mail.test']);
     expect(mailer.sent[0]?.text).toContain('#/reset?token=');
   });
@@ -341,7 +349,7 @@ describe('e-mail flows', () => {
   it('resets the password once and ends every session', async () => {
     const app = setup();
     const session = await signUp(app);
-    await post(app, '/auth/forgot', { email: account.email });
+    await requestReset(app);
     const token = lastToken();
     const password = 'brand-New#Pass42';
     expect((await post(app, '/auth/reset', { token, password })).status).toBe(204);
@@ -360,7 +368,7 @@ describe('e-mail flows', () => {
   it('keeps the link usable after a weak password', async () => {
     const app = setup();
     await signUp(app);
-    await post(app, '/auth/forgot', { email: account.email });
+    await requestReset(app);
     const token = lastToken();
     const weak = await post(app, '/auth/reset', { token, password: 'qwerty2024' });
     expect((await errorOf(weak)).code).toBe('weak_password');
@@ -375,7 +383,7 @@ describe('e-mail flows', () => {
     const verifyToken = lastToken();
     const password = 'brand-New#Pass42';
     expect((await post(app, '/auth/reset', { token: verifyToken, password })).status).toBe(400);
-    await post(app, '/auth/forgot', { email: account.email });
+    await requestReset(app);
     await database.db.update(emailTokens).set({ expiresAt: new Date(Date.now() - 1000) });
     expect((await post(app, '/auth/reset', { token: lastToken(), password })).status).toBe(400);
   });
@@ -463,6 +471,34 @@ describe('rate limits', () => {
       expect((await post(app, '/auth/forgot', { email })).status).toBe(200);
     }
     expect((await post(app, '/auth/forgot', { email })).status).toBe(429);
+  });
+
+  it('limits logins per address even with a new e-mail each time', async () => {
+    const app = setup(proxied);
+    const attempt = (i: number) =>
+      postFrom(app, '/auth/login', { ...wrong, email: `u${i}@mail.test` }, '9.9.9.9');
+    for (let i = 0; i < 30; i += 1) expect((await attempt(i)).status).toBe(401);
+    expect((await attempt(30)).status).toBe(429);
+  }, 30_000);
+
+  it('limits forgot per address across e-mails', async () => {
+    const app = setup(proxied);
+    const attempt = (i: number) =>
+      postFrom(app, '/auth/forgot', { email: `u${i}@mail.test` }, '9.9.9.9');
+    for (let i = 0; i < 20; i += 1) expect((await attempt(i)).status).toBe(200);
+    expect((await attempt(20)).status).toBe(429);
+  });
+
+  it('keeps the limiter table within its size, oldest keys first', () => {
+    const limiter = memoryRateLimiter(() => 1000, 2);
+    const rule = { limit: 1, windowMs: 60_000 };
+    expect(limiter.hit('a', rule).allowed).toBe(true);
+    expect(limiter.hit('b', rule).allowed).toBe(true);
+    expect(limiter.hit('b', rule).allowed).toBe(false);
+    expect(limiter.hit('c', rule).allowed).toBe(true);
+    // «a» was evicted, «b» survived.
+    expect(limiter.hit('b', rule).allowed).toBe(false);
+    expect(limiter.hit('a', rule).allowed).toBe(true);
   });
 
   it('ignores X-Forwarded-For unless the proxy is trusted', async () => {

@@ -82,7 +82,9 @@ export type Config = z.output<typeof envSchema>;
 
 /** Reads the environment; a misconfiguration stops the server with every problem listed. */
 export function loadConfig(env: Record<string, string | undefined>): Config {
-  const result = envSchema.safeParse(env);
+  // "NAME=" in a .env file means "not set", as in .env.example.
+  const present = Object.fromEntries(Object.entries(env).filter(([, value]) => value !== ''));
+  const result = envSchema.safeParse(present);
   if (!result.success) {
     const problems = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
     throw new Error(`Неверная конфигурация сервера:\n- ${problems.join('\n- ')}`);

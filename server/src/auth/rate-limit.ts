@@ -8,8 +8,11 @@ const MINUTE = 60 * 1000;
 /** Limits from the spec (docs/04-features/accounts-backend.md, section 8). */
 export const RATE_LIMITS = {
   login: { limit: 5, windowMs: 15 * MINUTE },
+  /** Every login runs argon2: without this, new e-mails from one address would be free. */
+  loginPerAddress: { limit: 30, windowMs: 15 * MINUTE },
   register: { limit: 5, windowMs: 60 * MINUTE },
   forgot: { limit: 3, windowMs: 60 * MINUTE },
+  forgotPerAddress: { limit: 20, windowMs: 60 * MINUTE },
   resendVerification: { limit: 3, windowMs: 60 * MINUTE },
 } satisfies Record<string, RateLimit>;
 
@@ -22,19 +25,29 @@ export interface RateLimiter {
 
 /** Keys come from user input, so the table must not grow without bound. */
 const MAX_KEYS = 100_000;
+const SWEEP_EVERY_MS = 60 * 1000;
 
-/** Fixed window per key, in memory; `now` is injectable for tests. */
-export function memoryRateLimiter(now: () => number = Date.now): RateLimiter {
+/** Fixed window per key, in memory; `now` and the size cap are injectable for tests. */
+export function memoryRateLimiter(
+  now: () => number = Date.now,
+  maxKeys: number = MAX_KEYS,
+): RateLimiter {
   const windows = new Map<string, { count: number; resetAt: number }>();
+  let nextSweep = 0;
 
   function makeRoom(time: number) {
-    for (const [key, entry] of windows) {
-      if (entry.resetAt <= time) windows.delete(key);
+    // A full scan at most once a minute, so a flood of new keys cannot make every request slow.
+    if (time >= nextSweep) {
+      nextSweep = time + SWEEP_EVERY_MS;
+      for (const [key, entry] of windows) {
+        if (entry.resetAt <= time) windows.delete(key);
+      }
     }
-    // Still full of live keys: Map keeps insertion order, so drop the oldest.
-    for (const key of windows.keys()) {
-      if (windows.size < MAX_KEYS) break;
-      windows.delete(key);
+    // Still full of live keys: Map keeps insertion order, so the oldest goes first.
+    while (windows.size >= maxKeys) {
+      const oldest = windows.keys().next();
+      if (oldest.done) return;
+      windows.delete(oldest.value);
     }
   }
 
@@ -43,7 +56,7 @@ export function memoryRateLimiter(now: () => number = Date.now): RateLimiter {
       const time = now();
       let entry = windows.get(key);
       if (!entry || entry.resetAt <= time) {
-        if (windows.size >= MAX_KEYS) makeRoom(time);
+        if (windows.size >= maxKeys) makeRoom(time);
         entry = { count: 0, resetAt: time + windowMs };
         windows.set(key, entry);
       }

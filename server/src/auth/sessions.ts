@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, type SQL } from 'drizzle-orm';
 import type { Db } from '../db';
 import { sessions, users, type User } from '../db/schema';
 import { hashToken, newOpaqueToken, REFRESH_TTL_MS } from './tokens';
@@ -24,23 +24,19 @@ export async function createSession(
   return refreshToken;
 }
 
-export const revokeFamily = (db: Db, familyId: string) =>
+const revokeWhere = (db: Db, condition: SQL) =>
   db
     .update(sessions)
     .set({ revokedAt: new Date() })
-    .where(and(eq(sessions.familyId, familyId), isNull(sessions.revokedAt)));
+    .where(and(condition, isNull(sessions.revokedAt)));
+
+const revokeFamily = (db: Db, familyId: string) => revokeWhere(db, eq(sessions.familyId, familyId));
 
 export const revokeAllSessions = (db: Db, userId: string) =>
-  db
-    .update(sessions)
-    .set({ revokedAt: new Date() })
-    .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)));
+  revokeWhere(db, eq(sessions.userId, userId));
 
 export const revokeSessionByToken = (db: Db, refreshToken: string) =>
-  db
-    .update(sessions)
-    .set({ revokedAt: new Date() })
-    .where(and(eq(sessions.refreshHash, hashToken(refreshToken)), isNull(sessions.revokedAt)));
+  revokeWhere(db, eq(sessions.refreshHash, hashToken(refreshToken)));
 
 /**
  * Replaces a refresh token with a new one in the same family. Null means the token cannot be

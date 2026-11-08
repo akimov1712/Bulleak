@@ -87,6 +87,13 @@ describe('loadConfig', () => {
     expect(loadConfig({ NODE_ENV: 'test' }).database).toEqual({ kind: 'pglite' });
   });
 
+  it('treats empty variables as not set', () => {
+    expect(loadConfig({ APP_URL: '', APP_ORIGIN: '', DATABASE_URL: '' })).toMatchObject({
+      appUrl: 'http://localhost:5173/',
+      database: { kind: 'pglite' },
+    });
+  });
+
   it('refuses to start production without a strong secret and origin', () => {
     expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(
       /JWT_SECRET[\s\S]*DATABASE_URL[\s\S]*APP_ORIGIN[\s\S]*RESEND_API_KEY/,

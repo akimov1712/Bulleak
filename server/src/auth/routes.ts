@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono, type Context, type MiddlewareHandler } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
@@ -19,7 +19,7 @@ import type { Config } from '../config';
 import type { Db } from '../db';
 import { users, type User } from '../db/schema';
 import type { Logger } from '../log';
-import { resetPasswordMail, verifyEmailMail, type Mail, type Mailer } from '../mail';
+import { resetPasswordMail, verifyEmailMail, type Mailer } from '../mail';
 import {
   emailTaken,
   invalidCredentials,
@@ -97,16 +97,32 @@ export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: A
     if (!allowed) throw rateLimited(retryAfterSec);
   }
 
+  // Matches the lower(email) unique index; e-mails are already normalised by the schemas.
+  const findUserByEmail = async (email: string) =>
+    (
+      await db
+        .select()
+        .from(users)
+        .where(sql`lower(${users.email}) = ${email}`)
+        .limit(1)
+    )[0];
+
+  const findUserById = async (id: string) =>
+    (await db.select().from(users).where(eq(users.id, id)).limit(1))[0];
+
   /** In the background: a mail outage must not fail the request or reveal who has an account. */
-  function sendInBackground(mail: Mail) {
-    mailer.send(mail).catch((error: unknown) => {
+  function inBackground(work: Promise<void>) {
+    work.catch((error: unknown) => {
       logger.error('mail failed', { reason: error instanceof Error ? error.message : 'unknown' });
     });
   }
 
-  async function sendVerification(user: User) {
-    const token = await issueEmailToken(db, user.id, 'verify');
-    sendInBackground(verifyEmailMail(user.email, `${config.appUrl}#/verify?token=${token}`));
+  const verificationMail = (user: User, token: string) =>
+    verifyEmailMail(user.email, `${config.appUrl}#/verify?token=${token}`);
+
+  async function issueAndSendReset(user: User) {
+    const token = await issueEmailToken(db, user.id, 'reset');
+    await mailer.send(resetPasswordMail(user.email, `${config.appUrl}#/reset?token=${token}`));
   }
 
   /** Access token in the body; refresh token as a cookie or in the body, per deployment. */
@@ -146,18 +162,20 @@ export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: A
         .returning();
       if (!user) return null;
       const refreshToken = await createSession(tx, user.id, c.req.header('User-Agent'));
-      return { user, refreshToken };
+      const verifyToken = await issueEmailToken(tx, user.id, 'verify');
+      return { user, refreshToken, verifyToken };
     });
     if (!created) throw emailTaken();
-    await sendVerification(created.user);
+    inBackground(mailer.send(verificationMail(created.user, created.verifyToken)));
     return c.json(await respondWithSession(c, created.user, created.refreshToken), 201);
   });
 
   app.post('/auth/login', async (c) => {
+    enforceLimit(`login-address:${clientIp(c)}`, RATE_LIMITS.loginPerAddress);
     const body = await parseBody(c, loginBodySchema);
     const limitKey = `login:${body.email}:${clientIp(c)}`;
     enforceLimit(limitKey, RATE_LIMITS.login);
-    const [user] = await db.select().from(users).where(eq(users.email, body.email)).limit(1);
+    const user = await findUserByEmail(body.email);
     const valid = await verifyPassword(user?.passwordHash, body.password);
     if (!user || !valid) throw invalidCredentials();
     limiter.reset(limitKey);
@@ -205,33 +223,34 @@ export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: A
 
   app.post('/auth/verify-email', async (c) => {
     const { token } = await parseBody(c, emailTokenBodySchema);
-    const userId = await consumeEmailToken(db, token, 'verify');
-    if (!userId) throw linkInvalid();
-    await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.id, userId));
+    const verified = await db.transaction(async (tx) => {
+      const userId = await consumeEmailToken(tx, token, 'verify');
+      if (!userId) return false;
+      await tx.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.id, userId));
+      return true;
+    });
+    if (!verified) throw linkInvalid();
     return c.body(null, 204);
   });
 
   app.post('/auth/resend-verification', requireAuth(config.jwtSecret), async (c) => {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, c.get('userId')))
-      .limit(1);
+    const user = await findUserById(c.get('userId'));
     if (!user) throw unauthorized();
     enforceLimit(`resend:${user.id}`, RATE_LIMITS.resendVerification);
-    if (user.emailVerifiedAt === null) await sendVerification(user);
+    if (user.emailVerifiedAt === null) {
+      const token = await issueEmailToken(db, user.id, 'verify');
+      inBackground(mailer.send(verificationMail(user, token)));
+    }
     return c.body(null, 204);
   });
 
-  // Always the same answer: the form must not reveal who has an account.
+  // Same answer and same work in the request: the form must not reveal who has an account.
   app.post('/auth/forgot', async (c) => {
+    enforceLimit(`forgot-address:${clientIp(c)}`, RATE_LIMITS.forgotPerAddress);
     const { email } = await parseBody(c, forgotBodySchema);
     enforceLimit(`forgot:${email}`, RATE_LIMITS.forgot);
-    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (user) {
-      const token = await issueEmailToken(db, user.id, 'reset');
-      sendInBackground(resetPasswordMail(user.email, `${config.appUrl}#/reset?token=${token}`));
-    }
+    const user = await findUserByEmail(email);
+    if (user) inBackground(issueAndSendReset(user));
     return c.json({ ok: true });
   });
 
@@ -258,11 +277,7 @@ export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: A
   });
 
   app.get('/me', requireAuth(config.jwtSecret), async (c) => {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, c.get('userId')))
-      .limit(1);
+    const user = await findUserById(c.get('userId'));
     // A valid token can outlive its account (deletion): treat it as signed out.
     if (!user) throw unauthorized();
     c.header('Cache-Control', 'no-store');
