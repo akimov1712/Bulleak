@@ -5,6 +5,7 @@ import { loadConfig } from '../config';
 import { openTestDatabase, type Database } from '../db';
 import { emailTokens, sessions, users } from '../db/schema';
 import { memoryLogger } from '../log';
+import { memoryMailer } from '../mail';
 import { hashToken, signAccessToken } from './tokens';
 
 let database: Database;
@@ -30,8 +31,11 @@ function setup(env: Record<string, string> = {}) {
     JWT_SECRET: SECRET,
     ...env,
   });
-  return createApp({ config, logger: memoryLogger(), db: database.db });
+  mailer = memoryMailer();
+  return createApp({ config, logger: memoryLogger(), db: database.db, mailer });
 }
+
+let mailer: ReturnType<typeof memoryMailer>;
 
 type App = ReturnType<typeof setup>;
 
@@ -266,6 +270,127 @@ describe('sessions', () => {
     });
     expect(out.status).toBe(204);
     expect(out.headers.get('Set-Cookie')).toMatch(/Max-Age=0/);
+  });
+});
+
+describe('e-mail flows', () => {
+  const tokenIn = (text: string | undefined) => /token=([\w-]+)/.exec(text ?? '')?.[1] ?? '';
+  const lastToken = () => tokenIn(mailer.sent.at(-1)?.text);
+
+  async function signUp(app: App) {
+    return authResponseSchema.parse(await (await post(app, '/auth/register', account)).json());
+  }
+
+  it('sends a verification link to the site and verifies once', async () => {
+    const app = setup({ APP_URL: 'https://x.test/Bulleak' });
+    const session = await signUp(app);
+    expect(mailer.sent).toHaveLength(1);
+    expect(mailer.sent[0]?.to).toBe('trader@mail.test');
+    expect(mailer.sent[0]?.text).toContain('https://x.test/Bulleak/#/verify?token=');
+    const token = lastToken();
+    expect((await post(app, '/auth/verify-email', { token })).status).toBe(204);
+    const res = await me(app, `Bearer ${session.accessToken}`);
+    expect(await res.json()).toMatchObject({ user: { emailVerified: true } });
+    const again = await post(app, '/auth/verify-email', { token });
+    expect(again.status).toBe(400);
+    expect((await errorOf(again)).code).toBe('token_invalid');
+  });
+
+  it('stores only a hash of the token', async () => {
+    await signUp(setup());
+    const [row] = await database.db.select().from(emailTokens);
+    expect(row?.tokenHash).toBe(hashToken(lastToken()));
+  });
+
+  it('refuses an expired verification link', async () => {
+    const app = setup();
+    await signUp(app);
+    await database.db.update(emailTokens).set({ expiresAt: new Date(Date.now() - 1000) });
+    expect((await post(app, '/auth/verify-email', { token: lastToken() })).status).toBe(400);
+  });
+
+  it('resends: the new link works, the old one does not; nothing for verified', async () => {
+    const app = setup();
+    const session = await signUp(app);
+    const first = lastToken();
+    const headers = { Authorization: `Bearer ${session.accessToken}` };
+    const resend = () =>
+      app.request(`${API_PREFIX}/auth/resend-verification`, { method: 'POST', headers });
+    expect((await resend()).status).toBe(204);
+    expect(mailer.sent).toHaveLength(2);
+    expect((await post(app, '/auth/verify-email', { token: first })).status).toBe(400);
+    expect((await post(app, '/auth/verify-email', { token: lastToken() })).status).toBe(204);
+    await resend();
+    expect(mailer.sent).toHaveLength(2);
+  });
+
+  it('answers forgot identically and writes only to existing accounts', async () => {
+    const app = setup();
+    await signUp(app);
+    mailer.sent.length = 0;
+    const known = await post(app, '/auth/forgot', { email: account.email });
+    const unknown = await post(app, '/auth/forgot', { email: 'ghost@mail.test' });
+    expect(known.status).toBe(200);
+    expect(unknown.status).toBe(200);
+    expect(await known.json()).toEqual(await unknown.json());
+    expect(mailer.sent.map((m) => m.to)).toEqual(['trader@mail.test']);
+    expect(mailer.sent[0]?.text).toContain('#/reset?token=');
+  });
+
+  it('resets the password once and ends every session', async () => {
+    const app = setup();
+    const session = await signUp(app);
+    await post(app, '/auth/forgot', { email: account.email });
+    const token = lastToken();
+    const password = 'brand-New#Pass42';
+    expect((await post(app, '/auth/reset', { token, password })).status).toBe(204);
+
+    const oldLogin = await post(app, '/auth/login', account);
+    expect(oldLogin.status).toBe(401);
+    const newLogin = await post(app, '/auth/login', { email: account.email, password });
+    expect(newLogin.status).toBe(200);
+    expect((await post(app, '/auth/refresh', { refreshToken: session.refreshToken })).status).toBe(
+      401,
+    );
+    expect(authResponseSchema.parse(await newLogin.json()).user.emailVerified).toBe(true);
+    expect((await post(app, '/auth/reset', { token, password })).status).toBe(400);
+  });
+
+  it('keeps the link usable after a weak password', async () => {
+    const app = setup();
+    await signUp(app);
+    await post(app, '/auth/forgot', { email: account.email });
+    const token = lastToken();
+    const weak = await post(app, '/auth/reset', { token, password: 'qwerty2024' });
+    expect((await errorOf(weak)).code).toBe('weak_password');
+    expect((await post(app, '/auth/reset', { token, password: 'brand-New#Pass42' })).status).toBe(
+      204,
+    );
+  });
+
+  it('refuses an expired reset link and a verification token used for reset', async () => {
+    const app = setup();
+    await signUp(app);
+    const verifyToken = lastToken();
+    const password = 'brand-New#Pass42';
+    expect((await post(app, '/auth/reset', { token: verifyToken, password })).status).toBe(400);
+    await post(app, '/auth/forgot', { email: account.email });
+    await database.db.update(emailTokens).set({ expiresAt: new Date(Date.now() - 1000) });
+    expect((await post(app, '/auth/reset', { token: lastToken(), password })).status).toBe(400);
+  });
+
+  it('survives a mail outage', async () => {
+    const config = loadConfig({ NODE_ENV: 'test', JWT_SECRET: SECRET });
+    const logger = memoryLogger();
+    const app = createApp({
+      config,
+      logger,
+      db: database.db,
+      mailer: { send: () => Promise.reject(new Error('down')) },
+    });
+    expect((await post(app, '/auth/register', account)).status).toBe(201);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(logger.lines.some((l) => l.message === 'mail failed')).toBe(true);
   });
 });
 

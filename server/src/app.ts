@@ -6,18 +6,20 @@ import type { Config } from './config';
 import type { Db } from './db';
 import { HttpError, internal, notFound, payloadTooLarge } from './errors';
 import type { Logger } from './log';
+import type { Mailer } from './mail';
 
 export interface AppDeps {
   config: Config;
   logger: Logger;
   db: Db;
+  mailer: Mailer;
 }
 
 export const API_PREFIX = '/api/v1';
 export const VERSION = '0.1.0';
 
 /** The API as a Hono app (no network listener): main.ts serves it, tests call `app.request`. */
-export function createApp({ config, logger, db }: AppDeps) {
+export function createApp({ config, logger, db, mailer }: AppDeps) {
   const app = new Hono();
 
   app.use(
@@ -54,7 +56,7 @@ export function createApp({ config, logger, db }: AppDeps) {
 
   app.get(`${API_PREFIX}/health`, (c) => c.json({ status: 'ok', version: VERSION }));
 
-  app.route(API_PREFIX, authRoutes({ config, db, apiPrefix: API_PREFIX }));
+  app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, apiPrefix: API_PREFIX }));
 
   app.notFound((c) => {
     const error = notFound();
@@ -63,7 +65,7 @@ export function createApp({ config, logger, db }: AppDeps) {
 
   app.onError((error, c) => {
     const known = error instanceof HttpError ? error : null;
-    if (!known) logger.error('unhandled error', { name: error.name, message: error.message });
+    if (!known) logger.error('unhandled error', { name: error.name, reason: error.message });
     const http = known ?? internal();
     return c.json(http.toBody(), http.status);
   });

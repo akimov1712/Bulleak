@@ -4,6 +4,7 @@ import { API_PREFIX, createApp } from './app';
 import { loadConfig } from './config';
 import { openTestDatabase, type Database } from './db';
 import { memoryLogger, redact } from './log';
+import { memoryMailer } from './mail';
 
 let database: Database;
 
@@ -16,7 +17,7 @@ afterAll(() => database.close());
 function setup(env: Record<string, string> = {}) {
   const logger = memoryLogger();
   const config = loadConfig({ NODE_ENV: 'test', APP_ORIGIN: 'https://bulleak.test', ...env });
-  return { app: createApp({ config, logger, db: database.db }), logger };
+  return { app: createApp({ config, logger, db: database.db, mailer: memoryMailer() }), logger };
 }
 
 describe('API skeleton', () => {
@@ -88,7 +89,7 @@ describe('loadConfig', () => {
 
   it('refuses to start production without a strong secret and origin', () => {
     expect(() => loadConfig({ NODE_ENV: 'production' })).toThrow(
-      /JWT_SECRET[\s\S]*DATABASE_URL[\s\S]*APP_ORIGIN/,
+      /JWT_SECRET[\s\S]*DATABASE_URL[\s\S]*APP_ORIGIN[\s\S]*RESEND_API_KEY/,
     );
     expect(() =>
       loadConfig({ NODE_ENV: 'production', APP_ORIGIN: 'https://x.test', JWT_SECRET: 'short' }),
@@ -99,6 +100,8 @@ describe('loadConfig', () => {
         APP_ORIGIN: 'https://x.test',
         JWT_SECRET: 'k'.repeat(48),
         DATABASE_URL: 'postgres://u:p@db.test:5432/bulleak',
+        RESEND_API_KEY: 'test-key',
+        MAIL_FROM: 'Bulleak <mail@bulleak.test>',
         PORT: '9000',
       }),
     ).toMatchObject({

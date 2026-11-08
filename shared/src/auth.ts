@@ -41,6 +41,20 @@ export type LoginBody = z.infer<typeof loginBodySchema>;
 export const refreshBodySchema = z.object({ refreshToken: z.string().min(1).max(200) });
 export type RefreshBody = z.infer<typeof refreshBodySchema>;
 
+export const emailTokenBodySchema = z.object({
+  token: z.string({ error: 'Ссылка неполная' }).min(1).max(200),
+});
+export type EmailTokenBody = z.infer<typeof emailTokenBodySchema>;
+
+export const forgotBodySchema = z.object({ email: emailSchema });
+export type ForgotBody = z.infer<typeof forgotBodySchema>;
+
+export const resetBodySchema = z.object({
+  token: z.string({ error: 'Ссылка неполная' }).min(1).max(200),
+  password: passwordSchema,
+});
+export type ResetBody = z.infer<typeof resetBodySchema>;
+
 /** What the API tells the client about the signed-in user. */
 export const publicUserSchema = z.object({
   id: z.uuid(),

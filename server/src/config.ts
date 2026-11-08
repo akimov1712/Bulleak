@@ -18,6 +18,11 @@ const envSchema = z
     DATABASE_URL: z.string().optional(),
     /** cookie — needs the site and the API on one domain; body — stored by the client. */
     REFRESH_TRANSPORT: z.enum(['cookie', 'body']).default('body'),
+    /** Public address of the site, for links in letters; the origin by default. */
+    APP_URL: z.url().optional(),
+    /** Without a key (outside production) letters are only written to the log. */
+    RESEND_API_KEY: z.string().optional(),
+    MAIL_FROM: z.string().optional(),
     /** Largest accepted request body, bytes. */
     BODY_LIMIT: z.coerce
       .number()
@@ -41,10 +46,23 @@ const envSchema = z
     if (production && !env.APP_ORIGIN) {
       ctx.addIssue({ code: 'custom', path: ['APP_ORIGIN'], message: 'обязателен в production' });
     }
+    if (production && (!env.RESEND_API_KEY || !env.MAIL_FROM)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['RESEND_API_KEY'],
+        message: 'вместе с MAIL_FROM обязателен в production',
+      });
+    }
+    const appOrigin = env.APP_ORIGIN ?? 'http://localhost:5173';
     return {
       env: env.NODE_ENV,
       port: env.PORT,
-      appOrigin: env.APP_ORIGIN ?? 'http://localhost:5173',
+      appOrigin,
+      appUrl: `${(env.APP_URL ?? appOrigin).replace(/\/+$/, '')}/`,
+      mail:
+        env.RESEND_API_KEY && env.MAIL_FROM
+          ? { apiKey: env.RESEND_API_KEY, from: env.MAIL_FROM }
+          : null,
       jwtSecret: secret,
       refreshTransport: env.REFRESH_TRANSPORT,
       bodyLimit: env.BODY_LIMIT,

@@ -42,5 +42,7 @@ export const invalidCredentials = () =>
 export const unauthorized = () => new HttpError(401, 'unauthorized', 'Нужно войти в аккаунт');
 export const tokenInvalid = () =>
   new HttpError(401, 'token_invalid', 'Сессия истекла. Войди в аккаунт ещё раз.');
+export const linkInvalid = () =>
+  new HttpError(400, 'token_invalid', 'Ссылка недействительна или устарела. Запроси новую.');
 export const payloadTooLarge = () =>
   new HttpError(413, 'payload_too_large', 'Слишком большой запрос');
