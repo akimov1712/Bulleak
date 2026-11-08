@@ -37,6 +37,10 @@ export const loginBodySchema = z.object({
 });
 export type LoginBody = z.infer<typeof loginBodySchema>;
 
+/** Used only when the refresh token is not delivered as a cookie. */
+export const refreshBodySchema = z.object({ refreshToken: z.string().min(1).max(200) });
+export type RefreshBody = z.infer<typeof refreshBodySchema>;
+
 /** What the API tells the client about the signed-in user. */
 export const publicUserSchema = z.object({
   id: z.uuid(),

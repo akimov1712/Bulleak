@@ -1,32 +1,32 @@
-import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { Hono, type Context, type MiddlewareHandler } from 'hono';
-import { setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import type { z } from 'zod';
 import {
   fieldErrors,
   isWeakPassword,
   loginBodySchema,
+  refreshBodySchema,
   registerBodySchema,
   type AuthResponse,
   type PublicUser,
 } from '@bulleak/shared';
 import type { Config } from '../config';
 import type { Db } from '../db';
-import { sessions, users, type User } from '../db/schema';
-import { emailTaken, invalidCredentials, unauthorized, validation, weakPassword } from '../errors';
-import { hashPassword, verifyPassword } from './password';
+import { users, type User } from '../db/schema';
 import {
-  ACCESS_TTL_SEC,
-  hashToken,
-  newOpaqueToken,
-  REFRESH_TTL_MS,
-  signAccessToken,
-  verifyAccessToken,
-} from './tokens';
+  emailTaken,
+  invalidCredentials,
+  tokenInvalid,
+  unauthorized,
+  validation,
+  weakPassword,
+} from '../errors';
+import { hashPassword, verifyPassword } from './password';
+import { createSession, revokeAllSessions, revokeSessionByToken, rotateSession } from './sessions';
+import { ACCESS_TTL_SEC, REFRESH_TTL_MS, signAccessToken, verifyAccessToken } from './tokens';
 
 export const REFRESH_COOKIE = 'bulleak_refresh';
-const USER_AGENT_MAX = 200;
 
 type AuthedEnv = { Variables: { userId: string } };
 
@@ -51,19 +51,6 @@ const publicUser = (user: User): PublicUser => ({
   emailVerified: user.emailVerifiedAt !== null,
   createdAt: user.createdAt.toISOString(),
 });
-
-/** Starts a new session family and returns the refresh token (stored only as a hash). */
-async function createSession(db: Db, userId: string, userAgent: string | undefined) {
-  const refreshToken = newOpaqueToken();
-  await db.insert(sessions).values({
-    userId,
-    refreshHash: hashToken(refreshToken),
-    familyId: randomUUID(),
-    userAgent: userAgent?.slice(0, USER_AGENT_MAX),
-    expiresAt: new Date(Date.now() + REFRESH_TTL_MS),
-  });
-  return refreshToken;
-}
 
 /** Requires a valid `Authorization: Bearer` access token; sets `userId`. */
 export function requireAuth(secret: string): MiddlewareHandler<AuthedEnv> {
@@ -128,6 +115,44 @@ export function authRoutes({ config, db, apiPrefix }: AuthDeps) {
     if (!user || !valid) throw invalidCredentials();
     const refreshToken = await createSession(db, user.id, c.req.header('User-Agent'));
     return c.json(await respondWithSession(c, user, refreshToken));
+  });
+
+  /** The presented refresh token: from the cookie or the body, per deployment. */
+  async function presentedRefreshToken(c: Context) {
+    if (config.refreshTransport === 'cookie') return getCookie(c, REFRESH_COOKIE) ?? null;
+    const raw: unknown = await c.req.json().catch(() => null);
+    const parsed = refreshBodySchema.safeParse(raw);
+    return parsed.success ? parsed.data.refreshToken : null;
+  }
+
+  const clearRefreshCookie = (c: Context) => {
+    if (config.refreshTransport === 'cookie') {
+      deleteCookie(c, REFRESH_COOKIE, { path: `${apiPrefix}/auth` });
+    }
+  };
+
+  app.post('/auth/refresh', async (c) => {
+    const token = await presentedRefreshToken(c);
+    const rotated = token ? await rotateSession(db, token, c.req.header('User-Agent')) : null;
+    if (!rotated) {
+      clearRefreshCookie(c);
+      throw tokenInvalid();
+    }
+    return c.json(await respondWithSession(c, rotated.user, rotated.refreshToken));
+  });
+
+  // Identified by the refresh token: the access token may already have expired.
+  app.post('/auth/logout', async (c) => {
+    const token = await presentedRefreshToken(c);
+    if (token) await revokeSessionByToken(db, token);
+    clearRefreshCookie(c);
+    return c.body(null, 204);
+  });
+
+  app.post('/auth/logout-all', requireAuth(config.jwtSecret), async (c) => {
+    await revokeAllSessions(db, c.get('userId'));
+    clearRefreshCookie(c);
+    return c.body(null, 204);
   });
 
   app.get('/me', requireAuth(config.jwtSecret), async (c) => {

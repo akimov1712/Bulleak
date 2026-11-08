@@ -161,6 +161,114 @@ describe('POST /auth/login', () => {
   });
 });
 
+describe('sessions', () => {
+  async function signUp(app: App) {
+    const body = authResponseSchema.parse(
+      await (await post(app, '/auth/register', account)).json(),
+    );
+    return { ...body, refreshToken: body.refreshToken ?? '' };
+  }
+
+  const refresh = (app: App, refreshToken: string) => post(app, '/auth/refresh', { refreshToken });
+
+  it('rotates the refresh token and issues a working access token', async () => {
+    const app = setup();
+    const first = await signUp(app);
+    const res = await refresh(app, first.refreshToken);
+    expect(res.status).toBe(200);
+    const second = authResponseSchema.parse(await res.json());
+    expect(second.refreshToken).not.toBe(first.refreshToken);
+    expect(second.user).toEqual(first.user);
+    expect((await me(app, `Bearer ${second.accessToken}`)).status).toBe(200);
+    const rows = await database.db.select().from(sessions);
+    expect(rows).toHaveLength(2);
+    expect(new Set(rows.map((r) => r.familyId)).size).toBe(1);
+  });
+
+  it('revokes the whole family when a rotated token is reused', async () => {
+    const app = setup();
+    const first = await signUp(app);
+    const second = authResponseSchema.parse(await (await refresh(app, first.refreshToken)).json());
+    const reuse = await refresh(app, first.refreshToken);
+    expect(reuse.status).toBe(401);
+    expect((await errorOf(reuse)).code).toBe('token_invalid');
+    // The thief's and the owner's tokens are both dead now.
+    expect((await refresh(app, second.refreshToken ?? '')).status).toBe(401);
+    const rows = await database.db.select().from(sessions);
+    expect(rows.every((r) => r.revokedAt !== null)).toBe(true);
+  });
+
+  it('does not touch other logins when a family is revoked', async () => {
+    const app = setup();
+    const first = await signUp(app);
+    const other = authResponseSchema.parse(await (await post(app, '/auth/login', account)).json());
+    await refresh(app, first.refreshToken);
+    await refresh(app, first.refreshToken);
+    expect((await refresh(app, other.refreshToken ?? '')).status).toBe(200);
+  });
+
+  it('lets only one of two simultaneous refreshes win', async () => {
+    const app = setup();
+    const { refreshToken } = await signUp(app);
+    const results = await Promise.all([refresh(app, refreshToken), refresh(app, refreshToken)]);
+    expect(results.map((r) => r.status).sort()).toEqual([200, 401]);
+  });
+
+  it('refuses expired and unknown tokens', async () => {
+    const app = setup();
+    const { refreshToken } = await signUp(app);
+    await database.db.update(sessions).set({ expiresAt: new Date(Date.now() - 1000) });
+    expect((await refresh(app, refreshToken)).status).toBe(401);
+    expect((await refresh(app, 'unknown')).status).toBe(401);
+    expect((await post(app, '/auth/refresh', {})).status).toBe(401);
+  });
+
+  it('logs out one session, idempotently', async () => {
+    const app = setup();
+    const { refreshToken } = await signUp(app);
+    const other = authResponseSchema.parse(await (await post(app, '/auth/login', account)).json());
+    expect((await post(app, '/auth/logout', { refreshToken })).status).toBe(204);
+    expect((await post(app, '/auth/logout', { refreshToken })).status).toBe(204);
+    expect((await refresh(app, refreshToken)).status).toBe(401);
+    expect((await refresh(app, other.refreshToken ?? '')).status).toBe(200);
+  });
+
+  it('logs out everywhere with an access token', async () => {
+    const app = setup();
+    const first = await signUp(app);
+    const other = authResponseSchema.parse(await (await post(app, '/auth/login', account)).json());
+    const anonymous = await app.request(`${API_PREFIX}/auth/logout-all`, { method: 'POST' });
+    expect(anonymous.status).toBe(401);
+    const res = await app.request(`${API_PREFIX}/auth/logout-all`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${first.accessToken}` },
+    });
+    expect(res.status).toBe(204);
+    expect((await refresh(app, first.refreshToken)).status).toBe(401);
+    expect((await refresh(app, other.refreshToken ?? '')).status).toBe(401);
+  });
+
+  it('reads and clears the cookie when configured', async () => {
+    const app = setup({ REFRESH_TRANSPORT: 'cookie' });
+    const registered = await post(app, '/auth/register', account);
+    const cookie = (registered.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
+    const res = await app.request(`${API_PREFIX}/auth/refresh`, {
+      method: 'POST',
+      headers: { Cookie: cookie },
+    });
+    expect(res.status).toBe(200);
+    expect(authResponseSchema.parse(await res.json()).refreshToken).toBeUndefined();
+    const rotated = (res.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
+    expect(rotated).not.toBe(cookie);
+    const out = await app.request(`${API_PREFIX}/auth/logout`, {
+      method: 'POST',
+      headers: { Cookie: rotated },
+    });
+    expect(out.status).toBe(204);
+    expect(out.headers.get('Set-Cookie')).toMatch(/Max-Age=0/);
+  });
+});
+
 describe('GET /me', () => {
   async function registered(app: App) {
     return authResponseSchema.parse(await (await post(app, '/auth/register', account)).json());
