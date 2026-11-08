@@ -216,4 +216,4 @@
 | 10 | auth/sessions, routes | Повторяющиеся запросы отзыва и поиска пользователя | Общие `revokeWhere`, `findUserByEmail`, `findUserById` |
 
 - Попутно: `npm install` из Bash-песочницы повредил `node_modules` (восстановлено через `npm ci`, правило добавлено в CLAUDE.md). Поле `message` в логе ошибок перекрывало текст записи — переименовано в `reason`.
-- `npm run check` и `npm run build` зелёные. Локальный e2e не запустился: Chromium не стартует в текущем окружении (ошибка ICU), e2e проверяются в CI.
+- `npm run check` и `npm run build` зелёные. Локальный e2e не запустился: Chromium не стартует в текущем окружении (ошибка ICU). CI зелёный, включая 172 e2e.
