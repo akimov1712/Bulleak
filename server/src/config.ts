@@ -16,6 +16,8 @@ const envSchema = z
     JWT_SECRET: z.string().optional(),
     /** postgres://… ; without it (outside production) a local PGlite database is used. */
     DATABASE_URL: z.string().optional(),
+    /** cookie — needs the site and the API on one domain; body — stored by the client. */
+    REFRESH_TRANSPORT: z.enum(['cookie', 'body']).default('body'),
     /** Largest accepted request body, bytes. */
     BODY_LIMIT: z.coerce
       .number()
@@ -44,6 +46,7 @@ const envSchema = z
       port: env.PORT,
       appOrigin: env.APP_ORIGIN ?? 'http://localhost:5173',
       jwtSecret: secret,
+      refreshTransport: env.REFRESH_TRANSPORT,
       bodyLimit: env.BODY_LIMIT,
       database: databaseTarget(env.NODE_ENV, env.DATABASE_URL),
     };

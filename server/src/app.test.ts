@@ -1,13 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { apiErrorSchema } from '@bulleak/shared';
 import { API_PREFIX, createApp } from './app';
 import { loadConfig } from './config';
+import { openTestDatabase, type Database } from './db';
 import { memoryLogger, redact } from './log';
+
+let database: Database;
+
+beforeAll(async () => {
+  database = await openTestDatabase();
+});
+
+afterAll(() => database.close());
 
 function setup(env: Record<string, string> = {}) {
   const logger = memoryLogger();
   const config = loadConfig({ NODE_ENV: 'test', APP_ORIGIN: 'https://bulleak.test', ...env });
-  return { app: createApp({ config, logger }), logger };
+  return { app: createApp({ config, logger, db: database.db }), logger };
 }
 
 describe('API skeleton', () => {

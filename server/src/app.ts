@@ -1,20 +1,23 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
+import { authRoutes } from './auth/routes';
 import type { Config } from './config';
+import type { Db } from './db';
 import { HttpError, internal, notFound, payloadTooLarge } from './errors';
 import type { Logger } from './log';
 
 export interface AppDeps {
   config: Config;
   logger: Logger;
+  db: Db;
 }
 
 export const API_PREFIX = '/api/v1';
 export const VERSION = '0.1.0';
 
 /** The API as a Hono app (no network listener): main.ts serves it, tests call `app.request`. */
-export function createApp({ config, logger }: AppDeps) {
+export function createApp({ config, logger, db }: AppDeps) {
   const app = new Hono();
 
   app.use(
@@ -50,6 +53,8 @@ export function createApp({ config, logger }: AppDeps) {
   );
 
   app.get(`${API_PREFIX}/health`, (c) => c.json({ status: 'ok', version: VERSION }));
+
+  app.route(API_PREFIX, authRoutes({ config, db, apiPrefix: API_PREFIX }));
 
   app.notFound((c) => {
     const error = notFound();
