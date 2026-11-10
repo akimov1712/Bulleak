@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Segmented } from '@/components/ui/Segmented';
 import { Switch } from '@/components/ui/Switch';
+import { AccountSection } from '@/features/account/AccountSection';
 import { applyImport, downloadBackup, resetAll, storageSummary } from '@/features/settings/dataOps';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatNumber } from '@/lib/format';
@@ -61,6 +62,8 @@ export function SettingsPage() {
           )}
         </Field>
       </Section>
+
+      <AccountSection />
 
       <Section title="Внешний вид">
         <Segmented<ThemeSetting>
