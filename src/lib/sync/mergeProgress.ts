@@ -5,6 +5,7 @@
  */
 import type { DateKey } from '@/lib/date';
 import { applyActivity } from '@/lib/gamification/streak';
+import { canonical } from './canonical';
 import { emptyStreak, MAX_QUIZ_ATTEMPTS } from '@/lib/progress/initial';
 import type {
   Counters,
@@ -30,18 +31,6 @@ function latest(a: number | undefined, b: number | undefined): number | undefine
   if (a === undefined) return b;
   if (b === undefined) return a;
   return Math.max(a, b);
-}
-
-/** Stable text of a value, for deterministic tie-breaks (key order does not matter). */
-function canonical(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
-  if (value && typeof value === 'object') {
-    const entries = Object.entries(value)
-      .filter(([, v]) => v !== undefined)
-      .sort(([x], [y]) => (x < y ? -1 : x > y ? 1 : 0));
-    return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`).join(',')}}`;
-  }
-  return JSON.stringify(value) ?? 'undefined';
 }
 
 /** Last write wins by `updatedAt`; equal times pick the same side on every device. */

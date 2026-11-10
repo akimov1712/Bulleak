@@ -2,7 +2,14 @@ import { z } from 'zod';
 import {
   apiErrorSchema,
   authResponseSchema,
+  progressDocSchema,
   publicUserSchema,
+  recordsPageSchema,
+  recordsPushResultSchema,
+  settingsDocSchema,
+  type ProgressDoc,
+  type RecordChange,
+  type RecordKindName,
   type AuthResponse,
   type ErrorCode,
   type LoginBody,
@@ -75,8 +82,10 @@ const nothing = z.unknown();
 const looseErrorSchema = z.object({ error: z.object({ message: z.string().min(1) }) });
 const meSchema = z.object({ user: publicUserSchema });
 
+const revSchema = z.object({ rev: z.number().int().min(0) });
+
 interface SendOptions {
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'PUT';
   body?: unknown;
   token?: string;
 }
@@ -185,13 +194,15 @@ export function createApiClient({
   }
 
   /** A request on behalf of the signed-in user; on 401 refreshes the token and retries once. */
+  async function authedResponse(path: string, options: SendOptions = {}): Promise<Response> {
+    const res = await send(path, { ...options, token: await accessToken() });
+    if (res.status !== 401) return res;
+    access = null;
+    return send(path, { ...options, token: await refresh() });
+  }
+
   async function authed<S extends z.ZodType>(path: string, schema: S, options: SendOptions = {}) {
-    let res = await send(path, { ...options, token: await accessToken() });
-    if (res.status === 401) {
-      access = null;
-      res = await send(path, { ...options, token: await refresh() });
-    }
-    return parse(res, schema);
+    return parse(await authedResponse(path, options), schema);
   }
 
   return {
@@ -253,6 +264,37 @@ export function createApiClient({
     async forgot(email: string) {
       await parse(await send('/auth/forgot', { body: { email } }), nothing);
     },
+
+    /* ---------- sync (docs/02-architecture/backend.md) ---------- */
+
+    getProgress: () => authed('/sync/progress', progressDocSchema, { method: 'GET' }),
+
+    /** Saves when the server is still at `baseRev`; otherwise returns what it has now. */
+    async putProgress(
+      state: Record<string, unknown>,
+      baseRev: number,
+    ): Promise<{ rev: number } | { conflict: ProgressDoc }> {
+      const res = await authedResponse('/sync/progress', {
+        method: 'PUT',
+        body: { state, baseRev },
+      });
+      if (res.status !== 409) return parse(res, revSchema);
+      // 409 carries the server's current document, not an error body.
+      const current = progressDocSchema.safeParse(await res.json().catch(() => undefined));
+      if (!current.success) throw new ApiError('bad_response', BAD_RESPONSE_MESSAGE, 409);
+      return { conflict: current.data };
+    },
+
+    getSettings: () => authed('/sync/settings', settingsDocSchema, { method: 'GET' }),
+
+    putSettings: (state: Record<string, unknown>) =>
+      authed('/sync/settings', revSchema, { method: 'PUT', body: { state } }),
+
+    pullRecords: (kind: RecordKindName, since: number) =>
+      authed(`/sync/records?kind=${kind}&since=${since}`, recordsPageSchema, { method: 'GET' }),
+
+    pushRecords: (kind: RecordKindName, changes: RecordChange[]) =>
+      authed('/sync/records', recordsPushResultSchema, { body: { kind, changes } }),
 
     async resetPassword(token: string, password: string) {
       await parse(await send('/auth/reset', { body: { token, password } }), nothing);

@@ -4,6 +4,7 @@ import { cn } from '@/lib/cn';
 import { useApplyTheme } from '@/hooks/useTheme';
 import { useApplyMotion } from '@/hooks/useReducedMotion';
 import { revalidateSession, subscribeAuthToOtherTabs } from '@/store/authStore';
+import { useSyncEngine } from '@/features/sync/useSyncEngine';
 import { Toaster } from '@/components/ui/Toaster';
 import { RewardsPresenter } from '@/features/gamification/RewardsPresenter';
 import { ScrollToTop } from './ScrollToTop';
@@ -25,6 +26,7 @@ export function RootLayout() {
   const wide = useWidePage();
   useApplyTheme();
   useApplyMotion();
+  useSyncEngine();
   useEffect(() => {
     revalidateSession();
     return subscribeAuthToOtherTabs();

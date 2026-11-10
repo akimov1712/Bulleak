@@ -6,6 +6,7 @@ import { levelFromXp } from '@/lib/gamification/levels';
 import { Hud, LevelBadge, ProfileSummary } from '@/features/gamification/Hud';
 import { useResolvedTheme } from '@/hooks/useTheme';
 import { buttonClass } from '@/components/ui/styles';
+import { SyncStatus } from '@/features/sync/SyncStatus';
 import { useAuth } from '@/store/authStore';
 import { useProgress } from '@/store/progressStore';
 import { useSettings } from '@/store/settingsStore';
@@ -122,6 +123,7 @@ function AccountBlock({ close }: { close: () => void }) {
       <p className="truncate px-2.5 text-xs text-text-muted" title={user.email}>
         {user.email}
       </p>
+      <SyncStatus className="px-2.5 pb-1" />
       {!user.emailVerified && (
         <div className="mx-1 my-1 flex flex-col gap-1 rounded-(--radius-btn) bg-warn-soft px-2.5 py-2 text-xs">
           <span className="font-medium text-warn">E-mail не подтверждён</span>

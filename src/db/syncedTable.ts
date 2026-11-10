@@ -34,10 +34,25 @@ export function withSyncFields<T extends SyncFields>(record: T, updatedAt: numbe
   return { ...record, uid: record.uid ?? newUid(), updatedAt: record.updatedAt ?? updatedAt };
 }
 
+type Listener = () => void;
+const listeners = new Set<Listener>();
+
+/** Called after any local change of a synced record (the sync engine waits a bit, then sends). */
+export function onLocalRecordChange(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 const live = <T extends SyncFields>(row: T | undefined): T | undefined =>
   row && !row.deleted ? row : undefined;
 
 type Row = SyncFields & { id?: number };
+
+/**
+ * Time of a new change of a record: always later than the previous one, so a quick edit made
+ * in the same millisecond still counts as newer (the newer change wins between devices).
+ */
+const nextChangeTime = (row: SyncFields) => Math.max(Date.now(), (row.updatedAt ?? 0) + 1);
 
 /** The few table operations a synced repository needs, typed by the concrete table. */
 export interface TableOps<T extends Row> {
@@ -52,7 +67,10 @@ export interface TableOps<T extends Row> {
 
 /** Add / update / soft-delete for a synced table; reads skip deleted rows. */
 export function syncedTable<T extends Row>(ops: TableOps<T>, kind: RecordKind) {
-  const touch = (uid: string, at: number) => db.outbox.put({ kind, uid, at });
+  const touch = async (uid: string, at: number) => {
+    await db.outbox.put({ kind, uid, at });
+    for (const listener of listeners) listener();
+  };
   const inTransaction = <R>(work: () => Promise<R>) =>
     db.transaction('rw', ops.table, db.outbox, work);
 
@@ -78,7 +96,7 @@ export function syncedTable<T extends Row>(ops: TableOps<T>, kind: RecordKind) {
       return inTransaction(async () => {
         const row = live(await ops.get(id));
         if (!row?.uid) return false;
-        const now = Date.now();
+        const now = nextChangeTime(row);
         await ops.patch(id, { ...changes, updatedAt: now });
         await touch(row.uid, now);
         return true;
@@ -89,7 +107,7 @@ export function syncedTable<T extends Row>(ops: TableOps<T>, kind: RecordKind) {
       return inTransaction(async () => {
         const row = live(await ops.get(id));
         if (!row?.uid) return;
-        const now = Date.now();
+        const now = nextChangeTime(row);
         const deletion: Partial<T> = {};
         Object.assign(deletion, { deleted: true, updatedAt: now });
         await ops.patch(id, deletion);
@@ -100,11 +118,11 @@ export function syncedTable<T extends Row>(ops: TableOps<T>, kind: RecordKind) {
     /** Soft-deletes every live record (the deletion reaches other devices too). */
     clear(): Promise<void> {
       return inTransaction(async () => {
-        const now = Date.now();
-        const deletion: Partial<T> = {};
-        Object.assign(deletion, { deleted: true, updatedAt: now });
         for (const row of await ops.all()) {
           if (row.deleted || row.id === undefined || !row.uid) continue;
+          const now = nextChangeTime(row);
+          const deletion: Partial<T> = {};
+          Object.assign(deletion, { deleted: true, updatedAt: now });
           await ops.patch(row.id, deletion);
           await touch(row.uid, now);
         }
