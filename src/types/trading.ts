@@ -14,7 +14,16 @@ export interface Candle {
 
 export type SimOutcome = 'tp' | 'sl' | 'timeout' | 'manual';
 
-export interface SimTrade {
+/** Fields that let a record sync between devices (set by the repositories). */
+export interface SyncFields {
+  /** Stable id across devices (the numeric `id` is local to this browser). */
+  uid?: string;
+  updatedAt?: number;
+  /** Deleted, but kept until other devices learn about it. */
+  deleted?: boolean;
+}
+
+export interface SimTrade extends SyncFields {
   id?: number;
   at: number;
   scenarioId: string | null;
@@ -42,7 +51,7 @@ export type JournalAccount = 'demo' | 'testnet' | 'real';
 export type JournalEmotion = 'calm' | 'fear' | 'greed' | 'fomo' | 'revenge' | 'bored';
 export type JournalTimeframe = '1H' | '4H' | '1D' | 'other';
 
-export interface JournalTrade {
+export interface JournalTrade extends SyncFields {
   id?: number;
   openedAt: number;
   closedAt?: number;

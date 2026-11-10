@@ -94,7 +94,9 @@ describe('simRepo', () => {
     const error = await simRepo.add(sim(1)).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(DbError);
     expect((error as DbError).message).toMatch(/закончилось место/);
-    expect((error as DbError).cause).toBe(quota);
+    // The write runs in a transaction (record + outbox), so Dexie wraps the original error.
+    const cause = (error as DbError).cause as { inner?: unknown } | undefined;
+    expect(cause === quota || cause?.inner === quota).toBe(true);
   });
 });
 

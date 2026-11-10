@@ -5,8 +5,8 @@
 |---|---|---|---|
 | Прогресс, XP, стрик, достижения, попытки | localStorage через `zustand/persist` | `tc-progress` | < 500 кБ |
 | Настройки | localStorage | `tc-settings` | < 1 кБ |
-| Сделки тренажёра | IndexedDB (Dexie) | `tc-db.simTrades` (индексы: `++id, at, scenarioId, strategyTag`) | растёт |
-| Журнал | IndexedDB (Dexie) | `tc-db.journal` (индексы: `++id, openedAt, account, setup`) | растёт |
+| Сделки тренажёра | IndexedDB (Dexie) | `tc-db.simTrades` (индексы: `++id, at, scenarioId, strategyTag, &uid`) | растёт |
+| Журнал | IndexedDB (Dexie) | `tc-db.journal` (индексы: `++id, openedAt, account, setup, &uid`) | растёт |
 | Свечи | статические файлы | `public/data/*.json` | ~200–500 кБ на файл |
 
 ## Правила
@@ -22,7 +22,8 @@
 - Сброс прогресса: двойное подтверждение (ввести слово «СБРОС»).
 
 ## IndexedDB (`src/db/`)
-- `db.ts` — `CourseDb` (Dexie), версия схемы 1. Любое изменение схемы — `version(N+1)` с `upgrade` и тестом.
+- `db.ts` — `CourseDb` (Dexie), версия схемы 2. Любое изменение схемы — `version(N+1)` с `upgrade` и тестом.
+- v2 (синхронизация, этап 15): у сделок и записей журнала есть `uid` (общий для всех устройств), `updatedAt` и мягкое удаление `deleted`. Удалённые записи не показываются, но хранятся, пока другие устройства о них не узнают. Таблица `outbox` (ключ `[kind+uid]`) — изменения, ещё не отправленные на сервер. Миграция проставляет `uid` старым записям. Логика — `syncedTable.ts`.
 - `simRepo` / `journalRepo` — add / list (новые сверху, фильтры) / get / update / remove / clear / count / replaceAll (для импорта).
 - Любая ошибка IndexedDB превращается в `DbError` с русским сообщением (приватный режим, нет места); UI показывает его тостом и продолжает работу — приложение не падает.
 - В тестах IndexedDB эмулирует `fake-indexeddb` (подключён в `src/test/setup.ts`).

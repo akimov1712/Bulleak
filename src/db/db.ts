@@ -1,12 +1,15 @@
 /** IndexedDB (Dexie) for records that keep growing: simulator trades and the trade journal. */
 import Dexie, { type EntityTable } from 'dexie';
 import type { JournalTrade, SimTrade } from '@/types/trading';
+import { withSyncFields, type OutboxEntry } from './syncedTable';
 
 export const DB_NAME = 'tc-db';
 
 export class CourseDb extends Dexie {
   simTrades!: EntityTable<SimTrade, 'id'>;
   journal!: EntityTable<JournalTrade, 'id'>;
+  /** Changes not yet sent to the server: one entry per record. */
+  outbox!: Dexie.Table<OutboxEntry, [string, string]>;
 
   constructor(name = DB_NAME) {
     super(name);
@@ -15,6 +18,28 @@ export class CourseDb extends Dexie {
       simTrades: '++id, at, scenarioId, strategyTag',
       journal: '++id, openedAt, account, setup',
     });
+    // v2: records get uid / updatedAt / deleted for sync, plus the outbox of unsent changes.
+    this.version(2)
+      .stores({
+        simTrades: '++id, at, scenarioId, strategyTag, &uid',
+        journal: '++id, openedAt, account, setup, &uid',
+        outbox: '[kind+uid], at',
+      })
+      .upgrade(async (tx) => {
+        const now = Date.now();
+        await tx
+          .table<SimTrade, number>('simTrades')
+          .toCollection()
+          .modify((t) => {
+            Object.assign(t, withSyncFields(t, t.at || now));
+          });
+        await tx
+          .table<JournalTrade, number>('journal')
+          .toCollection()
+          .modify((t) => {
+            Object.assign(t, withSyncFields(t, t.openedAt || now));
+          });
+      });
   }
 }
 

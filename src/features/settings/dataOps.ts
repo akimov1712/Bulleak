@@ -1,5 +1,6 @@
 /** Side-effectful data operations of the settings page: export, import, reset. */
 import { db, guard } from '@/db/db';
+import { withSyncFields } from '@/db/syncedTable';
 import { journalRepo } from '@/db/journalRepo';
 import { simRepo } from '@/db/simRepo';
 import { backupFileName, buildExport, type ParsedImport } from '@/lib/io/backup';
@@ -59,11 +60,13 @@ export async function downloadBackup(now = Date.now()): Promise<void> {
 export async function applyImport(data: ParsedImport): Promise<void> {
   // One transaction for both tables: either all trades are replaced or none.
   await guard('восстановить сделки', () =>
-    db.transaction('rw', db.simTrades, db.journal, async () => {
+    db.transaction('rw', db.simTrades, db.journal, db.outbox, async () => {
+      const now = Date.now();
       await db.simTrades.clear();
-      await db.simTrades.bulkAdd(data.simTrades);
+      await db.simTrades.bulkAdd(data.simTrades.map((t) => withSyncFields(t, t.at || now)));
       await db.journal.clear();
-      await db.journal.bulkAdd(data.journal);
+      await db.journal.bulkAdd(data.journal.map((t) => withSyncFields(t, t.openedAt || now)));
+      await db.outbox.clear();
     }),
   );
   useProgress.setState(data.progress);
@@ -79,9 +82,10 @@ export async function applyImport(data: ParsedImport): Promise<void> {
 /** Deletes all progress, trades, settings and remembered inputs of this site. */
 export async function resetAll(): Promise<void> {
   await guard('очистить сделки', () =>
-    db.transaction('rw', db.simTrades, db.journal, async () => {
+    db.transaction('rw', db.simTrades, db.journal, db.outbox, async () => {
       await db.simTrades.clear();
       await db.journal.clear();
+      await db.outbox.clear();
     }),
   );
   try {
