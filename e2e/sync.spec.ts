@@ -21,6 +21,9 @@ test('progress and settings follow the learner to another device, also after bei
   browser,
   baseURL,
 }) => {
+  // Local changes sync at most every 30 s (MIN_GAP_MS in syncEngine), and the test waits for
+  // three such syncs on the laptop.
+  test.setTimeout(180_000);
   const email = uniqueEmail();
   const laptop = await browser.newContext({ baseURL });
   const phone = await browser.newContext({ baseURL });
@@ -51,7 +54,7 @@ test('progress and settings follow the learner to another device, also after bei
   await laptop.setOffline(true);
   await toggleTheme(a, 'тёмную');
   await a.getByRole('button', { name: /^Профиль:/ }).click();
-  await expect(a.getByText(/Нет связи — изменения сохранятся/)).toBeVisible({ timeout: 15_000 });
+  await expect(a.getByText(/Нет связи — изменения сохранятся/)).toBeVisible({ timeout: 45_000 });
   await a.keyboard.press('Escape');
   const backOnline = syncedSettings(a);
   await laptop.setOffline(false);
