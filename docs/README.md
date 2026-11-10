@@ -33,7 +33,8 @@
 - [routing.md](02-architecture/routing.md) — страницы и URL
 - [content-pipeline.md](02-architecture/content-pipeline.md) — MDX, метаданные, тесты уроков
 - [design-system.md](02-architecture/design-system.md) — цвета, типографика, компоненты, маскот
-- [market-data.md](02-architecture/market-data.md) — загрузка свечей Bybit
+- [market-data.md](02-architecture/market-data.md)
+- [hosting.md](02-architecture/hosting.md) — сервер, nginx, выкладка — загрузка свечей Bybit
 
 ## 03-content
 - [content-plan.md](03-content/content-plan.md) — все модули и уроки

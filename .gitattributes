@@ -3,3 +3,4 @@
 *.webp binary
 *.jpg binary
 *.woff2 binary
+deploy/server/*.sh text eol=lf
