@@ -272,6 +272,11 @@ export async function syncOnce(api: SyncApi, userId: string): Promise<void> {
 /* ---------- when to sync ---------- */
 
 const DEBOUNCE_MS = 3_000;
+/**
+ * Local changes sync at most this often: the lesson timer writes progress every 15 s, and a
+ * sync on each write would send the whole document over and over while someone reads.
+ */
+const MIN_GAP_MS = 30_000;
 const INTERVAL_MS = 60_000;
 
 let scheduleSoon: () => void = () => undefined;
@@ -286,6 +291,7 @@ export function startSyncEngine(api: SyncApi, userId: string): () => void {
   let running = false;
   let again = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let lastStartedAt = -Infinity;
 
   async function run() {
     if (stopped) return;
@@ -294,6 +300,8 @@ export function startSyncEngine(api: SyncApi, userId: string): () => void {
       return;
     }
     running = true;
+    timer = undefined;
+    lastStartedAt = Date.now();
     useSyncStatus.setState({ state: 'syncing' });
     try {
       await syncOnce(api, userId);
@@ -316,15 +324,19 @@ export function startSyncEngine(api: SyncApi, userId: string): () => void {
     timer = setTimeout(() => void run(), delay);
   }
 
-  scheduleSoon = () => schedule(DEBOUNCE_MS);
+  /** After a local change: a few seconds of quiet, and not sooner than MIN_GAP after the last run. */
+  const afterChange = () =>
+    schedule(Math.max(DEBOUNCE_MS, lastStartedAt + MIN_GAP_MS - Date.now()));
+  scheduleSoon = afterChange;
   const onChange = () => {
-    if (!applyingRemote) schedule(DEBOUNCE_MS);
+    if (!applyingRemote) afterChange();
   };
   const unsubProgress = useProgress.subscribe(onChange);
   const unsubSettings = useSettings.subscribe(onChange);
   const unsubRecords = onLocalRecordChange(onChange);
   const onVisible = () => {
-    if (document.visibilityState === 'visible') schedule(0);
+    // Back to the tab: fetch news. Leaving it: send what is waiting before the tab sleeps.
+    if (document.visibilityState === 'visible' || timer) schedule(0);
   };
   const onOnline = () => schedule(0);
   document.addEventListener('visibilitychange', onVisible);

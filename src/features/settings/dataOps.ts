@@ -7,6 +7,7 @@ import { backupFileName, buildExport, type ParsedImport } from '@/lib/io/backup'
 import { SIM_BALANCE_KEY } from '@/lib/trading/simPlan';
 import { selectProgressData, useProgress } from '@/store/progressStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
+import { useAuth } from '@/store/authStore';
 import type { Settings } from '@/types/settings';
 
 /** Every key the app writes starts with this prefix. */
@@ -62,11 +63,22 @@ export async function applyImport(data: ParsedImport): Promise<void> {
   await guard('восстановить сделки', () =>
     db.transaction('rw', db.simTrades, db.journal, db.outbox, async () => {
       const now = Date.now();
+      const sims = data.simTrades.map((t) => withSyncFields(t, t.at || now));
+      const notes = data.journal.map((t) => withSyncFields(t, t.openedAt || now));
       await db.simTrades.clear();
-      await db.simTrades.bulkAdd(data.simTrades.map((t) => withSyncFields(t, t.at || now)));
+      await db.simTrades.bulkAdd(sims);
       await db.journal.clear();
-      await db.journal.bulkAdd(data.journal.map((t) => withSyncFields(t, t.openedAt || now)));
+      await db.journal.bulkAdd(notes);
+      // Restored records also go to the account, if one is signed in.
       await db.outbox.clear();
+      await db.outbox.bulkPut([
+        ...sims.map((t) => ({ kind: 'sim' as const, uid: t.uid ?? '', at: t.updatedAt ?? now })),
+        ...notes.map((t) => ({
+          kind: 'journal' as const,
+          uid: t.uid ?? '',
+          at: t.updatedAt ?? now,
+        })),
+      ]);
     }),
   );
   useProgress.setState(data.progress);
@@ -79,8 +91,16 @@ export async function applyImport(data: ParsedImport): Promise<void> {
   }
 }
 
-/** Deletes all progress, trades, settings and remembered inputs of this site. */
+/**
+ * Deletes all progress, trades, settings and remembered inputs of this site. A signed-in
+ * account is signed out first: otherwise the next sync would bring everything back.
+ */
 export async function resetAll(): Promise<void> {
+  const { api, user } = useAuth.getState();
+  if (api && user) {
+    useAuth.setState({ user: null });
+    await api.logout();
+  }
   await guard('очистить сделки', () =>
     db.transaction('rw', db.simTrades, db.journal, db.outbox, async () => {
       await db.simTrades.clear();

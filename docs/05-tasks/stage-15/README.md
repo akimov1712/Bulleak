@@ -18,8 +18,8 @@
 | [T-1506](T-1506-sync-e2e.md) | E2e синхронизации | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
 - [ ] `npm run e2e` и `npm run build` зелёные
 - [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
 - [ ] Тег `stage-15-done`

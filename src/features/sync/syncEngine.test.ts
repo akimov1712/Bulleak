@@ -7,6 +7,8 @@ import { journalRepo } from '@/db/journalRepo';
 import { selectProgressData, useProgress } from '@/store/progressStore';
 import { DEFAULT_SETTINGS, useSettings } from '@/store/settingsStore';
 import type { JournalTrade, SimTrade } from '@/types/trading';
+import { applyImport, resetAll } from '@/features/settings/dataOps';
+import { useAuth } from '@/store/authStore';
 import { startSyncEngine, syncOnce, useSyncStatus, type SyncApi } from './syncEngine';
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -292,7 +294,7 @@ describe('startSyncEngine', () => {
     vi.useRealTimers();
   });
 
-  it('syncs at once, again 3 s after a change, and reports going offline', async () => {
+  it('syncs at once, after a change not sooner than every 30 s, and reports going offline', async () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
     const server = fakeServer();
     const calls = vi.spyOn(server.api, 'getProgress');
@@ -303,9 +305,9 @@ describe('startSyncEngine', () => {
     expect(calls).toHaveBeenCalledTimes(1);
 
     useProgress.getState().dispatch({ type: 'lessonRead', lessonId: 'm00-l01' });
-    await vi.advanceTimersByTimeAsync(2_000);
+    await vi.advanceTimersByTimeAsync(20_000);
     expect(calls).toHaveBeenCalledTimes(1);
-    await vi.waitFor(() => expect(calls).toHaveBeenCalledTimes(2), { timeout: 5_000 });
+    await vi.waitFor(() => expect(calls).toHaveBeenCalledTimes(2), { timeout: 15_000 });
     await vi.waitFor(() => expect(useSyncStatus.getState().state).toBe('synced'));
 
     server.setOffline(true);
@@ -314,5 +316,41 @@ describe('startSyncEngine', () => {
 
     stop();
     expect(useSyncStatus.getState().state).toBe('idle');
+  });
+});
+
+describe('data operations while signed in', () => {
+  it('sends records restored from a backup to the account', async () => {
+    const server = fakeServer();
+    await syncOnce(server.api, USER);
+    await applyImport({
+      progress: selectProgressData(useProgress.getState()),
+      settings: {},
+      simTrades: [sim(5)],
+      journal: [note(6)],
+      simBalance: undefined,
+      preview: { simTrades: 1, journal: 1, skipped: 0, exportedAt: 0, lessonsCompleted: 0, xp: 0 },
+    } as Parameters<typeof applyImport>[0]);
+    await syncOnce(server.api, USER);
+    expect(server.records.sim.size).toBe(1);
+    expect(server.records.journal.size).toBe(1);
+  });
+
+  it('signs out before wiping, so nothing comes back from the account', async () => {
+    const logout = vi.fn(() => Promise.resolve());
+    useAuth.setState({
+      api: { logout } as unknown as NonNullable<ReturnType<typeof useAuth.getState>['api']>,
+      user: {
+        id: USER,
+        email: 'a@mail.test',
+        name: 'А',
+        emailVerified: true,
+        createdAt: '2026-11-10T00:00:00.000Z',
+      },
+    });
+    await resetAll();
+    expect(logout).toHaveBeenCalledOnce();
+    expect(useAuth.getState().user).toBeNull();
+    useAuth.setState({ api: null });
   });
 });
