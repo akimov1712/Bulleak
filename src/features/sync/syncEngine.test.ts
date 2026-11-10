@@ -246,6 +246,34 @@ describe('syncOnce', () => {
     expect(server.records.sim.size).toBe(1);
   });
 
+  it('takes guest records made before sync fields existed into the account', async () => {
+    const server = fakeServer();
+    // Saved by an older version: a uid from the v2 migration, but no outbox entry.
+    await db.simTrades.add({
+      ...sim(1),
+      uid: '9a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d',
+      updatedAt: 1,
+    });
+    await db.journal.add({ ...note(2), uid: '1b2c3d4e-5f6a-4b7c-9d8e-1f2a3b4c5d6e', updatedAt: 2 });
+    useProgress.getState().dispatch({ type: 'lessonRead', lessonId: 'm00-l01' });
+    // The account already has progress from another device.
+    server.setProgress({
+      state: { ...clone(selectProgressData(useProgress.getState())), lessons: {}, xp: 300 },
+      rev: 4,
+    });
+
+    await syncOnce(server.api, USER);
+
+    expect(server.records.sim.size).toBe(1);
+    expect(server.records.journal.size).toBe(1);
+    const state = server.progress.state as { xp: number; lessons: Record<string, unknown> };
+    expect(state.xp).toBe(300);
+    expect(Object.keys(state.lessons)).toEqual(['m00-l01']);
+    // Later syncs send only new changes.
+    await syncOnce(server.api, USER);
+    expect(await db.outbox.count()).toBe(0);
+  });
+
   it('starts over for another account on the same browser', async () => {
     const server = fakeServer();
     await simRepo.add(sim(1));

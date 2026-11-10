@@ -242,8 +242,26 @@ async function syncRecords(api: SyncApi, meta: SyncMeta) {
 }
 
 /** One full sync; throws ApiError on failure (network, server). */
+/**
+ * The first sync of an account in this browser takes along what was done here before signing
+ * in (as a guest, or before records had sync fields): every live record goes to the outbox.
+ * Progress needs nothing extra — it is merged with the account's anyway.
+ */
+async function queueLocalRecords() {
+  await db.transaction('rw', db.simTrades, db.journal, db.outbox, async () => {
+    const now = Date.now();
+    const sims = await db.simTrades.filter((t) => !t.deleted && Boolean(t.uid)).toArray();
+    const notes = await db.journal.filter((t) => !t.deleted && Boolean(t.uid)).toArray();
+    await db.outbox.bulkPut([
+      ...sims.map((t) => ({ kind: 'sim' as const, uid: t.uid ?? '', at: t.updatedAt ?? now })),
+      ...notes.map((t) => ({ kind: 'journal' as const, uid: t.uid ?? '', at: t.updatedAt ?? now })),
+    ]);
+  });
+}
+
 export async function syncOnce(api: SyncApi, userId: string): Promise<void> {
   const meta = readMeta(userId);
+  if (meta.lastSyncAt === null) await queueLocalRecords();
   await syncProgress(api);
   await syncSettings(api, meta);
   await syncRecords(api, meta);
