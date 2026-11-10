@@ -81,6 +81,12 @@ export function LoginPage() {
           <Button type="submit" fullWidth loading={form.pending}>
             Войти
           </Button>
+          <Link
+            to={paths.forgot()}
+            className="self-center text-sm font-semibold text-info hover:underline"
+          >
+            Забыли пароль?
+          </Link>
         </form>
       )}
     </AuthCard>

@@ -96,6 +96,18 @@ export const routes: RouteObject[] = [
         lazy: () => import('@/pages/RegisterPage').then((m) => ({ Component: m.RegisterPage })),
       },
       {
+        path: 'forgot',
+        lazy: () => import('@/pages/ForgotPage').then((m) => ({ Component: m.ForgotPage })),
+      },
+      {
+        path: 'reset',
+        lazy: () => import('@/pages/ResetPage').then((m) => ({ Component: m.ResetPage })),
+      },
+      {
+        path: 'verify',
+        lazy: () => import('@/pages/VerifyPage').then((m) => ({ Component: m.VerifyPage })),
+      },
+      {
         path: 'about',
         lazy: () => import('@/pages/AboutPage').then((m) => ({ Component: m.AboutPage })),
       },

@@ -122,6 +122,28 @@ function AccountBlock({ close }: { close: () => void }) {
       <p className="truncate px-2.5 text-xs text-text-muted" title={user.email}>
         {user.email}
       </p>
+      {!user.emailVerified && (
+        <div className="mx-1 my-1 flex flex-col gap-1 rounded-(--radius-btn) bg-warn-soft px-2.5 py-2 text-xs">
+          <span className="font-medium text-warn">E-mail не подтверждён</span>
+          <button
+            type="button"
+            className="self-start font-semibold text-info hover:underline"
+            onClick={() => {
+              api.resendVerification().then(
+                () => toast({ tone: 'info', title: 'Письмо отправлено', description: user.email }),
+                (error: unknown) =>
+                  toast({
+                    tone: 'error',
+                    title: 'Не удалось отправить письмо',
+                    description: error instanceof Error ? error.message : undefined,
+                  }),
+              );
+            }}
+          >
+            Отправить письмо ещё раз
+          </button>
+        </div>
+      )}
       <button
         type="button"
         onClick={() => {

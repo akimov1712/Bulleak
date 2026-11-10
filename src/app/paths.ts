@@ -22,5 +22,8 @@ export const paths = {
   about: () => '/about',
   login: () => '/login',
   register: () => '/register',
+  forgot: () => '/forgot',
+  reset: () => '/reset',
+  verify: () => '/verify',
   devUi: () => '/dev/ui',
 } as const;
