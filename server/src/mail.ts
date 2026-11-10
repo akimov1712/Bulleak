@@ -29,9 +29,11 @@ export function memoryMailer(logger?: Logger): Mailer & { sent: Mail[] } {
 
 /** Tests only: appends letters to a file as JSON lines, so e2e can open the links. */
 export function fileMailer(path: string): Mailer {
+  let folder: Promise<unknown> | null = null;
   return {
     send: async (mail) => {
-      await mkdir(dirname(path), { recursive: true });
+      folder ??= mkdir(dirname(path), { recursive: true });
+      await folder;
       await appendFile(path, `${JSON.stringify(mail)}\n`, 'utf8');
     },
   };

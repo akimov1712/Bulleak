@@ -24,12 +24,15 @@ export function RegisterPage() {
   const setUser = useAuth((s) => s.setUser);
   // The name the learner already gave in onboarding.
   const profileName = useProgress((s) => s.profile.name);
+  const setProfileName = useProgress((s) => s.setName);
   const form = useAuthForm(
     registerBodySchema,
     async (body) => {
       if (!api) return;
       const created = await api.register(body);
       setUser(created);
+      // The account name is the one to greet and print on the certificate.
+      setProfileName(created.name);
       toast({
         tone: 'success',
         title: 'Аккаунт создан',

@@ -19,6 +19,7 @@ export function VerifyPage() {
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';
   const api = useAuth((s) => s.api);
+  const signedIn = useAuth((s) => s.user !== null);
   const [status, setStatus] = useState<Status>('pending');
 
   useEffect(() => {
@@ -63,7 +64,10 @@ export function VerifyPage() {
       )}
       {shown === 'failed' && (
         <p role="alert">
-          Ссылка недействительна или устарела. Новое письмо можно отправить из меню профиля.
+          Ссылка недействительна или устарела.{' '}
+          {signedIn
+            ? 'Новое письмо можно отправить из меню профиля.'
+            : 'Войди в аккаунт — в меню профиля появится кнопка «Отправить письмо ещё раз».'}
         </p>
       )}
       {shown === 'network' && (

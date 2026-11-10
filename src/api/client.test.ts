@@ -236,6 +236,32 @@ describe('ApiClient', () => {
     expect(bodyOf(api.calls[1]?.init ?? {})).toEqual({});
   });
 
+  it('keeps the message of an error code this bundle does not know', async () => {
+    const api = fakeApi({
+      '/auth/login': () =>
+        json(400, { error: { code: 'brand_new_code', message: 'Новое правило' } }),
+    });
+    await expect(
+      client(api).api.login({ email: user.email, password: 'secret-pass' }),
+    ).rejects.toMatchObject({ code: 'bad_response', message: 'Новое правило' });
+  });
+
+  it('checkSession signs out a revoked session, forgetAccessToken forces a refresh', async () => {
+    const api = fakeApi({
+      '/auth/login': () => session('a1', 'r1'),
+      '/auth/refresh': [() => session('a2', 'r2'), () => unauthorized('token_invalid')],
+      '/me': () => json(200, { user }),
+    });
+    const { api: c, store, onSignedOut } = client(api);
+    await c.login({ email: user.email, password: 'secret-pass' });
+    c.forgetAccessToken();
+    await c.me();
+    expect(api.calls.map((x) => x.path)).toEqual(['/auth/login', '/auth/refresh', '/me']);
+    await expect(c.checkSession()).rejects.toMatchObject({ code: 'token_invalid' });
+    expect(store.value).toBeNull();
+    expect(onSignedOut).toHaveBeenCalledOnce();
+  });
+
   it('accepts empty 204 answers', async () => {
     const api = fakeApi({ '/auth/verify-email': () => new Response(null, { status: 204 }) });
     await expect(client(api).api.verifyEmail('t')).resolves.toBeUndefined();

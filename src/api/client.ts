@@ -72,6 +72,7 @@ export interface ApiClientOptions {
 const EXPIRY_MARGIN_MS = 30_000;
 
 const nothing = z.unknown();
+const looseErrorSchema = z.object({ error: z.object({ message: z.string().min(1) }) });
 const meSchema = z.object({ user: publicUserSchema });
 
 interface SendOptions {
@@ -112,10 +113,17 @@ export function createApiClient({
   }
 
   async function failure(res: Response): Promise<ApiError> {
-    const parsed = apiErrorSchema.safeParse(await res.json().catch(() => null));
-    if (!parsed.success) return new ApiError('bad_response', BAD_RESPONSE_MESSAGE, res.status);
-    const { code, message, fields } = parsed.data.error;
-    return new ApiError(code, message, res.status, fields);
+    const raw: unknown = await res.json().catch(() => null);
+    const parsed = apiErrorSchema.safeParse(raw);
+    if (parsed.success) {
+      const { code, message, fields } = parsed.data.error;
+      return new ApiError(code, message, res.status, fields);
+    }
+    // A newer server may send a code this bundle does not know (the PWA can be out of date):
+    // keep its message, it is written for people.
+    const loose = looseErrorSchema.safeParse(raw);
+    if (loose.success) return new ApiError('bad_response', loose.data.error.message, res.status);
+    return new ApiError('bad_response', BAD_RESPONSE_MESSAGE, res.status);
   }
 
   async function parse<S extends z.ZodType>(res: Response, schema: S): Promise<z.output<S>> {
@@ -189,6 +197,19 @@ export function createApiClient({
   return {
     /** The user remembered from the last session (may be stale until `me()`). */
     storedUser: (): PublicUser | null => store.read()?.user ?? null,
+
+    /** Another tab signed out: the access token in this tab's memory must not outlive it. */
+    forgetAccessToken() {
+      access = null;
+    },
+
+    /**
+     * Asks the server whether this device's session is still alive (refresh now, not when the
+     * access token expires); a revoked session signs out through `onSignedOut`.
+     */
+    async checkSession() {
+      await refresh();
+    },
 
     async register(body: RegisterBody): Promise<PublicUser> {
       const auth = await parse(await send('/auth/register', { body }), authResponseSchema);

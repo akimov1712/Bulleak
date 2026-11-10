@@ -18,16 +18,15 @@ export function ResetPage() {
   const [params] = useSearchParams();
   const token = params.get('token') ?? '';
   const api = useAuth((s) => s.api);
-  const setUser = useAuth((s) => s.setUser);
   const [done, setDone] = useState(false);
   const form = useAuthForm(
     resetBodySchema,
     async (body) => {
       if (!api) return;
       await api.resetPassword(body.token, body.password);
-      // The server has ended every session, this one included.
-      setUser(null);
-      await api.logout();
+      // The server ended every session of that account. If this device was signed in to it,
+      // the check signs it out; a different account stays signed in.
+      if (api.storedUser()) await api.checkSession().catch(() => undefined);
       setDone(true);
     },
     (body) => (isWeakPassword(body.password) ? { password: WEAK } : null),
@@ -62,7 +61,7 @@ export function ResetPage() {
           }}
         >
           <FormMessage message={form.message} />
-          {form.message?.includes('Ссылка') && (
+          {form.code === 'token_invalid' && (
             <Link to={paths.forgot()} className="text-sm font-semibold text-info hover:underline">
               Запросить новую ссылку
             </Link>

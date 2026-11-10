@@ -43,6 +43,7 @@ function withApi(
       },
     },
     lock: (task) => task(),
+    onSignedOut: () => useAuth.setState({ user: null }),
     fetch: vi.fn((url: string | URL | Request, init?: RequestInit) => {
       const path = String(url).replace('https://api.test/v1', '');
       const body = init?.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : {};
@@ -86,8 +87,39 @@ describe('ForgotPage', () => {
 });
 
 describe('ResetPage', () => {
+  /** Sessions live until the reset; afterwards the server rejects their refresh tokens. */
+  function resettingApi(sameAccount: boolean) {
+    let reset = false;
+    return withApi(
+      (path) => {
+        if (path === '/auth/reset') {
+          reset = true;
+          return noContent();
+        }
+        if (path === '/auth/refresh') {
+          return reset && sameAccount
+            ? json(401, { error: { code: 'token_invalid', message: 'Сессия истекла.' } })
+            : json(200, { user, accessToken: 'a1', expiresIn: 900, refreshToken: 'r2' });
+        }
+        if (path === '/me') return json(200, { user });
+        return noContent();
+      },
+      { user, refreshToken: 'r1' },
+    );
+  }
+
+  it('keeps another account signed in on this device', async () => {
+    resettingApi(false);
+    const ue = userEvent.setup();
+    renderAt('/reset?token=tok-1');
+    await ue.type(await screen.findByLabelText('Новый пароль'), 'brand new long phrase');
+    await ue.click(screen.getByRole('button', { name: 'Сохранить пароль' }));
+    expect(await screen.findByText(/Пароль изменён/)).toBeInTheDocument();
+    expect(useAuth.getState().user).toEqual(user);
+  });
+
   it('sets a new password and signs this device out', async () => {
-    const requests = withApi(() => noContent(), { user, refreshToken: 'r1' });
+    const requests = resettingApi(true);
     const ue = userEvent.setup();
     renderAt('/reset?token=tok-1');
     await ue.type(await screen.findByLabelText('Новый пароль'), 'brand new long phrase');

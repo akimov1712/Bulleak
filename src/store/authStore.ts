@@ -43,7 +43,11 @@ export function subscribeAuthToOtherTabs(): () => void {
   if (typeof window === 'undefined' || !API_URL) return () => undefined;
   const onStorage = (event: StorageEvent) => {
     if (event.key === SESSION_KEY || event.key === null) {
-      useAuth.setState({ user: sessions.read()?.user ?? null });
+      const session = sessions.read();
+      // Signed out elsewhere, or another account signed in: drop this tab's access token.
+      if (session?.user.id !== useAuth.getState().user?.id)
+        useAuth.getState().api?.forgetAccessToken();
+      useAuth.setState({ user: session?.user ?? null });
     }
   };
   window.addEventListener('storage', onStorage);

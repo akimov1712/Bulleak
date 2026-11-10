@@ -18,8 +18,8 @@
 | [T-1406](T-1406-auth-e2e.md) | E2e авторизации | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
 - [ ] `npm run e2e` и `npm run build` зелёные
 - [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
 - [ ] Тег `stage-14-done`
