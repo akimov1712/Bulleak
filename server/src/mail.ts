@@ -1,3 +1,5 @@
+import { appendFile, mkdir } from 'node:fs/promises';
+import { dirname } from 'node:path';
 import type { Config } from './config';
 import type { Logger } from './log';
 
@@ -25,6 +27,16 @@ export function memoryMailer(logger?: Logger): Mailer & { sent: Mail[] } {
   };
 }
 
+/** Tests only: appends letters to a file as JSON lines, so e2e can open the links. */
+export function fileMailer(path: string): Mailer {
+  return {
+    send: async (mail) => {
+      await mkdir(dirname(path), { recursive: true });
+      await appendFile(path, `${JSON.stringify(mail)}\n`, 'utf8');
+    },
+  };
+}
+
 const RESEND_URL = 'https://api.resend.com/emails';
 
 export function resendMailer(apiKey: string, from: string): Mailer {
@@ -41,7 +53,8 @@ export function resendMailer(apiKey: string, from: string): Mailer {
 }
 
 export function createMailer(config: Config, logger: Logger): Mailer {
-  return config.mail ? resendMailer(config.mail.apiKey, config.mail.from) : memoryMailer(logger);
+  if (config.mail) return resendMailer(config.mail.apiKey, config.mail.from);
+  return config.mailOutbox ? fileMailer(config.mailOutbox) : memoryMailer(logger);
 }
 
 export const verifyEmailMail = (to: string, link: string): Mail => ({

@@ -21,7 +21,7 @@ npm run dev:server   # API на http://localhost:8787/api/v1
 npm run db:migrate   # применить миграции вручную
 npm run test -w server
 ```
-Настройки — `server/.env` по образцу `server/.env.example`. Локально файл не обязателен. Без ключа Resend текст письма со ссылкой выводится в лог сервера.
+Настройки — `server/.env` по образцу `server/.env.example`. Локально файл не обязателен. Без ключа Resend текст письма со ссылкой выводится в лог сервера. В e2e письма пишутся в файл `MAIL_OUTBOX` (в production он запрещён).
 
 ## API (`/api/v1`)
 | Запрос | Что делает | Ответ |

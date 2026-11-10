@@ -23,6 +23,8 @@ const envSchema = z
     /** Without a key (outside production) letters are only written to the log. */
     RESEND_API_KEY: z.string().optional(),
     MAIL_FROM: z.string().optional(),
+    /** Tests only: letters are appended to this file as JSON lines (e2e reads the links). */
+    MAIL_OUTBOX: z.string().optional(),
     /** Behind a reverse proxy: take the client address from X-Forwarded-For. */
     TRUST_PROXY: z.stringbool().default(false),
     /** Largest accepted request body, bytes. */
@@ -48,6 +50,9 @@ const envSchema = z
     if (production && !env.APP_ORIGIN) {
       ctx.addIssue({ code: 'custom', path: ['APP_ORIGIN'], message: 'обязателен в production' });
     }
+    if (production && env.MAIL_OUTBOX) {
+      ctx.addIssue({ code: 'custom', path: ['MAIL_OUTBOX'], message: 'запрещён в production' });
+    }
     if (production && (!env.RESEND_API_KEY || !env.MAIL_FROM)) {
       ctx.addIssue({
         code: 'custom',
@@ -65,6 +70,7 @@ const envSchema = z
         env.RESEND_API_KEY && env.MAIL_FROM
           ? { apiKey: env.RESEND_API_KEY, from: env.MAIL_FROM }
           : null,
+      mailOutbox: env.MAIL_OUTBOX ?? null,
       jwtSecret: secret,
       refreshTransport: env.REFRESH_TRANSPORT,
       trustProxy: env.TRUST_PROXY,

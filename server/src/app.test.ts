@@ -87,6 +87,21 @@ describe('loadConfig', () => {
     expect(loadConfig({ NODE_ENV: 'test' }).database).toEqual({ kind: 'pglite' });
   });
 
+  it('allows the test mail outbox only outside production', () => {
+    expect(loadConfig({ MAIL_OUTBOX: '/tmp/outbox.jsonl' }).mailOutbox).toBe('/tmp/outbox.jsonl');
+    expect(() =>
+      loadConfig({
+        NODE_ENV: 'production',
+        APP_ORIGIN: 'https://x.test',
+        JWT_SECRET: 'k'.repeat(48),
+        DATABASE_URL: 'postgres://u:p@db.test:5432/bulleak',
+        RESEND_API_KEY: 'test-key',
+        MAIL_FROM: 'Bulleak <mail@bulleak.test>',
+        MAIL_OUTBOX: '/tmp/outbox.jsonl',
+      }),
+    ).toThrow(/MAIL_OUTBOX: запрещён в production/);
+  });
+
   it('treats empty variables as not set', () => {
     expect(loadConfig({ APP_URL: '', APP_ORIGIN: '', DATABASE_URL: '' })).toMatchObject({
       appUrl: 'http://localhost:5173/',
