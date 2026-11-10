@@ -76,6 +76,8 @@ export interface Counters {
 
 export interface Profile {
   name: string;
+  /** Last edit of the name: the newer one wins when two devices sync. */
+  updatedAt?: number;
   startedAt: number;
   lastBackupAt?: number;
 }

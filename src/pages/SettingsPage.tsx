@@ -56,7 +56,9 @@ export function SettingsPage() {
               value={name}
               maxLength={40}
               onChange={(e) =>
-                useProgress.setState((s) => ({ profile: { ...s.profile, name: e.target.value } }))
+                useProgress.setState((s) => ({
+                  profile: { ...s.profile, name: e.target.value, updatedAt: Date.now() },
+                }))
               }
             />
           )}

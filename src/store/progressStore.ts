@@ -69,7 +69,11 @@ export const useProgress = create<ProgressStore>()(
           void dispatch({ type: 'quizCompleted', lessonId, result, durationSec }),
         recordExam: (key, result, durationSec) =>
           void dispatch({ type: 'examCompleted', key, result, durationSec }),
-        setName: (name) => apply((s) => ({ ...s, profile: { ...s.profile, name: name.trim() } })),
+        setName: (name) =>
+          apply((s) => ({
+            ...s,
+            profile: { ...s.profile, name: name.trim(), updatedAt: Date.now() },
+          })),
         replace: (next) => set(migrateProgress(next, PROGRESS_VERSION, Date.now())),
         reset: () => set(createInitialProgress(Date.now())),
       };

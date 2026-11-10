@@ -1,0 +1,19 @@
+# T-1503 · API синхронизации
+
+- **Этап:** 15 Синхронизация
+- **Статус:** ☐ не начата
+
+## Контекст (прочитать перед началом)
+- [ТЗ: аккаунты и бэкенд](../../04-features/accounts-backend.md), разделы 6 и 7
+- [Бэкенд](../../02-architecture/backend.md)
+
+## Что сделать
+1. Таблицы `progress`, `settings`, `sim_trades`, `journal_entries`.
+2. `GET/PUT /sync/progress` с `baseRev` и ответом 409, `GET/PUT /sync/settings`, `GET/POST /sync/records` с курсором.
+3. Лимиты размера, изоляция пользователей.
+
+## Критерии приёмки
+- [ ] Тесты: конфликт 409, курсор и удаления, чужие данные недоступны, лимиты
+- [ ] Выполнен [Definition of Done](../../01-rules/definition-of-done.md)
+
+**Коммит:** `feat(sync): add sync API`

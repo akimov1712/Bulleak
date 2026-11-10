@@ -150,6 +150,9 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
     counters,
     profile: {
       name: typeof profileRaw.name === 'string' ? profileRaw.name : '',
+      ...(optNum(profileRaw.updatedAt) !== undefined
+        ? { updatedAt: optNum(profileRaw.updatedAt) }
+        : {}),
       startedAt: num(profileRaw.startedAt, now),
       lastBackupAt: optNum(profileRaw.lastBackupAt),
     },
