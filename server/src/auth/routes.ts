@@ -2,10 +2,8 @@ import { eq, sql } from 'drizzle-orm';
 import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono, type Context, type MiddlewareHandler } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
-import type { z } from 'zod';
 import {
   emailTokenBodySchema,
-  fieldErrors,
   forgotBodySchema,
   isWeakPassword,
   loginBodySchema,
@@ -16,6 +14,7 @@ import {
   type PublicUser,
 } from '@bulleak/shared';
 import type { Config } from '../config';
+import { parseBody, type AuthedEnv } from '../http';
 import type { Db } from '../db';
 import { users, type User } from '../db/schema';
 import type { Logger } from '../log';
@@ -27,7 +26,6 @@ import {
   rateLimited,
   tokenInvalid,
   unauthorized,
-  validation,
   weakPassword,
 } from '../errors';
 import { consumeEmailToken, issueEmailToken, peekEmailToken } from './email-tokens';
@@ -38,8 +36,6 @@ import { ACCESS_TTL_SEC, REFRESH_TTL_MS, signAccessToken, verifyAccessToken } fr
 
 export const REFRESH_COOKIE = 'bulleak_refresh';
 
-type AuthedEnv = { Variables: { userId: string } };
-
 export interface AuthDeps {
   config: Config;
   db: Db;
@@ -48,13 +44,6 @@ export interface AuthDeps {
   limiter: RateLimiter;
   /** Path the refresh cookie is limited to. */
   apiPrefix: string;
-}
-
-async function parseBody<S extends z.ZodType>(c: Context, schema: S): Promise<z.output<S>> {
-  const raw: unknown = await c.req.json().catch(() => null);
-  const result = schema.safeParse(raw);
-  if (!result.success) throw validation(fieldErrors(result.error));
-  return result.data;
 }
 
 const publicUser = (user: User): PublicUser => ({

@@ -32,7 +32,8 @@ const envSchema = z
       .number()
       .int()
       .positive()
-      .default(64 * 1024),
+      // A synced progress document may be up to 1 MB (shared/src/sync.ts).
+      .default(2 * 1024 * 1024),
   })
   .transform((env, ctx) => {
     const production = env.NODE_ENV === 'production';

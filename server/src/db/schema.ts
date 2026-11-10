@@ -1,4 +1,14 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 /*
  * Query-side view of the tables. The source of truth for the structure is the SQL in
@@ -15,6 +25,8 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   name: text('name').notNull(),
   createdAt: ts('created_at').notNull().defaultNow(),
+  /** Counter of record changes (sync cursor). */
+  recordRev: bigint('record_rev', { mode: 'number' }).notNull().default(0),
 });
 
 export const sessions = pgTable('sessions', {
@@ -41,7 +53,43 @@ export const emailTokens = pgTable('email_tokens', {
   usedAt: ts('used_at'),
 });
 
-export const schema = { users, sessions, emailTokens };
+type Json = Record<string, unknown>;
+const rev = (name: string) => bigint(name, { mode: 'number' });
+const owner = () =>
+  uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' });
+
+export const progress = pgTable('progress', {
+  userId: owner().primaryKey(),
+  state: jsonb('state').$type<Json>().notNull(),
+  schemaVersion: integer('schema_version').notNull(),
+  rev: rev('rev').notNull(),
+  updatedAt: ts('updated_at').notNull().defaultNow(),
+});
+
+export const settings = pgTable('settings', {
+  userId: owner().primaryKey(),
+  state: jsonb('state').$type<Json>().notNull(),
+  rev: rev('rev').notNull(),
+  updatedAt: ts('updated_at').notNull().defaultNow(),
+});
+
+export const syncRecords = pgTable(
+  'sync_records',
+  {
+    userId: owner(),
+    kind: text('kind', { enum: ['sim', 'journal'] }).notNull(),
+    uid: uuid('uid').notNull(),
+    data: jsonb('data').$type<Json>(),
+    changedAt: rev('changed_at').notNull(),
+    rev: rev('rev').notNull(),
+    deleted: boolean('deleted').notNull().default(false),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.kind, t.uid] })],
+);
+
+export const schema = { users, sessions, emailTokens, progress, settings, syncRecords };
 
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

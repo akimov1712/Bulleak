@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
 import { memoryRateLimiter, type RateLimiter } from './auth/rate-limit';
 import { authRoutes } from './auth/routes';
+import { syncRoutes } from './sync/routes';
 import type { Config } from './config';
 import type { Db } from './db';
 import { HttpError, internal, notFound, payloadTooLarge } from './errors';
@@ -69,6 +70,7 @@ export function createApp({ config, logger, db, mailer, limiter = memoryRateLimi
   app.get(`${API_PREFIX}/health`, (c) => c.json({ status: 'ok', version: VERSION }));
 
   app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, limiter, apiPrefix: API_PREFIX }));
+  app.route(API_PREFIX, syncRoutes({ config, db }));
 
   app.notFound((c) => {
     const error = notFound();
