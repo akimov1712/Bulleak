@@ -172,7 +172,12 @@ export default defineConfig(({ mode }) => ({
   ],
   // The in-app preview pane cannot open the HMR websocket, which makes the Vite client
   // reload in a loop. `--mode pane` (used by .claude/launch.json) turns HMR off there.
-  server: mode === 'pane' ? { hmr: false } : undefined,
+  server: {
+    ...(mode === 'pane' ? { hmr: false } : {}),
+    // The API and its local database are not part of the site. On Windows the watcher's open
+    // handles also block renaming server/.data while the dev server runs.
+    watch: { ignored: ['**/server/**'] },
+  },
   build: {
     rolldownOptions: {
       output: {

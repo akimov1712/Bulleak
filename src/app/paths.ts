@@ -20,5 +20,7 @@ export const paths = {
   certificate: () => '/certificate',
   plan: () => '/plan',
   about: () => '/about',
+  login: () => '/login',
+  register: () => '/register',
   devUi: () => '/dev/ui',
 } as const;

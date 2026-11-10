@@ -77,7 +77,11 @@ export function createApp({ config, logger, db, mailer, limiter = memoryRateLimi
 
   app.onError((error, c) => {
     const known = error instanceof HttpError ? error : null;
-    if (!known) logger.error('unhandled error', { name: error.name, reason: error.message });
+    if (!known) {
+      // Drizzle wraps database errors: the real reason is in `cause`.
+      const cause = error.cause instanceof Error ? error.cause.message : undefined;
+      logger.error('unhandled error', { name: error.name, reason: error.message, cause });
+    }
     const http = known ?? internal();
     return c.json(http.toBody(), http.status, http.headers);
   });

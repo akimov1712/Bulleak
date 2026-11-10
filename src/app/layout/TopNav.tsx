@@ -1,13 +1,16 @@
 import { Fragment, lazy, Suspense, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
-import { ChevronDown, Moon, Search, Sun } from 'lucide-react';
+import { ChevronDown, LogOut, Moon, Search, Sun } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { levelFromXp } from '@/lib/gamification/levels';
 import { Hud, LevelBadge, ProfileSummary } from '@/features/gamification/Hud';
 import { useResolvedTheme } from '@/hooks/useTheme';
+import { buttonClass } from '@/components/ui/styles';
+import { useAuth } from '@/store/authStore';
 import { useProgress } from '@/store/progressStore';
 import { useSettings } from '@/store/settingsStore';
-import { useUi } from '@/store/uiStore';
+import { toast, useUi } from '@/store/uiStore';
+import { paths } from '../paths';
 import { Dropdown } from './Dropdown';
 import { Logo } from './Logo';
 import { isItemActive, NAV_SECTIONS, secondaryNav, type NavItem } from './nav';
@@ -88,6 +91,54 @@ function ThemeRow() {
   );
 }
 
+/** Sign-in buttons for a guest, e-mail and sign-out for an account; nothing without an API. */
+function AccountBlock({ close }: { close: () => void }) {
+  const api = useAuth((s) => s.api);
+  const user = useAuth((s) => s.user);
+  const setUser = useAuth((s) => s.setUser);
+  if (!api) return null;
+  if (!user) {
+    return (
+      <div className="flex gap-2 border-t border-border px-1 pt-3 pb-1">
+        <Link
+          to={paths.login()}
+          onClick={close}
+          className={buttonClass({ size: 'sm', fullWidth: true })}
+        >
+          Войти
+        </Link>
+        <Link
+          to={paths.register()}
+          onClick={close}
+          className={buttonClass({ size: 'sm', variant: 'secondary', fullWidth: true })}
+        >
+          Регистрация
+        </Link>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-0.5 border-t border-border pt-2">
+      <p className="truncate px-2.5 text-xs text-text-muted" title={user.email}>
+        {user.email}
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          close();
+          setUser(null);
+          void api.logout();
+          toast({ tone: 'info', title: 'Ты вышел из аккаунта' });
+        }}
+        className="flex h-10 w-full items-center gap-3 rounded-(--radius-btn) px-2.5 text-sm font-medium transition-colors hover:bg-surface-2"
+      >
+        <LogOut className="size-4 text-text-muted" aria-hidden="true" />
+        Выйти
+      </button>
+    </div>
+  );
+}
+
 function ProfileMenu() {
   const name = useProgress((s) => s.profile.name);
   const info = levelFromXp(useProgress((s) => s.xp));
@@ -118,6 +169,7 @@ function ProfileMenu() {
           <div className="p-2">
             <ProfileSummary />
           </div>
+          <AccountBlock close={close} />
           <div className="border-t border-border pt-2">
             <ul className="flex flex-col gap-0.5" aria-label="Профиль">
               {[

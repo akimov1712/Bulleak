@@ -27,6 +27,17 @@ export const useAuth = create<AuthState>()((set) => ({
   setUser: (user) => set({ user }),
 }));
 
+/** Refreshes the remembered user from the API; a rejected session signs out by itself. */
+export function revalidateSession(): void {
+  const { api, user } = useAuth.getState();
+  if (!api || !user) return;
+  api.me().then(
+    (fresh) => useAuth.setState({ user: fresh }),
+    // Offline or server down: keep the remembered user, the next request will retry.
+    () => undefined,
+  );
+}
+
 /** Sign-in and sign-out in another tab show up here too. */
 export function subscribeAuthToOtherTabs(): () => void {
   if (typeof window === 'undefined' || !API_URL) return () => undefined;
