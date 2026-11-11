@@ -9,7 +9,7 @@ import {
 } from '@/lib/stats/confidence';
 
 /** «Достаточно ли сделок?» — never calls a strategy profitable without the data for it. */
-export const VERDICT_TEXT: Record<EdgeVerdict, string> = {
+const VERDICT_TEXT: Record<EdgeVerdict, string> = {
   'too-few': `Сделок меньше ${MIN_TRADES_FOR_VERDICT}: по ним нельзя сказать, есть ли у тебя преимущество. Это нормально — просто продолжай.`,
   unclear:
     'Интервал включает ноль: по этим данным нельзя отличить преимущество от везения. Нужно больше сделок.',
