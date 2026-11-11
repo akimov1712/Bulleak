@@ -14,7 +14,8 @@ concurrency:
 jobs:
   # Fast, separate signal for the API: PGlite, no external services.
   server:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright system deps fail to install on the newer image behind ubuntu-latest.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +29,8 @@ jobs:
       - run: npm run test -w server
 
   check:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright system deps fail to install on the newer image behind ubuntu-latest.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
