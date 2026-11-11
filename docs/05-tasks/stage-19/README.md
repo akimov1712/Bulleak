@@ -23,8 +23,8 @@
 | [T-1910](T-1910-confidence.md) | Калибровка уверенности | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
-- [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
-- [ ] Тег `stage-19-done`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
+- [x] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
+- [x] Тег `stage-19-done`
