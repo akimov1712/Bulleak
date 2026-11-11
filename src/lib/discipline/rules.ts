@@ -2,8 +2,8 @@
  * Discipline rules for simulator and journal trades (docs/04-features/stats-v2.md, section 2).
  * One implementation for statistics and the learner model (behaviour estimate B).
  */
-import type { SimTrade } from '@/types/trading';
-import type { ClosedTrade } from '@/lib/journal/metrics';
+import type { JournalTrade, SimTrade } from '@/types/trading';
+import { isClosed, type ClosedTrade } from '@/lib/journal/metrics';
 import { toDateKey } from '@/lib/date';
 import { stopMovedAway } from '@/lib/trading/manage';
 
@@ -168,3 +168,18 @@ export function disciplineChecks(
     return checks;
   });
 }
+
+/** Own simulator trades (no strategy backtests, no deleted records), oldest first. */
+export const simDisciplineTrades = (trades: readonly SimTrade[]): DisciplineTrade[] =>
+  trades
+    .filter((t) => !t.deleted && !t.strategyTag)
+    .sort((a, b) => a.at - b.at)
+    .map(fromSim);
+
+/** Closed journal trades by entry time. */
+export const journalDisciplineTrades = (trades: readonly JournalTrade[]): DisciplineTrade[] =>
+  trades
+    .filter(isClosed)
+    .filter((t) => !t.deleted)
+    .sort((a, b) => a.openedAt - b.openedAt)
+    .map(fromJournal);

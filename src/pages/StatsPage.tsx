@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LearningStats } from '@/features/stats/LearningStats';
+import { DisciplineStats } from '@/features/stats/DisciplineStats';
 import { JournalStats, SimulatorStats } from '@/features/stats/TradingStats';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
-type Tab = 'learning' | 'simulator' | 'journal';
+type Tab = 'learning' | 'discipline' | 'simulator' | 'journal';
 
 const TABS = [
   { id: 'learning', label: 'Обучение' },
+  { id: 'discipline', label: 'Дисциплина' },
   { id: 'simulator', label: 'Тренажёр' },
   { id: 'journal', label: 'Журнал' },
 ] as const;
@@ -23,6 +25,7 @@ export function StatsPage() {
       <Tabs items={TABS} value={tab} onChange={setTab} label="Разделы статистики" />
       <div role="tabpanel" aria-label={TABS.find((t) => t.id === tab)?.label}>
         {tab === 'learning' && <LearningStats />}
+        {tab === 'discipline' && <DisciplineStats />}
         {tab === 'simulator' && <SimulatorStats />}
         {tab === 'journal' && <JournalStats />}
       </div>

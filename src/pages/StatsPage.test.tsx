@@ -22,6 +22,37 @@ beforeEach(async () => {
 });
 
 describe('StatsPage', () => {
+  it('discipline tab: rules kept in simulator trades, index after five trades', async () => {
+    const trade = (i: number, riskPct: number) => ({
+      at: Date.UTC(2026, 10, 1 + i, 12),
+      scenarioId: null,
+      dataset: 'BTCUSDT-240',
+      startIndex: 500,
+      side: 'long' as const,
+      entry: 100,
+      sl: 95,
+      tp: 110,
+      riskPct,
+      balanceBefore: 10_000,
+      qty: 1,
+      exitPrice: 110,
+      exitIndex: 510,
+      outcome: 'tp' as const,
+      pnl: 10,
+      r: 2,
+      fees: 0,
+    });
+    for (let i = 0; i < 4; i++) await simRepo.add(trade(i, 1));
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: 'Дисциплина' }));
+    expect(await screen.findByText('мало данных')).toBeInTheDocument();
+
+    await simRepo.add(trade(4, 2));
+    // 10 checks (risk + R:R per trade), one broken → 90.
+    expect(await screen.findByText('90 / 100')).toBeInTheDocument();
+    expect(screen.getByText('нарушено 1 из 5')).toBeInTheDocument();
+  });
+
   it('every tab has an empty state for a new learner', async () => {
     renderPage();
     expect(screen.getByText('Статистики пока нет')).toBeInTheDocument();
