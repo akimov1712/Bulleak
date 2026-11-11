@@ -26,6 +26,7 @@ import { ACCOUNT_LABEL, ACCOUNTS } from '../journal/labels';
 import { BacktestVsForward } from './BacktestVsForward';
 import { Bars } from './charts';
 import { ExpectancyCard } from './ExpectancyCard';
+import { bootstrapMean, edgeVerdict } from '@/lib/stats/confidence';
 import { CurveCard, GroupBreakdowns, type LabelledResult } from './ResultsBreakdown';
 
 const TIMEFRAME_LABEL: Record<string, string> = { '60': '1H', '240': '4H', D: '1D' };
@@ -192,6 +193,12 @@ function BacktestReportCard({ tag, trades }: { tag: string; trades: SimTrade[] }
           ? 'Пороги пройдены — можно переходить к форвард-тесту на демо или тестнете (урок 11.6).'
           : 'Пороги пока не пройдены. Меняй одно правило за раз и проверяй на новых данных (урок 11.5).'}
       </p>
+      {report.ready && edgeVerdict(bootstrapMean(trades.map((t) => t.r))) !== 'positive' && (
+        <p className="text-sm text-text-muted">
+          Но интервал матожидания ещё включает ноль: по этим сделкам нельзя отличить преимущество от
+          везения. Форвард-тест как раз это и проверит.
+        </p>
+      )}
     </Card>
   );
 }
