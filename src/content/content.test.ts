@@ -19,7 +19,7 @@ import { getScenario } from './scenarios';
 import { finalExam } from './final-exam';
 import { mdxComponents } from '@/features/lesson/mdxComponents';
 import { MOODS } from '@/components/mascot/moods';
-import { skillGroups, skills } from './skills';
+import { skillGroups, skillIndex, skills } from './skills';
 import { skillGraphProblems } from '@/lib/learner/skills';
 
 const datasetLengths = new Map<DatasetName, number>();
@@ -212,6 +212,36 @@ describe('skill graph', () => {
     ]);
     expect(problems).toEqual([]);
     expect(skills.length).toBeGreaterThanOrEqual(25);
+  });
+
+  it('every question maps to a skill, every skill has questions, its lessons test it', async () => {
+    const lessonQuizzes = await Promise.all(
+      contentInventory.quizzes.map((id) => contentInventory.loadQuiz(id)),
+    );
+    const exams = await Promise.all(
+      contentInventory.exams.map((id) => contentInventory.loadExam(id)),
+    );
+    const questions = [...lessonQuizzes, ...exams, finalExam].flatMap((quiz) => quiz.questions);
+
+    const unmapped = questions.filter((q) => skillIndex.skillsOfTags(q.tags).length === 0);
+    expect(unmapped.map((q) => q.id)).toEqual([]);
+
+    const perSkill = new Map<string, number>();
+    for (const q of questions) {
+      for (const s of skillIndex.skillsOfTags(q.tags)) perSkill.set(s, (perSkill.get(s) ?? 0) + 1);
+    }
+    const thin = skills.filter((s) => (perSkill.get(s.id) ?? 0) < 5).map((s) => s.id);
+    expect(thin, 'skills with fewer than 5 questions').toEqual([]);
+
+    const quizOf = new Map(lessonQuizzes.map((quiz) => [quiz.id, quiz]));
+    const untested = skills.flatMap((s) =>
+      s.lessons
+        .filter(
+          (l) => !quizOf.get(l)?.questions.some((q) => q.tags.some((t) => s.tags.includes(t))),
+        )
+        .map((l) => `${s.id}: ${l}`),
+    );
+    expect(untested, 'skill lessons whose quiz does not test the skill').toEqual([]);
   });
 });
 
