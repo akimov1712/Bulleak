@@ -5,6 +5,7 @@ import { Onboarding } from '@/features/home/Onboarding';
 import { ContinueCard } from '@/features/home/ContinueCard';
 import { TodayCard } from '@/features/home/TodayCard';
 import { ReviewCard } from '@/features/learner/ReviewCard';
+import { AdviceCard } from '@/features/learner/AdviceCard';
 import { ModulesCard } from '@/features/home/ModulesCard';
 import { courseCompletion, currentLesson } from '@/lib/progress/unlock';
 import { BackupReminder, QuickLinks, RecentAchievements } from '@/features/home/HomeExtras';
@@ -70,6 +71,7 @@ export function HomePage() {
       )}
       <div className="grid gap-5 lg:grid-cols-12">
         <div className="flex flex-col gap-5 lg:col-span-8">
+          <AdviceCard />
           <ContinueCard step={step} done={done} total={total} />
           <ModulesCard ctx={ctx} current={currentLesson(ctx)?.moduleId} />
         </div>

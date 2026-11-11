@@ -71,3 +71,36 @@ describe('SkillsPage', () => {
     expect(screen.getByLabelText('Сводка')).toHaveTextContent('Знаю, но нарушаю1');
   });
 });
+
+describe('home advice', () => {
+  it('points at the knowledge–behaviour gap', async () => {
+    const answers = Array.from({ length: 6 }, (_, i) => ({
+      q: `q${i}`,
+      ok: true,
+      tags: ['risk-per-trade'],
+      type: 'single' as const,
+    }));
+    useProgress.setState({
+      quizAttempts: [
+        { quizId: 'm09-l01', at: Date.now() - 1000, ratio: 1, passed: true, tags: {}, answers },
+      ],
+      profile: { ...useProgress.getState().profile, name: 'Тестер' },
+    });
+    for (let i = 0; i < 5; i++) await simRepo.add(trade(Date.now() - 500 + i));
+
+    renderAt('/');
+    const card = await screen.findByRole('region', { name: 'Совет на сегодня' });
+    expect(card).toHaveTextContent('Риск на сделку и лимиты');
+    expect(within(card).getByRole('link', { name: 'Посмотреть навык' })).toHaveAttribute(
+      'href',
+      '/skills',
+    );
+  });
+
+  it('stays hidden for a new learner', async () => {
+    useProgress.setState({ profile: { ...useProgress.getState().profile, name: 'Тестер' } });
+    renderAt('/');
+    expect(await screen.findByRole('heading', { level: 1, name: /Тестер/ })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Совет на сегодня' })).not.toBeInTheDocument();
+  });
+});
