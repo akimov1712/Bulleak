@@ -20,6 +20,8 @@ export const XP = {
   journalDailyCap: 30,
   calculatorFirstUse: 5,
   dailyGoal: 20,
+  /** A passed spaced review (sessions are only offered for due skills). */
+  review: 15,
 } as const;
 
 const reason = (label: string, xp: number): RewardReason => ({ label, xp });
@@ -77,6 +79,9 @@ export function xpForEvent(
       const xp = capped(XP.journalEntry, today?.journalXp ?? 0, XP.journalDailyCap);
       return xp > 0 ? [reason('Запись в журнале', xp)] : [];
     }
+
+    case 'reviewCompleted':
+      return event.result.passed ? [reason('Повторение', XP.review)] : [];
 
     case 'calculatorUsed':
       return state.counters.calculatorsUsed.includes(event.calcId)

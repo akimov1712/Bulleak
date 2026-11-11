@@ -8,7 +8,13 @@ import { levelFromXp } from '@/lib/gamification/levels';
 import { applyActivity, effectiveStreak } from '@/lib/gamification/streak';
 import { evaluateAchievements } from '@/lib/gamification/achievements';
 import { emptyDay } from './initial';
-import { addLessonTime, markLessonRead, recordExam, recordLessonQuiz } from './actions';
+import {
+  addLessonTime,
+  markLessonRead,
+  recordExam,
+  recordLessonQuiz,
+  recordReview,
+} from './actions';
 
 export interface ApplyContext {
   now: number;
@@ -30,6 +36,8 @@ function transition(state: ProgressState, event: ProgressEvent, now: number): Pr
       return recordLessonQuiz(state, event.lessonId, event.result, now, event.durationSec);
     case 'examCompleted':
       return recordExam(state, event.key, event.result, now, event.durationSec);
+    case 'reviewCompleted':
+      return recordReview(state, event.result, now, event.durationSec);
     case 'simTrade': {
       const key = toDateKey(now);
       const day = state.activity[key] ?? emptyDay();

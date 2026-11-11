@@ -11,6 +11,8 @@ export type ProgressEvent =
   | { type: 'lessonTime'; lessonId: LessonId; seconds: number }
   | { type: 'quizCompleted'; lessonId: LessonId; result: QuizResult; durationSec?: number }
   | { type: 'examCompleted'; key: ModuleId | 'final'; result: QuizResult; durationSec?: number }
+  /** Spaced review of skills (learner model, T-1907). */
+  | { type: 'reviewCompleted'; result: QuizResult; durationSec?: number }
   | { type: 'simTrade'; outcome: SimOutcome; r: number; backtest?: boolean }
   | { type: 'simSkip'; scenarioId: string; correct: boolean }
   | { type: 'backtestEvaluated'; trades: number; expectancyR: number }

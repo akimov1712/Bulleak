@@ -22,6 +22,7 @@ interface ProgressActions {
   addTime: (id: LessonId, seconds: number) => void;
   recordQuiz: (id: LessonId, result: QuizResult, durationSec?: number) => void;
   recordExam: (key: ExamKey, result: QuizResult, durationSec?: number) => void;
+  recordReview: (result: QuizResult, durationSec?: number) => Rewards;
   setName: (name: string) => void;
   /** Replace everything (import) — input is normalized first. */
   replace: (next: unknown) => void;
@@ -67,6 +68,8 @@ export const useProgress = create<ProgressStore>()(
         addTime: (lessonId, seconds) => void dispatch({ type: 'lessonTime', lessonId, seconds }),
         recordQuiz: (lessonId, result, durationSec) =>
           void dispatch({ type: 'quizCompleted', lessonId, result, durationSec }),
+        recordReview: (result, durationSec) =>
+          dispatch({ type: 'reviewCompleted', result, durationSec }),
         recordExam: (key, result, durationSec) =>
           void dispatch({ type: 'examCompleted', key, result, durationSec }),
         setName: (name) =>

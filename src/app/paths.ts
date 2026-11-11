@@ -15,6 +15,7 @@ export const paths = {
   glossary: (termId?: string) => (termId ? `/glossary/${termId}` : '/glossary'),
   cheatsheets: () => '/cheatsheets',
   stats: () => '/stats',
+  review: () => '/review',
   achievements: () => '/achievements',
   settings: () => '/settings',
   certificate: () => '/certificate',

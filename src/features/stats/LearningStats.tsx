@@ -1,3 +1,4 @@
+import { REVIEW_QUIZ_ID } from '@/lib/learner/review';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { paths } from '@/app/paths';
@@ -30,6 +31,7 @@ const dateTimeFormat = new Intl.DateTimeFormat('ru-RU', {
 /** Human name of a quiz attempt: lesson title, module exam or the final exam. */
 function quizName(quizId: string): string {
   if (quizId === 'final') return 'Финальный экзамен';
+  if (quizId === REVIEW_QUIZ_ID) return 'Повторение навыков';
   if (quizId.endsWith('-exam')) {
     const module = courseIndex.getModule(quizId.replace('-exam', ''));
     return `Экзамен: ${module?.title ?? quizId}`;

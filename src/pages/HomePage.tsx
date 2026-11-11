@@ -4,6 +4,7 @@ import { BACKUP_SNOOZE_MS, nextStep, shouldRemindBackup } from '@/lib/progress/n
 import { Onboarding } from '@/features/home/Onboarding';
 import { ContinueCard } from '@/features/home/ContinueCard';
 import { TodayCard } from '@/features/home/TodayCard';
+import { ReviewCard } from '@/features/learner/ReviewCard';
 import { ModulesCard } from '@/features/home/ModulesCard';
 import { courseCompletion, currentLesson } from '@/lib/progress/unlock';
 import { BackupReminder, QuickLinks, RecentAchievements } from '@/features/home/HomeExtras';
@@ -73,6 +74,7 @@ export function HomePage() {
           <ModulesCard ctx={ctx} current={currentLesson(ctx)?.moduleId} />
         </div>
         <div className="flex flex-col gap-5 lg:col-span-4">
+          <ReviewCard />
           <TodayCard />
           <QuickLinks />
         </div>

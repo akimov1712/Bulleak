@@ -18,6 +18,7 @@
 | `/journal/new`, `/journal/:id` | JournalEntryPage | Создание / редактирование сделки |
 | `/glossary` | GlossaryPage | Поиск по терминам; `/glossary/:termId` — открыт термин |
 | `/cheatsheets` | CheatsheetsPage | Шпаргалки и чек-лист перед сделкой |
+| `/review` | ReviewPage | Повторение навыков: 5 вопросов по навыкам, которым подошёл срок (T-1907) |
 | `/stats` | StatsPage | Статистика |
 | `/achievements` | AchievementsPage | Все достижения |
 | `/settings` | SettingsPage | Тема, цель дня, экспорт/импорт, сброс |

@@ -3,6 +3,7 @@ import type { QuizResult } from '@/types/quiz';
 import type { DayActivity, ExamKey, ProgressState, QuizAttempt } from '@/types/progress';
 import { toDateKey } from '@/lib/date';
 import { emptyDay, emptyLessonProgress, MAX_QUIZ_ATTEMPTS } from './initial';
+import { REVIEW_QUIZ_ID } from '@/lib/learner/review';
 
 /**
  * Pure state transitions for learning progress (no XP/achievements — those are layered on
@@ -108,6 +109,28 @@ export function recordLessonQuiz(
       ...state.counters,
       perfectQuizzes: state.counters.perfectQuizzes + (perfect ? 1 : 0),
     },
+  };
+}
+
+/** A spaced-review session: an attempt with quizId "review", no lesson or exam changes. */
+export function recordReview(
+  state: ProgressState,
+  result: QuizResult,
+  now: number,
+  durationSec?: number,
+): ProgressState {
+  return {
+    ...state,
+    quizAttempts: pushAttempt(state, {
+      quizId: REVIEW_QUIZ_ID,
+      at: now,
+      ratio: result.ratio,
+      passed: result.passed,
+      tags: tagStats(result),
+      durationSec,
+      answers: attemptAnswers(result),
+    }),
+    activity: updateDay(state, now, (d) => ({ ...d, quizzes: d.quizzes + 1 })),
   };
 }
 
