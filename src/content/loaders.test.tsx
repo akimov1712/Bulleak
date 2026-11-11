@@ -57,7 +57,7 @@ describe('content loaders', () => {
   it('loads the quiz module', async () => {
     const quiz = await loadQuiz('m00-l01');
     expect(quiz.id).toBe('m00-l01');
-    expect(quiz.questions.length).toBeGreaterThanOrEqual(8);
+    expect(quiz.questions.length).toBeGreaterThanOrEqual(5);
   });
 
   it('throws a typed error for missing content', async () => {

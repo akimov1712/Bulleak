@@ -119,7 +119,7 @@ describe('QuizPage', () => {
 
   it('failing shows the mistakes review and does not complete the lesson', async () => {
     renderAt('/lesson/m00-l01/quiz');
-    await runQuiz(5); // 5/8 = 62.5%
+    await runQuiz(3); // 3 of 6 = 50 %
     expect(await screen.findByRole('heading', { name: 'Почти получилось' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Разбор ошибок' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Повторить урок' })).toBeInTheDocument();
