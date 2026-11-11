@@ -258,6 +258,17 @@ describe('glossary', () => {
   });
 });
 
+describe('why it matters and typical mistakes (T-2206)', () => {
+  it('every lesson says why it matters and warns about a typical mistake', () => {
+    const noWhy = courseIndex.lessons.filter((l) => l.why.trim().length < 30).map((l) => l.id);
+    expect(noWhy).toEqual([]);
+    const noWarning = contentInventory.lessons.filter(
+      (id) => !mdxSources[id]?.includes('<Warning'),
+    );
+    expect(noWarning).toEqual([]);
+  });
+});
+
 describe('lesson texts and glossary links', () => {
   it.each(contentInventory.lessons)('%s: terms exist in the glossary', (id) => {
     const lesson = courseIndex.getLesson(id);

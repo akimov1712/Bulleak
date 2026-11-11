@@ -130,6 +130,9 @@ function LessonView({ lesson }: { lesson: LessonMeta }) {
                   {badge.label}
                 </Badge>
               </div>
+              <p className="mt-4 rounded-xl border-l-4 border-primary bg-surface-2 p-3 text-sm">
+                <b>Почему это важно.</b> {lesson.why}
+              </p>
             </header>
           </div>
 

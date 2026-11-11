@@ -16,6 +16,8 @@ export interface LessonMeta {
   title: string;
   /** One sentence for cards and popovers. */
   summary: string;
+  /** Why the lesson matters to a trader, shown at its start (hints.md, section 6). */
+  why: string;
   /** Estimated reading + practice time. */
   minutes: number;
   /** Glossary term ids introduced in this lesson. */

@@ -123,6 +123,7 @@ interface ParsedLesson {
   index: number;
   title: string;
   summary: string;
+  why: string;
   minutes: number;
   terms: string[];
   practice?: string;
@@ -160,6 +161,8 @@ function parseBrief(file: string, moduleId: string, index: number): ParsedLesson
   const plain = (text: string) => text.replace(/\*\*|__|`/g, '').trim();
   const firstGoal = plain(goals[0] ?? title);
   const summary = firstGoal.endsWith('.') ? firstGoal : `${firstGoal}.`;
+  const why = plain(md.match(/\*\*Зачем:\*\* ([^\n]+)/)?.[1] ?? '');
+  if (!why) throw new Error(`No «Зачем» line in ${file}`);
   const terms = [...section(md, 'Термины').matchAll(/`([a-z0-9-]+)`/g)].map((m) => m[1] ?? '');
   return {
     id,
@@ -167,6 +170,7 @@ function parseBrief(file: string, moduleId: string, index: number): ParsedLesson
     index,
     title,
     summary,
+    why,
     minutes,
     terms,
     practice: practiceOf(practiceLine),
@@ -197,6 +201,7 @@ const body = modules
           `        index: ${l.index},`,
           `        title: ${q(l.title)},`,
           `        summary: ${q(l.summary)},`,
+          `        why: ${q(l.why)},`,
           `        minutes: ${l.minutes},`,
           `        terms: [${l.terms.map(q).join(', ')}],`,
           l.practice ? `        practice: ${q(l.practice)},` : null,

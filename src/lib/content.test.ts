@@ -13,8 +13,26 @@ const mini: CourseModule[] = [
     color: 'blue',
     hasExam: true,
     lessons: [
-      { id: 'm01-l02', moduleId: 'm01', index: 2, title: 'b2', summary: '', minutes: 1, terms: [] },
-      { id: 'm01-l01', moduleId: 'm01', index: 1, title: 'b1', summary: '', minutes: 1, terms: [] },
+      {
+        id: 'm01-l02',
+        moduleId: 'm01',
+        index: 2,
+        title: 'b2',
+        summary: '',
+        why: '',
+        minutes: 1,
+        terms: [],
+      },
+      {
+        id: 'm01-l01',
+        moduleId: 'm01',
+        index: 1,
+        title: 'b1',
+        summary: '',
+        why: '',
+        minutes: 1,
+        terms: [],
+      },
     ],
   },
   {
@@ -26,7 +44,16 @@ const mini: CourseModule[] = [
     color: 'green',
     hasExam: false,
     lessons: [
-      { id: 'm00-l01', moduleId: 'm00', index: 1, title: 'a1', summary: '', minutes: 1, terms: [] },
+      {
+        id: 'm00-l01',
+        moduleId: 'm00',
+        index: 1,
+        title: 'a1',
+        summary: '',
+        why: '',
+        minutes: 1,
+        terms: [],
+      },
     ],
   },
 ];

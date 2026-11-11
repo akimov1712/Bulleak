@@ -19,6 +19,7 @@ const lesson = (moduleId: string, i: number) => ({
   index: i,
   title: `${moduleId} ${i}`,
   summary: '',
+  why: '',
   minutes: 5,
   terms: [],
 });
