@@ -134,7 +134,9 @@ function checkWith(t: DisciplineTrade, ctx: Context, limits: Limits): RuleCheck[
     });
   }
   const p = ctx.previous;
-  const afterLoss = p !== undefined && p.loss && t.at - p.closedAt <= limits.revengeWindowMs;
+  // The loss must be known at entry: overlapping trades (opened before it closed) do not count.
+  const sinceLoss = p !== undefined && p.loss ? t.at - p.closedAt : -1;
+  const afterLoss = p !== undefined && sinceLoss >= 0 && sinceLoss <= limits.revengeWindowMs;
   if (t.revengeMarked) checks.push({ rule: 'revenge', ok: false });
   else if (afterLoss) checks.push({ rule: 'revenge', ok: t.riskSize <= p.riskSize * (1 + EPS) });
   if (t.stopMovedAway !== undefined) checks.push({ rule: 'stop-moved', ok: !t.stopMovedAway });

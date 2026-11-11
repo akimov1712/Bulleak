@@ -78,9 +78,13 @@ export function isSimTrade(v: unknown): v is SimTrade {
     num(v.pnl) &&
     num(v.r) &&
     num(v.fees) &&
-    (v.notes === undefined || str(v.notes))
+    (v.notes === undefined || str(v.notes)) &&
+    (v.actions === undefined || (Array.isArray(v.actions) && v.actions.every(isTradeAction)))
   );
 }
+
+const isTradeAction = (a: unknown): boolean =>
+  isObj(a) && num(a.index) && num(a.price) && oneOf('move-sl', 'move-tp', 'partial')(a.kind);
 
 export function isJournalTrade(v: unknown): v is JournalTrade {
   return (

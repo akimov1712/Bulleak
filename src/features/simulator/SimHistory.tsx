@@ -14,6 +14,7 @@ import { INTERVAL_LABEL, datasetInterval, isDatasetName } from '@/lib/trading/ca
 import { filterTrades, simSummary, tradeKind, type SimTradeKind } from '@/lib/trading/simStats';
 import type { SimOutcome, SimTrade } from '@/types/trading';
 import { LazyCandleChart } from '../charts/LazyCandleChart';
+import { finalLevels } from '@/lib/trading/manage';
 
 // No "all": free, scenario and backtest results are different samples and never share a summary.
 const FILTERS: { value: SimTradeKind; label: string }[] = [
@@ -167,6 +168,8 @@ function TradeReplay({ trade }: { trade: SimTrade }) {
     return <p role="alert">Неизвестный набор данных: {trade.dataset}</p>;
   }
   const long = trade.side === 'long';
+  const final = finalLevels(trade);
+  const partial = trade.actions?.find((a) => a.kind === 'partial');
   return (
     <div className="flex flex-col gap-3">
       <LazyCandleChart
@@ -178,6 +181,40 @@ function TradeReplay({ trade }: { trade: SimTrade }) {
           { type: 'hline', price: trade.entry, label: 'Вход', tone: 'info', dashed: true },
           { type: 'hline', price: trade.sl, label: 'SL', tone: 'bear' },
           { type: 'hline', price: trade.tp, label: 'TP', tone: 'bull' },
+          // Levels moved during the trade: where they were at the exit.
+          ...(final.sl !== trade.sl
+            ? [
+                {
+                  type: 'hline' as const,
+                  price: final.sl,
+                  label: 'SL итог',
+                  tone: 'bear' as const,
+                  dashed: true,
+                },
+              ]
+            : []),
+          ...(final.tp !== trade.tp
+            ? [
+                {
+                  type: 'hline' as const,
+                  price: final.tp,
+                  label: 'TP итог',
+                  tone: 'bull' as const,
+                  dashed: true,
+                },
+              ]
+            : []),
+          ...(partial
+            ? [
+                {
+                  type: 'marker' as const,
+                  time: { index: partial.index },
+                  position: long ? ('above' as const) : ('below' as const),
+                  text: '50 %',
+                  tone: 'info' as const,
+                },
+              ]
+            : []),
           {
             type: 'marker',
             time: { index: trade.startIndex },

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createInitialProgress, emptyLessonProgress } from '@/lib/progress/initial';
 import type { Settings } from '@/types/settings';
 import type { JournalTrade, SimTrade } from '@/types/trading';
-import { backupFileName, buildExport, parseImport } from './backup';
+import { backupFileName, buildExport, isSimTrade, parseImport } from './backup';
 
 const NOW = Date.UTC(2026, 8, 27, 12);
 const settings: Settings = {
@@ -128,5 +128,33 @@ describe('backup', () => {
     expect(r.data.progress.xp).toBe(10);
     expect(r.data.progress.counters.simSkippedScenarios).toEqual([]);
     expect(r.data.settings).toEqual({ sound: false });
+  });
+});
+
+describe('isSimTrade actions', () => {
+  it('accepts valid in-trade actions and rejects malformed ones', () => {
+    const base = {
+      at: 1,
+      scenarioId: null,
+      dataset: 'BTCUSDT-240',
+      startIndex: 0,
+      side: 'long',
+      entry: 100,
+      sl: 95,
+      tp: 110,
+      riskPct: 1,
+      balanceBefore: 1000,
+      qty: 1,
+      exitPrice: 110,
+      exitIndex: 2,
+      outcome: 'tp',
+      pnl: 10,
+      r: 2,
+      fees: 0,
+    };
+    expect(isSimTrade({ ...base, actions: [{ index: 1, kind: 'move-sl', price: 99 }] })).toBe(true);
+    expect(isSimTrade({ ...base, actions: [null] })).toBe(false);
+    expect(isSimTrade({ ...base, actions: [{ index: 1, kind: 'move-sl' }] })).toBe(false);
+    expect(isSimTrade({ ...base, actions: 'x' })).toBe(false);
   });
 });

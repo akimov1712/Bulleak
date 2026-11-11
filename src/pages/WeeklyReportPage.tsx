@@ -17,17 +17,12 @@ import { formatNumber, formatPct, plural } from '@/lib/format';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useProgress } from '@/store/progressStore';
 import { paths } from '@/app/paths';
+import { downloadFile } from '@/features/io/download';
 
 const dateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' });
 
-function download(name: string, text: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = name;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
+const download = (name: string, text: string) =>
+  downloadFile(name, new Blob([text], { type: 'text/csv;charset=utf-8' }));
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

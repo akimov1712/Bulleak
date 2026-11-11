@@ -89,3 +89,17 @@ describe('weeklyReport', () => {
     expect(r.skills).toEqual([]);
   });
 });
+
+describe('weeklyReport baseline', () => {
+  it('a skill first answered this week starts from the prior, not from zero', () => {
+    const r = weeklyReport({
+      progress: { activity: {} },
+      answers: [answer(NOW - 1000, false)],
+      sim: [],
+      journal: [],
+      now: NOW,
+    });
+    // One wrong answer: K moves only a little from the 0.2 prior — not listed as «лучше».
+    expect(r.skills).toEqual([]);
+  });
+});

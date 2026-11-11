@@ -63,6 +63,16 @@ export function closePart(
   };
 }
 
+/** Levels in force at the exit (after all moves). */
+export function finalLevels(t: { sl: number; tp: number; actions?: readonly TradeAction[] }) {
+  let { sl, tp } = t;
+  for (const a of t.actions ?? []) {
+    if (a.kind === 'move-sl') sl = a.price;
+    if (a.kind === 'move-tp') tp = a.price;
+  }
+  return { sl, tp };
+}
+
 /**
  * Did the learner move the stop away from the price at any point? Undefined for trades
  * recorded before actions existed (the rule does not apply to them).

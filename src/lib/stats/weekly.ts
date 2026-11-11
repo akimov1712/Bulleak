@@ -3,7 +3,7 @@ import type { ProgressState } from '@/types/progress';
 import type { JournalTrade, SimTrade } from '@/types/trading';
 import { addDays, dateRange, toDateKey } from '@/lib/date';
 import type { AnswerEvent } from '@/lib/learner/events';
-import { knowledgeBySkill } from '@/lib/learner/knowledge';
+import { DEFAULT_BKT, knowledgeBySkill } from '@/lib/learner/knowledge';
 import {
   disciplineChecks,
   journalDisciplineTrades,
@@ -78,7 +78,8 @@ export function weeklyReport(input: {
   const skills = [...changed]
     .map((skill) => ({
       skill,
-      before: before.get(skill)?.p ?? 0,
+      // A skill first answered this week starts from the model's prior, not from zero.
+      before: before.get(skill)?.p ?? DEFAULT_BKT.pL0,
       after: after.get(skill)?.p ?? 0,
     }))
     .filter((c) => Math.abs(c.after - c.before) >= SKILL_CHANGE)

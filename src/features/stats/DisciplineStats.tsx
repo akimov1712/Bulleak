@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { Card } from '@/components/ui/Card';
 import { Segmented } from '@/components/ui/Segmented';
@@ -44,33 +44,59 @@ export function DisciplineStats() {
       ),
     [],
   );
-  if (loaded === undefined) return null;
-  if (loaded instanceof Error) return <Card role="alert">{loaded.message}</Card>;
-
-  const trades =
-    source === 'sim' ? simDisciplineTrades(loaded.sim) : journalDisciplineTrades(loaded.journal);
-  const summary = disciplineSummary(disciplineChecks(trades));
-  const series = summary.series.filter((v): v is number => v !== null);
-  const ownSim = loaded.sim.filter((t) => !t.deleted && !t.strategyTag);
-  const closedJournal = loaded.journal.filter(isClosed).filter((t) => !t.deleted);
-  const held: HeldTrade[] =
-    source === 'sim'
-      ? ownSim.map((t) => ({ at: t.at, held: t.exitIndex - t.startIndex, r: t.r, pnl: t.pnl }))
-      : closedJournal.map((t) => ({
+  // Once per data change: discipline checks of both sources and the bootstraps behind them.
+  const data = useMemo(() => {
+    if (loaded === undefined || loaded instanceof Error) return loaded;
+    const ownSim = loaded.sim.filter((t) => !t.deleted && !t.strategyTag);
+    const closedJournal = loaded.journal.filter(isClosed).filter((t) => !t.deleted);
+    const bySource = {
+      sim: disciplineChecks(simDisciplineTrades(loaded.sim)),
+      journal: disciplineChecks(journalDisciplineTrades(loaded.journal)),
+    };
+    const summaries = {
+      sim: disciplineSummary(bySource.sim),
+      journal: disciplineSummary(bySource.journal),
+    };
+    const metrics = (src: Source) => {
+      const sum = summaries[src];
+      return sourceMetrics(
+        src === 'sim' ? ownSim : closedJournal,
+        sum.fewTrades ? null : sum.index,
+      );
+    };
+    // Revenge over all trades (the rules table covers only the latest window).
+    const revenge = (src: Source) => {
+      const all = bySource[src].flat().filter((c) => c.rule === 'revenge');
+      return { broken: all.filter((c) => !c.ok).length, checked: all.length };
+    };
+    return {
+      summaries,
+      held: {
+        sim: ownSim.map((t) => ({
+          at: t.at,
+          held: t.exitIndex - t.startIndex,
+          r: t.r,
+          pnl: t.pnl,
+        })),
+        journal: closedJournal.map((t) => ({
           at: t.openedAt,
           held: t.closedAt - t.openedAt,
           r: t.r,
           pnl: t.pnl,
-        }));
-  // Both sources side by side, whatever the switch shows.
-  const both = (['sim', 'journal'] as const).map((src) => {
-    const list =
-      src === 'sim' ? simDisciplineTrades(loaded.sim) : journalDisciplineTrades(loaded.journal);
-    const sum = disciplineSummary(disciplineChecks(list));
-    const results = src === 'sim' ? ownSim : closedJournal;
-    return sourceMetrics(results, sum.fewTrades ? null : sum.index);
-  });
-  const revenge = summary.rules.find((r) => r.rule === 'revenge') ?? { broken: 0, checked: 0 };
+        })),
+      } satisfies Record<Source, HeldTrade[]>,
+      revenge: { sim: revenge('sim'), journal: revenge('journal') },
+      both: [metrics('sim'), metrics('journal')] as const,
+    };
+  }, [loaded]);
+  if (data === undefined) return null;
+  if (data instanceof Error) return <Card role="alert">{data.message}</Card>;
+
+  const summary = data.summaries[source];
+  const series = summary.series.filter((v): v is number => v !== null);
+  const held = data.held[source];
+  const revenge = data.revenge[source];
+  const both = data.both;
 
   return (
     <div className="flex flex-col gap-4">

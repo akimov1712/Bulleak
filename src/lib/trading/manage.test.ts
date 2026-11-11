@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Candle } from '@/types/trading';
-import { canMoveLevel, closePart, moveLevel, stopMovedAway } from './manage';
+import { canMoveLevel, closePart, finalLevels, moveLevel, stopMovedAway } from './manage';
 import { closeManually, startTrade, stepTrade, type SimOrder } from './simulate';
 
 const candle = (o: number, h: number, l: number, c: number): Candle => ({ t: 0, o, h, l, c, v: 1 });
@@ -78,5 +78,23 @@ describe('stopMovedAway', () => {
         actions: [{ index: 1, kind: 'move-sl', price: 115 }],
       }),
     ).toBe(true);
+  });
+});
+
+describe('finalLevels', () => {
+  it('applies the moves in order', () => {
+    expect(
+      finalLevels({
+        sl: 90,
+        tp: 130,
+        actions: [
+          { index: 1, kind: 'move-sl', price: 95 },
+          { index: 2, kind: 'partial', price: 110 },
+          { index: 3, kind: 'move-sl', price: 100 },
+          { index: 3, kind: 'move-tp', price: 140 },
+        ],
+      }),
+    ).toEqual({ sl: 100, tp: 140 });
+    expect(finalLevels({ sl: 90, tp: 130 })).toEqual({ sl: 90, tp: 130 });
   });
 });

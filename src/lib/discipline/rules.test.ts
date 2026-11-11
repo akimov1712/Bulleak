@@ -107,3 +107,13 @@ describe('simulator trades', () => {
     expect(rules(plain ?? [])).toEqual(['risk:ok', 'rr:ok']);
   });
 });
+
+describe('review fixes', () => {
+  it('an overlapping trade opened before the loss closed is not revenge', () => {
+    const a = lossJ({ openedAt: T0, closedAt: T0 + 120 * MIN });
+    const b = journal({ openedAt: T0 + 60 * MIN, closedAt: T0 + 180 * MIN, qty: 3 });
+    expect(rules(disciplineChecks([a, b].map(fromJournal))[1] ?? [])).not.toContain(
+      'revenge:broken',
+    );
+  });
+});

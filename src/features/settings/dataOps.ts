@@ -1,5 +1,6 @@
 /** Side-effectful data operations of the settings page: export, import, reset. */
 import { db, guard } from '@/db/db';
+import { downloadFile } from '@/features/io/download';
 import { withSyncFields } from '@/db/syncedTable';
 import { journalRepo } from '@/db/journalRepo';
 import { simRepo } from '@/db/simRepo';
@@ -44,14 +45,10 @@ export async function downloadBackup(now = Date.now()): Promise<void> {
     simBalance: readSimBalance(),
     now,
   });
-  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = backupFileName(now);
-  link.click();
-  // Revoking synchronously can cancel the download in some browsers.
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  downloadFile(
+    backupFileName(now),
+    new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }),
+  );
 }
 
 /**
