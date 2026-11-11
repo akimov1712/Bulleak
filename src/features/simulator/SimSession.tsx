@@ -31,6 +31,7 @@ import { closePart, moveLevel, stopMovedAway } from '@/lib/trading/manage';
 import { chartHints } from '@/lib/hints/chart';
 import { MarkupNote } from './MarkupNote';
 import { PreEntryWarnings } from './PreEntryWarnings';
+import { TipCard } from './TipCard';
 import { useDbQuery } from '@/db/useDbQuery';
 import { brokenRulesForDraft, type RuleId } from '@/lib/discipline/rules';
 import { simRepo } from '@/db/simRepo';
@@ -433,6 +434,7 @@ export function SimSession(props: SimSessionProps) {
         />
         <div className="flex flex-col gap-4">
           {strategy && <BacktestPanel strategy={strategy} decisionKey={anchor} />}
+          {!trade && !strategy && skippedTo === null && <TipCard trades={ownTrades ?? []} />}
           {scenario && skippedTo !== null ? (
             <ScenarioDebrief scenario={scenario} decision="skip" />
           ) : result ? (
