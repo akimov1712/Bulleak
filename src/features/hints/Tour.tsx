@@ -27,9 +27,10 @@ export function Tour({ id }: { id: TourId }) {
     // Hidden in this layout (e.g. desktop tabs on a phone): nothing to highlight.
     if (!el || (typeof el.checkVisibility === 'function' && !el.checkVisibility())) return;
     el.classList.add(...HIGHLIGHT);
-    el.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+    // The first step must not move the page away from the tour text itself.
+    if (step > 0) el.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
     return () => el.classList.remove(...HIGHLIGHT);
-  }, [target]);
+  }, [target, step]);
 
   if (seen || !current) return null;
   const finish = () => update({ toursSeen: [...useSettings.getState().toursSeen, id] });

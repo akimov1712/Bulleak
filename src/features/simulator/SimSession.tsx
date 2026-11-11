@@ -145,6 +145,12 @@ export function SimSession(props: SimSessionProps) {
   const [paused, setPaused] = useState(false);
   /** Scenario skipped: the candles revealed up to this index. */
   const [skippedTo, setSkippedTo] = useState<number | null>(null);
+  // Markup is recomputed only when the visible part of the chart changes, not on every render.
+  const markupCursor = trade ? trade.state.index : (skippedTo ?? anchor);
+  const markupHints = useMemo(
+    () => (markup ? chartHints(candles, markupCursor) : null),
+    [markup, candles, markupCursor],
+  );
 
   const result = trade?.state.result ?? null;
   const playing = trade !== null && result === null;
@@ -276,7 +282,7 @@ export function SimSession(props: SimSessionProps) {
 
   // Markup on the candles seen so far; locked in a scenario until the decision is made.
   const markupLocked = scenario !== undefined && decision === null;
-  const hints = markup && !markupLocked ? chartHints(candles, cursor) : null;
+  const hints = markupLocked ? null : markupHints;
   const levels: SimLevel[] = (hints?.levels ?? []).map((l, i) => ({
     id: `hint-${i}` as LevelId,
     price: l.price,

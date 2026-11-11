@@ -1,7 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { X } from 'lucide-react';
 import type { PreparedQuestion, PreparedQuiz } from '@/lib/quiz/prepare';
-import { nextHintLevel, nudgeHiddenOptions, type HintLevel } from '@/lib/hints/ladder';
+import {
+  applyHints,
+  nextHintLevel,
+  nudgeHiddenOptions,
+  withoutHiddenOptions,
+  type HintLevel,
+} from '@/lib/hints/ladder';
 import { HintPanel } from './HintPanel';
 import { useSettings } from '@/store/settingsStore';
 import type { Confidence, QuizResult } from '@/types/quiz';
@@ -73,14 +79,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
       finalSeconds,
     );
     onFinish({
-      result: {
-        ...result,
-        perQuestion: result.perQuestion.map((p) => {
-          const conf = confidence[p.id];
-          const hint = hints[p.id];
-          return { ...p, ...(conf && { conf }), ...(hint && { hint }) };
-        }),
-      },
+      result: applyHints(result, hints, confidence, prepared.quiz.passRatio),
       answers: finalAnswers,
       durationSec: Math.round((performance.now() - startedAt) / 1000),
     });
@@ -171,15 +170,12 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
               const next = nextHintLevel(question, hint);
               if (next === null) return;
               setHints({ ...hints, [question.id]: next });
-              // A chosen option the nudge hides is dropped.
               if (next === 1) {
-                const hidden = nudgeHiddenOptions(question);
-                const v = answers[question.id];
-                const kept = Array.isArray(v)
-                  ? v.filter((id) => !hidden.includes(String(id)))
-                  : hidden.includes(String(v))
-                    ? initialAnswer(question)
-                    : v;
+                const kept = withoutHiddenOptions(
+                  question,
+                  answers[question.id],
+                  initialAnswer(question),
+                );
                 setAnswers({ ...answers, [question.id]: kept });
               }
             }}
