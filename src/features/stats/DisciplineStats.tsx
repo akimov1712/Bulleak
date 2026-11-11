@@ -21,6 +21,8 @@ import { formatNumber, plural } from '@/lib/format';
 import { paths } from '@/app/paths';
 import { EquityCurves } from '../calculators/EquityCurves';
 import { BehaviourCard } from './BehaviourCard';
+import { SimVsJournalCard } from './SimVsJournalCard';
+import { sourceMetrics } from '@/lib/stats/compare';
 import { isClosed } from '@/lib/journal/metrics';
 import type { HeldTrade } from '@/lib/stats/behaviour';
 
@@ -49,15 +51,25 @@ export function DisciplineStats() {
     source === 'sim' ? simDisciplineTrades(loaded.sim) : journalDisciplineTrades(loaded.journal);
   const summary = disciplineSummary(disciplineChecks(trades));
   const series = summary.series.filter((v): v is number => v !== null);
+  const ownSim = loaded.sim.filter((t) => !t.deleted && !t.strategyTag);
+  const closedJournal = loaded.journal.filter(isClosed).filter((t) => !t.deleted);
   const held: HeldTrade[] =
     source === 'sim'
-      ? loaded.sim
-          .filter((t) => !t.deleted && !t.strategyTag)
-          .map((t) => ({ at: t.at, held: t.exitIndex - t.startIndex, r: t.r, pnl: t.pnl }))
-      : loaded.journal
-          .filter(isClosed)
-          .filter((t) => !t.deleted)
-          .map((t) => ({ at: t.openedAt, held: t.closedAt - t.openedAt, r: t.r, pnl: t.pnl }));
+      ? ownSim.map((t) => ({ at: t.at, held: t.exitIndex - t.startIndex, r: t.r, pnl: t.pnl }))
+      : closedJournal.map((t) => ({
+          at: t.openedAt,
+          held: t.closedAt - t.openedAt,
+          r: t.r,
+          pnl: t.pnl,
+        }));
+  // Both sources side by side, whatever the switch shows.
+  const both = (['sim', 'journal'] as const).map((src) => {
+    const list =
+      src === 'sim' ? simDisciplineTrades(loaded.sim) : journalDisciplineTrades(loaded.journal);
+    const sum = disciplineSummary(disciplineChecks(list));
+    const results = src === 'sim' ? ownSim : closedJournal;
+    return sourceMetrics(results, sum.fewTrades ? null : sum.index);
+  });
   const revenge = summary.rules.find((r) => r.rule === 'revenge') ?? { broken: 0, checked: 0 };
 
   return (
@@ -138,6 +150,7 @@ export function DisciplineStats() {
           <BehaviourCard trades={held} revenge={revenge} />
         </>
       )}
+      {both[0] && both[1] && <SimVsJournalCard sim={both[0]} journal={both[1]} />}
     </div>
   );
 }
