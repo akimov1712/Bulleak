@@ -29,8 +29,12 @@ jobs:
       - run: npm run test -w server
 
   check:
-    # Pinned: Playwright system deps fail to install on the newer image behind ubuntu-latest.
     runs-on: ubuntu-24.04
+    # Official Playwright image: browsers and system libraries are preinstalled, so the job does
+    # not depend on apt mirrors (`playwright install --with-deps` started failing on runners).
+    # The tag must match @playwright/test in package-lock.json.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +45,6 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
       - run: npm run e2e
       - if: failure()
         uses: actions/upload-artifact@v4
