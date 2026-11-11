@@ -1,4 +1,5 @@
 import { Sigma } from 'lucide-react';
+import { expectancyAdvice } from '@/lib/hints/calculators';
 import { cn } from '@/lib/cn';
 import { formatNumber, formatR } from '@/lib/format';
 import { expectancyProjection } from '@/lib/trading/rr';
@@ -44,6 +45,7 @@ export function ExpectancyCalc() {
 
   return (
     <CalculatorCard
+      advice={result ? expectancyAdvice({ expectancyR: result.perTradeR }) : null}
       icon={Sigma}
       title="Матожидание"
       onReset={reset}

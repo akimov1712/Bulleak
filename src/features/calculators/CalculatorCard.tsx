@@ -14,6 +14,8 @@ export interface CalculatorCardProps {
   emptyHint: string;
   /** "Как считается": formula and explanation. */
   howTo?: ReactNode;
+  /** «Что это значит»: the result read against the course rules (hints.md, section 7). */
+  advice?: string | null;
   /** Small print under the result (sources, caveats). */
   note?: ReactNode;
   onReset: () => void;
@@ -38,7 +40,15 @@ export function CalculatorCard(props: CalculatorCardProps) {
             — {props.emptyHint}
           </p>
         ) : (
-          props.result
+          <>
+            {props.result}
+            {props.advice && (
+              <p className="mt-3 rounded-xl bg-surface-2 p-3 text-sm" data-calc-advice="">
+                <b>Что это значит. </b>
+                {props.advice}
+              </p>
+            )}
+          </>
         )}
       </div>
       {props.howTo && (

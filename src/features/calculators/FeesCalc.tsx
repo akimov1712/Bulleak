@@ -1,4 +1,5 @@
 import { Receipt } from 'lucide-react';
+import { feesAdvice } from '@/lib/hints/calculators';
 import { Segmented } from '@/components/ui/Segmented';
 import { BYBIT_BASE_FEES, fundingFee, roundTripFees, type FeeRole } from '@/lib/trading/fees';
 import { formatNumber, formatUsd } from '@/lib/format';
@@ -67,6 +68,7 @@ export function FeesCalc() {
 
   return (
     <CalculatorCard
+      advice={riskShare !== null ? feesAdvice({ feesShareOfRisk: riskShare / 100 }) : null}
       icon={Receipt}
       title="Комиссии сделки"
       onReset={reset}

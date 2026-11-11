@@ -1,4 +1,5 @@
 import { Flame } from 'lucide-react';
+import { liquidationAdvice } from '@/lib/hints/calculators';
 import { Segmented } from '@/components/ui/Segmented';
 import { formatNumber } from '@/lib/format';
 import { BYBIT_BASE_FEES } from '@/lib/trading/fees';
@@ -58,6 +59,11 @@ export function LiquidationCalc() {
 
   return (
     <CalculatorCard
+      advice={
+        distance !== null
+          ? liquidationAdvice({ distancePct: distance, stopBeyondLiquidation: stopTooFar })
+          : null
+      }
       icon={Flame}
       title="Цена ликвидации"
       onReset={reset}

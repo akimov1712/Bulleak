@@ -1,4 +1,5 @@
 import { Target } from 'lucide-react';
+import { rrAdvice } from '@/lib/hints/calculators';
 import { Segmented } from '@/components/ui/Segmented';
 import { cn } from '@/lib/cn';
 import { formatNumber, formatPct } from '@/lib/format';
@@ -32,6 +33,11 @@ export function RiskRewardCalc() {
 
   return (
     <CalculatorCard
+      advice={
+        result && breakeven !== null
+          ? rrAdvice({ rr: result.rr, breakevenWinrate: breakeven })
+          : null
+      }
       icon={Target}
       title="Риск / прибыль"
       onReset={reset}

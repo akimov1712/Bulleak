@@ -1,4 +1,5 @@
 import { TrendingDown } from 'lucide-react';
+import { drawdownAdvice } from '@/lib/hints/calculators';
 import { formatNumber } from '@/lib/format';
 import { drawdownAfterLosses, recoveryPct } from '@/lib/trading/drawdown';
 import { CalculatorCard, NumberField, ResultRows, ResultValue } from './CalculatorCard';
@@ -25,6 +26,7 @@ export function DrawdownCalc() {
 
   return (
     <CalculatorCard
+      advice={recovery !== null ? drawdownAdvice({ recoveryPct: recovery }) : null}
       icon={TrendingDown}
       title="Просадка и восстановление"
       onReset={reset}

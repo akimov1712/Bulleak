@@ -1,4 +1,5 @@
 import { Scale } from 'lucide-react';
+import { positionAdvice } from '@/lib/hints/calculators';
 import { formatNumber, formatUsd } from '@/lib/format';
 import { positionSize } from '@/lib/trading/position';
 import { CalculatorCard, NumberField, ResultRows, ResultValue } from './CalculatorCard';
@@ -33,6 +34,11 @@ export function PositionCalc() {
 
   return (
     <CalculatorCard
+      advice={
+        result && riskPct !== null && balance !== null
+          ? positionAdvice({ riskPct, margin: result.margin, balance })
+          : null
+      }
       icon={Scale}
       title="Размер позиции"
       onReset={reset}
