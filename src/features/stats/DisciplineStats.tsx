@@ -20,6 +20,9 @@ import {
 import { formatNumber, plural } from '@/lib/format';
 import { paths } from '@/app/paths';
 import { EquityCurves } from '../calculators/EquityCurves';
+import { BehaviourCard } from './BehaviourCard';
+import { isClosed } from '@/lib/journal/metrics';
+import type { HeldTrade } from '@/lib/stats/behaviour';
 
 type Source = 'sim' | 'journal';
 
@@ -46,6 +49,16 @@ export function DisciplineStats() {
     source === 'sim' ? simDisciplineTrades(loaded.sim) : journalDisciplineTrades(loaded.journal);
   const summary = disciplineSummary(disciplineChecks(trades));
   const series = summary.series.filter((v): v is number => v !== null);
+  const held: HeldTrade[] =
+    source === 'sim'
+      ? loaded.sim
+          .filter((t) => !t.deleted && !t.strategyTag)
+          .map((t) => ({ at: t.at, held: t.exitIndex - t.startIndex, r: t.r, pnl: t.pnl }))
+      : loaded.journal
+          .filter(isClosed)
+          .filter((t) => !t.deleted)
+          .map((t) => ({ at: t.openedAt, held: t.closedAt - t.openedAt, r: t.r, pnl: t.pnl }));
+  const revenge = summary.rules.find((r) => r.rule === 'revenge') ?? { broken: 0, checked: 0 };
 
   return (
     <div className="flex flex-col gap-4">
@@ -122,6 +135,7 @@ export function DisciplineStats() {
               </p>
             </Card>
           )}
+          <BehaviourCard trades={held} revenge={revenge} />
         </>
       )}
     </div>
