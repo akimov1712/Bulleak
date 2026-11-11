@@ -35,6 +35,7 @@ const pages: [string, string][] = [
   ['#/journal', 'Журнал сделок'],
   ['#/glossary', 'Глоссарий'],
   ['#/stats', 'Статистика'],
+  ['#/skills', 'Мои навыки'],
   ['#/achievements', 'Достижения'],
   ['#/settings', 'Настройки'],
   ['#/about', 'О курсе'],

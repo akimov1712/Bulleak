@@ -29,6 +29,7 @@ describe('routes', () => {
     [paths.glossary('leverage'), 'Кредитное плечо'],
     [paths.cheatsheets(), 'Шпаргалки'],
     [paths.stats(), 'Статистика'],
+    [paths.skills(), 'Мои навыки'],
     [paths.achievements(), 'Достижения'],
     [paths.settings(), 'Настройки'],
     [paths.certificate(), 'Сертификат пока не получен'],

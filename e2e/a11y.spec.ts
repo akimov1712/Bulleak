@@ -26,6 +26,8 @@ const PAGES = [
   '/glossary/leverage',
   '/cheatsheets',
   '/stats',
+  '/skills',
+  '/review',
   '/achievements',
   '/settings',
   '/plan',
@@ -49,6 +51,21 @@ for (const scheme of ['light', 'dark'] as const) {
             state: {
               xp: 1200,
               profile: { name: 'Тест' },
+              // Two days old: the skills page has rows and the review card and page have work.
+              quizAttempts: [
+                {
+                  quizId: 'm09-l01',
+                  at: Date.now() - 2 * 86_400_000,
+                  ratio: 0.6,
+                  passed: false,
+                  tags: {},
+                  answers: [1, 2, 3, 4, 5].map((i) => ({
+                    q: `m09-l01-q${i}`,
+                    ok: i > 2,
+                    tags: ['risk-per-trade'],
+                  })),
+                },
+              ],
               exams: { final: { best: 0.9, attempts: 1, passedAt: Date.UTC(2026, 8, 29, 10) } },
             },
             version: 3,

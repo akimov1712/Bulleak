@@ -2,6 +2,7 @@ import {
   Award,
   BarChart3,
   BookOpen,
+  Brain,
   CandlestickChart,
   ClipboardList,
   Calculator,
@@ -115,6 +116,13 @@ export const NAV_SECTIONS: NavSection[] = [
     id: 'progress',
     label: 'Прогресс',
     items: [
+      {
+        to: paths.skills(),
+        label: 'Мои навыки',
+        short: 'Навыки',
+        icon: Brain,
+        description: 'Что знаю, что применяю, что повторить',
+      },
       {
         to: paths.stats(),
         label: 'Статистика',

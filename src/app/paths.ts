@@ -16,6 +16,7 @@ export const paths = {
   cheatsheets: () => '/cheatsheets',
   stats: () => '/stats',
   review: () => '/review',
+  skills: () => '/skills',
   achievements: () => '/achievements',
   settings: () => '/settings',
   certificate: () => '/certificate',
