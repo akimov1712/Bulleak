@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react';
+import { PRE_TRADE_CHECKLIST } from '@/content/cheatsheets';
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, FastForward } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -178,6 +179,14 @@ export function OrderPanel(props: OrderPanelProps) {
           </p>
         ))}
 
+      <details className="rounded-xl border border-border p-2.5 text-sm">
+        <summary className="cursor-pointer font-semibold">Чек-лист перед сделкой</summary>
+        <ul className="mt-2 flex list-disc flex-col gap-1 pl-5 text-text-muted">
+          {PRE_TRADE_CHECKLIST.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </details>
       <div className="flex flex-col gap-2">
         <Button
           size="lg"

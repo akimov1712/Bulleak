@@ -185,3 +185,35 @@ export const journalDisciplineTrades = (trades: readonly JournalTrade[]): Discip
     .filter((t) => !t.deleted)
     .sort((a, b) => a.openedAt - b.openedAt)
     .map(fromJournal);
+
+export interface OrderDraftForCheck {
+  entry: number;
+  sl: number;
+  tp: number;
+  riskPct: number;
+}
+
+/**
+ * Rules the order would break if opened `now` (hints.md, section 3): the draft is checked as
+ * the next trade after the learner's own simulator trades.
+ */
+export function brokenRulesForDraft(
+  draft: OrderDraftForCheck,
+  ownTrades: readonly SimTrade[],
+  now: number,
+  limits: Limits = COURSE_LIMITS,
+): RuleId[] {
+  const next: DisciplineTrade = {
+    at: now,
+    closedAt: now,
+    entry: draft.entry,
+    sl: draft.sl,
+    tp: draft.tp,
+    riskPct: draft.riskPct,
+    riskSize: draft.riskPct,
+    r: 0,
+    loss: false,
+  };
+  const all = [...simDisciplineTrades(ownTrades).filter((t) => t.at <= now), next];
+  return (disciplineChecks(all, limits).at(-1) ?? []).filter((c) => !c.ok).map((c) => c.rule);
+}

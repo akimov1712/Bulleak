@@ -30,6 +30,9 @@ import type { Side } from '@/lib/trading/pnl';
 import { closePart, moveLevel, stopMovedAway } from '@/lib/trading/manage';
 import { chartHints } from '@/lib/hints/chart';
 import { MarkupNote } from './MarkupNote';
+import { PreEntryWarnings } from './PreEntryWarnings';
+import { useDbQuery } from '@/db/useDbQuery';
+import { brokenRulesForDraft, type RuleId } from '@/lib/discipline/rules';
 import { simRepo } from '@/db/simRepo';
 import { toast } from '@/store/uiStore';
 import { useProgress } from '@/store/progressStore';
@@ -50,7 +53,7 @@ import { ScenarioBrief, ScenarioDebrief } from './ScenarioBrief';
 import { BacktestPanel } from './BacktestPanel';
 import type { StrategyRules } from '@/content/strategies';
 import { isDecisionCorrect } from '@/content/scenarios';
-import type { SimDecision, SimScenario, TradeAction } from '@/types/trading';
+import type { SimDecision, SimScenario, SimTrade, TradeAction } from '@/types/trading';
 
 export interface SimSessionProps {
   dataset: DatasetName;
@@ -127,6 +130,9 @@ export function SimSession(props: SimSessionProps) {
   const atrSeries = useMemo(() => atr(candles), [candles]);
   const wide = useMediaQuery('(min-width: 1024px)');
   const dispatch = useProgress((s) => s.dispatch);
+  // Own trades for the check before entry (hints.md, section 3).
+  const ownTrades = useDbQuery(() => simRepo.list().catch((): SimTrade[] => []), []);
+  const [warnings, setWarnings] = useState<RuleId[] | null>(null);
 
   const [anchor, setAnchor] = useState(start ?? 0);
   const [lines, setLines] = useState<number[]>([]);
@@ -237,9 +243,23 @@ export function SimSession(props: SimSessionProps) {
       ...defaultLevels(side, entryPrice, atrSeries[anchor] ?? null, steps.tick),
     }));
 
-  const open = () => {
+  /** Opens the order; unless `confirmed`, first checks it against the course rules. */
+  const open = (confirmed = false) => {
     const { side, sl, tp } = draft;
     if (!side || sl === null || tp === null || !plan || plan.error || plan.qty === null) return;
+    // Backtests follow the strategy's own rules; free trades and scenarios are checked.
+    if (!confirmed && !strategy) {
+      const broken = brokenRulesForDraft(
+        { entry: entryPrice, sl, tp, riskPct: draft.riskPct },
+        ownTrades ?? [],
+        Date.now(),
+      );
+      if (broken.length > 0) {
+        setWarnings(broken);
+        return;
+      }
+    }
+    setWarnings(null);
     setPaused(false);
     const order: SimOrder = { side, entry: entryPrice, sl, tp, qty: plan.qty };
     setTrade({
@@ -475,7 +495,7 @@ export function SimSession(props: SimSessionProps) {
               coin={symbol.replace('USDT', '')}
               tick={steps.tick}
               qtyStep={steps.qty}
-              onOpen={open}
+              onOpen={() => open()}
               onSkip={() => {
                 if (scenario) {
                   // A skip is a decision too: correct skips count towards sim-skip.
@@ -495,6 +515,11 @@ export function SimSession(props: SimSessionProps) {
           )}
         </div>
       </div>
+      <PreEntryWarnings
+        rules={warnings}
+        onFix={() => setWarnings(null)}
+        onOpenAnyway={() => open(true)}
+      />
     </div>
   );
 }

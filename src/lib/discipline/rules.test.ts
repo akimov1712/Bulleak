@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ClosedTrade } from '@/lib/journal/metrics';
 import type { SimTrade } from '@/types/trading';
-import { disciplineChecks, fromJournal, fromSim } from './rules';
+import { brokenRulesForDraft, disciplineChecks, fromJournal, fromSim } from './rules';
 
 const MIN = 60_000;
 const T0 = new Date(2026, 10, 11, 12, 0).getTime();
@@ -115,5 +115,29 @@ describe('review fixes', () => {
     expect(rules(disciplineChecks([a, b].map(fromJournal))[1] ?? [])).not.toContain(
       'revenge:broken',
     );
+  });
+});
+
+describe('brokenRulesForDraft', () => {
+  const draft = { entry: 100, sl: 95, tp: 110, riskPct: 1 };
+
+  it('a clean order breaks nothing', () => {
+    expect(brokenRulesForDraft(draft, [], T0)).toEqual([]);
+  });
+
+  it('names risk and R:R, and revenge right after a loss', () => {
+    expect(brokenRulesForDraft({ ...draft, riskPct: 2, tp: 104 }, [], T0)).toEqual(['risk', 'rr']);
+    const loss = sim({ at: T0 - 5 * MIN, pnl: -10, r: -1, riskPct: 1 });
+    expect(brokenRulesForDraft({ ...draft, riskPct: 1.5 }, [loss], T0)).toEqual([
+      'risk',
+      'revenge',
+    ]);
+  });
+
+  it('warns after the daily loss limit', () => {
+    const losses = [1, 2, 3].map((i) =>
+      sim({ at: T0 - (60 - i) * MIN, pnl: -10, r: -1, balanceBefore: 1000 }),
+    );
+    expect(brokenRulesForDraft(draft, losses, T0)).toContain('daily-loss');
   });
 });
