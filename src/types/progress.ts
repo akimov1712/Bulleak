@@ -49,6 +49,7 @@ export interface AttemptAnswer {
   type?: QuestionType;
   sec?: number;
   conf?: Confidence;
+  hint?: 1 | 2 | 3;
 }
 
 export interface QuizAttempt {

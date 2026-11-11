@@ -1,6 +1,7 @@
 import type { ProgressEvent, RewardReason } from '@/types/events';
 import type { ProgressState } from '@/types/progress';
 import { toDateKey } from '@/lib/date';
+import { HINT_BLOCKS_BONUS } from '@/lib/hints/ladder';
 
 /** XP table — docs/04-features/gamification.md. */
 export const XP = {
@@ -52,6 +53,9 @@ export function xpForEvent(
       if (!passed) return [];
       if (lesson?.completedAt === undefined) {
         const out = [reason('Тест сдан', XP.quizFirstPass)];
+        // Bonuses are for answers of one's own: none after the rule or the walkthrough hint.
+        const helped = event.result.perQuestion.some((p) => (p.hint ?? 0) >= HINT_BLOCKS_BONUS);
+        if (helped) return out;
         if (ratio >= 1) out.push(reason('Без ошибок', XP.quizBonus100));
         else if (ratio >= 0.9) out.push(reason('Почти идеально', XP.quizBonus90));
         return out;

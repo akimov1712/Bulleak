@@ -61,6 +61,7 @@ function attemptAnswers(raw: unknown[]): AttemptAnswer[] {
       ...(isQuestionType(a.type) && { type: a.type }),
       ...(sec !== undefined && sec >= 0 && { sec }),
       ...((a.conf === 'sure' || a.conf === 'unsure' || a.conf === 'guess') && { conf: a.conf }),
+      ...((a.hint === 1 || a.hint === 2 || a.hint === 3) && { hint: a.hint }),
     });
   }
   return out;

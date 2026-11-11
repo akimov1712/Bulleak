@@ -121,6 +121,8 @@ export interface QuestionResult {
   /** Seconds from showing the question to checking the answer. */
   sec?: number;
   conf?: Confidence;
+  /** Highest hint level opened (1 nudge, 2 rule, 3 walkthrough). */
+  hint?: 1 | 2 | 3;
 }
 
 export interface QuizResult {

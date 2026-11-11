@@ -116,3 +116,18 @@ describe('knowledgeBySkill', () => {
     );
   });
 });
+
+describe('hints in knowledge tracing', () => {
+  it('a right answer after the walkthrough counts as wrong; after the rule it tells less', () => {
+    const plain = knowledgeBySkill([answer(1, true, ['risk'], { type: 'numeric' })], 2).get('risk');
+    const rule = knowledgeBySkill([answer(1, true, ['risk'], { type: 'numeric', hint: 2 })], 2).get(
+      'risk',
+    );
+    const walk = knowledgeBySkill([answer(1, true, ['risk'], { type: 'numeric', hint: 3 })], 2).get(
+      'risk',
+    );
+    expect(rule?.p).toBeLessThan(plain?.p ?? 0);
+    expect(walk?.p).toBeLessThan(rule?.p ?? 0);
+    expect(walk?.correct).toBe(0);
+  });
+});

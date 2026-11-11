@@ -17,6 +17,7 @@ export interface AnswerEvent {
   type?: QuestionType;
   sec?: number;
   conf?: Confidence;
+  hint?: 1 | 2 | 3;
 }
 
 export interface TradeEvent {
@@ -77,6 +78,7 @@ export function answerEvents(
           ...(a.type !== undefined && { type: a.type }),
           ...(a.sec !== undefined && { sec: a.sec }),
           ...(a.conf !== undefined && { conf: a.conf }),
+          ...(a.hint !== undefined && { hint: a.hint }),
         }))
       : fromSummary(attempt, skillsOfTags),
   );

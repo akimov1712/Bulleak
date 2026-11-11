@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { X } from 'lucide-react';
-import type { PreparedQuiz } from '@/lib/quiz/prepare';
+import type { PreparedQuestion, PreparedQuiz } from '@/lib/quiz/prepare';
+import { nextHintLevel, nudgeHiddenOptions, type HintLevel } from '@/lib/hints/ladder';
+import { HintPanel } from './HintPanel';
 import type { Confidence, QuizResult } from '@/types/quiz';
 import { CONFIDENCE_LEVELS } from '@/lib/learner/calibration';
 import { Pill } from '@/components/ui/Badge';
@@ -42,6 +44,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const [shownAt, setShownAt] = useState(startedAt);
   const [seconds, setSeconds] = useState<Record<string, number>>({});
   const [confidence, setConfidence] = useState<Record<string, Confidence>>({});
+  const [hints, setHints] = useState<Record<string, HintLevel>>({});
 
   const question = questions[index];
   if (!question) return null;
@@ -49,6 +52,15 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const verdict = verdicts[question.id];
   const checked = verdict !== undefined;
   const isLast = index === questions.length - 1;
+  const hint = hints[question.id];
+  // After the nudge the hidden options are not shown.
+  const shownQuestion: PreparedQuestion =
+    hint !== undefined && (question.type === 'single' || question.type === 'multi')
+      ? {
+          ...question,
+          options: question.options.filter((o) => !nudgeHiddenOptions(question).includes(o.id)),
+        }
+      : question;
 
   function finish(finalAnswers: Record<string, unknown>, finalSeconds: Record<string, number>) {
     const result = gradeQuiz(
@@ -63,7 +75,8 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
         ...result,
         perQuestion: result.perQuestion.map((p) => {
           const conf = confidence[p.id];
-          return conf ? { ...p, conf } : p;
+          const hint = hints[p.id];
+          return { ...p, ...(conf && { conf }), ...(hint && { hint }) };
         }),
       },
       answers: finalAnswers,
@@ -142,11 +155,34 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
 
         <QuestionView
           key={question.id}
-          question={question}
+          question={shownQuestion}
           value={value}
           onChange={(v) => setAnswers({ ...answers, [question.id]: v })}
           state={!checked || mode === 'exam' ? 'answering' : verdict ? 'correct' : 'wrong'}
         />
+
+        {!checked && mode === 'lesson' && (
+          <HintPanel
+            question={question}
+            level={hint}
+            onNext={() => {
+              const next = nextHintLevel(question, hint);
+              if (next === null) return;
+              setHints({ ...hints, [question.id]: next });
+              // A chosen option the nudge hides is dropped.
+              if (next === 1) {
+                const hidden = nudgeHiddenOptions(question);
+                const v = answers[question.id];
+                const kept = Array.isArray(v)
+                  ? v.filter((id) => !hidden.includes(String(id)))
+                  : hidden.includes(String(v))
+                    ? initialAnswer(question)
+                    : v;
+                setAnswers({ ...answers, [question.id]: kept });
+              }
+            }}
+          />
+        )}
 
         {!checked && mode === 'lesson' && (
           <div

@@ -93,16 +93,18 @@ export function knowledgeBySkill(
     for (const skill of e.skills) {
       const params = paramsOf(skill);
       const s = state.get(skill) ?? { p: params.pL0, answers: 0, correct: 0, lastAt: e.at };
-      const p = bktStep(
-        forget(s.p, e.at - s.lastAt, params),
-        e.ok,
-        guessChance(e.type, params),
-        params,
-      );
+      // Hints (docs/04-features/hints.md): after the rule a right answer tells as little as a
+      // coin flip; after the walkthrough it is not the learner's own answer at all.
+      const ok = e.ok && (e.hint ?? 0) < 3;
+      const pG =
+        (e.hint ?? 0) >= 2
+          ? Math.max(0.5, guessChance(e.type, params))
+          : guessChance(e.type, params);
+      const p = bktStep(forget(s.p, e.at - s.lastAt, params), ok, pG, params);
       state.set(skill, {
         p,
         answers: s.answers + 1,
-        correct: s.correct + (e.ok ? 1 : 0),
+        correct: s.correct + (ok ? 1 : 0),
         lastAt: e.at,
       });
     }

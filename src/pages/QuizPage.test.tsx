@@ -35,6 +35,32 @@ async function runQuiz(correctCount: number) {
 }
 
 describe('QuizPage', () => {
+  it('the hint ladder opens step by step and is recorded; no perfect bonus after it', async () => {
+    renderAt('/lesson/m00-l01/quiz');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Начать' }));
+    for (let i = 0; i < quiz.questions.length; i++) {
+      if (i === 0) {
+        let hint = screen.queryByRole('button', { name: /^Подсказка:/ });
+        while (hint) {
+          await user.click(hint);
+          hint = screen.queryByRole('button', { name: /^Подсказка:/ });
+        }
+        expect(screen.getByText(/После разбора ответ не засчитывается/)).toBeInTheDocument();
+      }
+      await answer(currentQuestion(quiz.questions), true);
+      await user.click(screen.getByRole('button', { name: 'Проверить' }));
+      await user.click(
+        screen.getByRole('button', {
+          name: i === quiz.questions.length - 1 ? 'Результат' : 'Дальше',
+        }),
+      );
+    }
+    const state = useProgress.getState();
+    expect(state.quizAttempts.at(-1)?.answers?.[0]?.hint).toBe(3);
+    expect(state.counters.perfectQuizzes).toBe(0);
+  }, 30_000);
+
   it('stores the optional confidence mark with each answer', async () => {
     renderAt('/lesson/m00-l01/quiz');
     const user = userEvent.setup();

@@ -4,6 +4,7 @@ import type { DayActivity, ExamKey, ProgressState, QuizAttempt } from '@/types/p
 import { toDateKey } from '@/lib/date';
 import { emptyDay, emptyLessonProgress, MAX_QUIZ_ATTEMPTS } from './initial';
 import { REVIEW_QUIZ_ID } from '@/lib/learner/review';
+import { HINT_BLOCKS_BONUS } from '@/lib/hints/ladder';
 
 /**
  * Pure state transitions for learning progress (no XP/achievements — those are layered on
@@ -38,6 +39,7 @@ function attemptAnswers(result: QuizResult): QuizAttempt['answers'] {
     ...(p.type !== undefined && { type: p.type }),
     ...(p.sec !== undefined && { sec: p.sec }),
     ...(p.conf !== undefined && { conf: p.conf }),
+    ...(p.hint !== undefined && { hint: p.hint }),
   }));
 }
 
@@ -79,7 +81,9 @@ export function recordLessonQuiz(
   const firstPass = result.passed && lesson.completedAt === undefined;
   // Only retakes of an already completed lesson count (they are what the improvement XP rewards).
   const improved = lesson.completedAt !== undefined && result.ratio > lesson.quizBest;
-  const perfect = result.ratio === 1;
+  // A perfect test is one answered on one's own: the rule or walkthrough hint does not count.
+  const perfect =
+    result.ratio === 1 && !result.perQuestion.some((p) => (p.hint ?? 0) >= HINT_BLOCKS_BONUS);
   return {
     ...state,
     lessons: {
