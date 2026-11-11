@@ -22,6 +22,38 @@ beforeEach(async () => {
 });
 
 describe('StatsPage', () => {
+  it('simulator tab: R curve and breakdowns by instrument, timeframe and side', async () => {
+    const t = (i: number, dataset: string, side: 'long' | 'short', r: number) => ({
+      at: Date.UTC(2026, 10, 1 + i, 12),
+      scenarioId: null,
+      dataset,
+      startIndex: 500,
+      side,
+      entry: 100,
+      sl: 95,
+      tp: 110,
+      riskPct: 1,
+      balanceBefore: 10_000,
+      qty: 1,
+      exitPrice: 110,
+      exitIndex: 510,
+      outcome: 'tp' as const,
+      pnl: r * 100,
+      r,
+      fees: 0,
+    });
+    await simRepo.add(t(0, 'BTCUSDT-240', 'long', 2));
+    await simRepo.add(t(1, 'BTCUSDT-60', 'short', -1));
+    await simRepo.add(t(2, 'ETHUSDT-240', 'long', -1));
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: 'Тренажёр' }));
+    const curve = await screen.findByLabelText('Результат в R');
+    expect(curve).toHaveTextContent('Убытков подряд2');
+    const byTf = screen.getByRole('heading', { name: 'По таймфрейму' }).closest('div');
+    expect(byTf).toHaveTextContent('4H2');
+    expect(byTf).toHaveTextContent('1H1');
+  });
+
   it('discipline tab: rules kept in simulator trades, index after five trades', async () => {
     const trade = (i: number, riskPct: number) => ({
       at: Date.UTC(2026, 10, 1 + i, 12),

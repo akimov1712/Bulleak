@@ -26,6 +26,21 @@ import { ACCOUNT_LABEL, ACCOUNTS } from '../journal/labels';
 import { BacktestVsForward } from './BacktestVsForward';
 import { Bars } from './charts';
 import { ExpectancyCard } from './ExpectancyCard';
+import { CurveCard, GroupBreakdowns, type LabelledResult } from './ResultsBreakdown';
+
+const TIMEFRAME_LABEL: Record<string, string> = { '60': '1H', '240': '4H', D: '1D' };
+
+/** Simulator trade → instrument, timeframe and side labels (dataset name «BTCUSDT-240»). */
+const simLabels = (t: SimTrade): LabelledResult => {
+  const [symbol = t.dataset, interval = ''] = t.dataset.split('-');
+  return {
+    r: t.r,
+    pnl: t.pnl,
+    symbol,
+    timeframe: TIMEFRAME_LABEL[interval] ?? interval,
+    side: t.side,
+  };
+};
 
 const toError = (e: unknown) => (e instanceof Error ? e : new Error(String(e)));
 
@@ -101,6 +116,8 @@ export function SimulatorStats() {
                 trades={trades.filter((t) => t.strategyTag === tag)}
               />
             ))}
+          <CurveCard results={[...trades].sort((a, b) => a.at - b.at)} />
+          <GroupBreakdowns results={trades.map(simLabels)} />
           {s.balanceCurve.length > 2 && (
             <Card className="flex flex-col gap-2">
               <h2 className="font-semibold">Виртуальный баланс</h2>
@@ -215,6 +232,15 @@ export function JournalStats() {
       <BacktestVsForward />
       <JournalKpis metrics={journalMetrics(trades)} />
       <ExpectancyCard rs={byCloseTime(trades).map((t) => t.r)} />
+      <GroupBreakdowns
+        results={byCloseTime(trades).map((t) => ({
+          r: t.r,
+          pnl: t.pnl,
+          symbol: t.symbol,
+          timeframe: t.timeframe === 'other' ? 'Другой' : t.timeframe,
+          side: t.side,
+        }))}
+      />
       <JournalBreakdowns trades={trades} />
     </div>
   );

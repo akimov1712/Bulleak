@@ -80,7 +80,7 @@ export function JournalBreakdowns({ trades }: { trades: readonly JournalTrade[] 
   );
 }
 
-function Breakdown({
+export function Breakdown({
   title,
   rows,
 }: {
