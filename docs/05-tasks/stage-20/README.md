@@ -23,8 +23,8 @@
 | [T-2010](T-2010-sample-size.md) | «Достаточно ли сделок?» | ☑ |
 
 ## Завершение этапа
-- [ ] Все задачи закрыты
-- [ ] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
-- [ ] `npm run e2e` и `npm run build` зелёные
-- [ ] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
-- [ ] Тег `stage-20-done`
+- [x] Все задачи закрыты
+- [x] `/code-review` → исправления → запись в `docs/06-qa/review-log.md`
+- [x] `npm run e2e` и `npm run build` зелёные
+- [x] Демонстрация пользователю, фидбэк в `docs/PROGRESS.md`
+- [x] Тег `stage-20-done`
