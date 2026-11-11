@@ -111,8 +111,12 @@ export type AnswerValue = AnswerByType[QuestionType];
 
 export interface QuestionResult {
   id: string;
+  /** Set by gradeQuiz; guessing odds depend on it. */
+  type?: QuestionType;
   correct: boolean;
   tags: string[];
+  /** Seconds from showing the question to checking the answer. */
+  sec?: number;
 }
 
 export interface QuizResult {

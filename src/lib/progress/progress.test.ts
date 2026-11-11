@@ -66,6 +66,23 @@ describe('recordLessonQuiz', () => {
     expect(s.activity[DAY]).toMatchObject({ quizzes: 1, lessonsCompleted: 1 });
     expect(s.quizAttempts[0]?.tags).toEqual({ risk: [8, 10], chart: [4, 5] });
     expect(s.quizAttempts[0]?.durationSec).toBe(120);
+    expect(s.quizAttempts[0]?.answers).toHaveLength(10);
+    expect(s.quizAttempts[0]?.answers?.[0]).toEqual({ q: 'q0', ok: true, tags: ['risk'] });
+  });
+
+  it('stores the question type and seconds of each answer', () => {
+    const r: QuizResult = {
+      quizId: 'm00-l01',
+      correct: 0,
+      total: 1,
+      ratio: 0,
+      passed: false,
+      perQuestion: [{ id: 'q', type: 'numeric', correct: false, tags: ['pnl'], sec: 30 }],
+    };
+    const s = recordExam(createInitialProgress(T0), 'm01', r, T0);
+    expect(s.quizAttempts[0]?.answers).toEqual([
+      { q: 'q', ok: false, tags: ['pnl'], type: 'numeric', sec: 30 },
+    ]);
   });
 
   it('does not complete on a failed attempt', () => {
@@ -129,6 +146,36 @@ describe('recordExam', () => {
 });
 
 describe('migrateProgress', () => {
+  it('keeps valid answers of an attempt and drops malformed ones', () => {
+    const s = migrateProgress(
+      {
+        quizAttempts: [
+          {
+            quizId: 'm00-l01',
+            at: T0,
+            ratio: 0.5,
+            passed: false,
+            tags: {},
+            answers: [
+              { q: 'a', ok: true, tags: ['risk', 7], type: 'single', sec: 5 },
+              { q: 'b', ok: false, tags: [], type: 'essay', sec: -1 },
+              { q: 'c' },
+              'junk',
+            ],
+          },
+          { quizId: 'm00-l02', at: T0, ratio: 1, passed: true, tags: {} },
+        ],
+      },
+      PROGRESS_VERSION,
+      T0,
+    );
+    expect(s.quizAttempts[0]?.answers).toEqual([
+      { q: 'a', ok: true, tags: ['risk'], type: 'single', sec: 5 },
+      { q: 'b', ok: false, tags: [] },
+    ]);
+    expect(s.quizAttempts[1]).not.toHaveProperty('answers');
+  });
+
   it('returns a fresh state for garbage', () => {
     for (const junk of [null, undefined, 42, 'text', [], true]) {
       expect(migrateProgress(junk, 0, T0)).toEqual(createInitialProgress(T0));

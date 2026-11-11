@@ -1,4 +1,5 @@
-import type { ProgressState } from '@/types/progress';
+import type { AttemptAnswer, ProgressState } from '@/types/progress';
+import type { QuestionType } from '@/types/quiz';
 import { isDateKey } from '@/lib/date';
 import { sanitizePlan, sanitizeStrategy } from '@/lib/plan/plan';
 import {
@@ -35,6 +36,35 @@ function record<T>(v: unknown, map: (value: unknown) => T | null): Record<string
  * Unknown fields are dropped, missing ones get defaults, nothing throws.
  * Add a `if (version < N)` step here whenever ProgressState changes (and bump PROGRESS_VERSION).
  */
+const QUESTION_TYPES: readonly string[] = [
+  'single',
+  'multi',
+  'truefalse',
+  'numeric',
+  'chart-click',
+  'match',
+  'order',
+] satisfies QuestionType[];
+const isQuestionType = (v: unknown): v is QuestionType =>
+  typeof v === 'string' && QUESTION_TYPES.includes(v);
+
+/** Per-question answers of an attempt; malformed entries are dropped. */
+function attemptAnswers(raw: unknown[]): AttemptAnswer[] {
+  const out: AttemptAnswer[] = [];
+  for (const a of raw) {
+    if (!isObject(a) || typeof a.q !== 'string' || typeof a.ok !== 'boolean') continue;
+    const sec = optNum(a.sec);
+    out.push({
+      q: a.q,
+      ok: a.ok,
+      tags: strArray(a.tags),
+      ...(isQuestionType(a.type) && { type: a.type }),
+      ...(sec !== undefined && sec >= 0 && { sec }),
+    });
+  }
+  return out;
+}
+
 export function migrateProgress(persisted: unknown, _version: number, now: number): ProgressState {
   const base = createInitialProgress(now);
   if (!isObject(persisted)) return base;
@@ -133,6 +163,7 @@ export function migrateProgress(persisted: unknown, _version: number, now: numbe
       passed: typeof a.passed === 'boolean' ? a.passed : false,
       tags,
       durationSec: optNum(a.durationSec),
+      ...(Array.isArray(a.answers) && { answers: attemptAnswers(a.answers) }),
     });
   }
 

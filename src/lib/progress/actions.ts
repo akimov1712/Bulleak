@@ -29,6 +29,16 @@ function tagStats(result: QuizResult): QuizAttempt['tags'] {
   return tags;
 }
 
+function attemptAnswers(result: QuizResult): QuizAttempt['answers'] {
+  return result.perQuestion.map((p) => ({
+    q: p.id,
+    ok: p.correct,
+    tags: p.tags,
+    ...(p.type !== undefined && { type: p.type }),
+    ...(p.sec !== undefined && { sec: p.sec }),
+  }));
+}
+
 /** First time the lesson is read to the end. Idempotent. */
 export function markLessonRead(state: ProgressState, id: LessonId, now: number): ProgressState {
   const lesson = state.lessons[id] ?? emptyLessonProgress();
@@ -87,6 +97,7 @@ export function recordLessonQuiz(
       passed: result.passed,
       tags: tagStats(result),
       durationSec,
+      answers: attemptAnswers(result),
     }),
     activity: updateDay(state, now, (d) => ({
       ...d,
@@ -127,6 +138,7 @@ export function recordExam(
       passed: result.passed,
       tags: tagStats(result),
       durationSec,
+      answers: attemptAnswers(result),
     }),
     activity: updateDay(state, now, (d) => ({ ...d, quizzes: d.quizzes + 1 })),
   };

@@ -128,6 +128,13 @@ describe('mergeProgress rules', () => {
     expect(m.quizAttempts.map((x) => x.at)).toEqual([1, 2, 3]);
   });
 
+  it('keeps the per-question answers of attempts from either device', () => {
+    const answers = [{ q: 'm00-l01-q1', ok: true, tags: ['risk'], type: 'single' as const }];
+    const attempt = { quizId: 'm00-l01', at: 5, ratio: 1, passed: true, tags: {}, answers };
+    const m = mergeProgress(base({ quizAttempts: [attempt] }), base());
+    expect(m.quizAttempts[0]?.answers).toEqual(answers);
+  });
+
   it('keeps only the newest 500 attempts', () => {
     const many = (from: number) =>
       Array.from({ length: 300 }, (_, i) => ({

@@ -50,11 +50,15 @@ export function gradeQuiz(
   questions: readonly Question[],
   answers: Readonly<Record<string, unknown>>,
   passRatio: number,
+  /** Seconds per question id, when measured. */
+  seconds: Readonly<Record<string, number>> = {},
 ): QuizResult {
   const perQuestion = questions.map((q) => ({
     id: q.id,
+    type: q.type,
     correct: gradeQuestion(q, answers[q.id]),
     tags: q.tags,
+    ...(seconds[q.id] !== undefined && { sec: seconds[q.id] }),
   }));
   const correct = perQuestion.filter((p) => p.correct).length;
   const total = questions.length;

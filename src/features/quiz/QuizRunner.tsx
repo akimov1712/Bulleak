@@ -37,6 +37,8 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const [verdicts, setVerdicts] = useState<Record<string, boolean>>({});
   const [confirmExit, setConfirmExit] = useState(false);
   const [startedAt] = useState(() => performance.now());
+  const [shownAt, setShownAt] = useState(startedAt);
+  const [seconds, setSeconds] = useState<Record<string, number>>({});
 
   const question = questions[index];
   if (!question) return null;
@@ -45,24 +47,35 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const checked = verdict !== undefined;
   const isLast = index === questions.length - 1;
 
-  function finish(finalAnswers: Record<string, unknown>) {
+  function finish(finalAnswers: Record<string, unknown>, finalSeconds: Record<string, number>) {
     onFinish({
-      result: gradeQuiz(prepared.quiz.id, questions, finalAnswers, prepared.quiz.passRatio),
+      result: gradeQuiz(
+        prepared.quiz.id,
+        questions,
+        finalAnswers,
+        prepared.quiz.passRatio,
+        finalSeconds,
+      ),
       answers: finalAnswers,
       durationSec: Math.round((performance.now() - startedAt) / 1000),
     });
   }
 
-  function next() {
-    if (isLast) finish(answers);
-    else setIndex(index + 1);
+  function next(finalSeconds = seconds) {
+    if (isLast) finish(answers, finalSeconds);
+    else {
+      setIndex(index + 1);
+      setShownAt(performance.now());
+    }
   }
 
   function check(event?: FormEvent) {
     event?.preventDefault();
     if (!question || checked || !isAnswered(question, value)) return;
     setVerdicts({ ...verdicts, [question.id]: gradeQuestion(question, value) });
-    if (mode === 'exam') next();
+    const spent = { ...seconds, [question.id]: Math.round((performance.now() - shownAt) / 1000) };
+    setSeconds(spent);
+    if (mode === 'exam') next(spent);
   }
 
   return (
@@ -141,7 +154,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
             correctAnswer={correctAnswerText(question)}
             explanation={question.explanation}
             isLast={isLast}
-            onNext={next}
+            onNext={() => next()}
           />
         </div>
       )}

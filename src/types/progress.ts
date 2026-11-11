@@ -1,6 +1,7 @@
 /** Learning progress persisted in localStorage (key "tc-progress"). See data-model.md. */
 import type { DateKey } from '@/lib/date';
 import type { LessonId, ModuleId } from './course';
+import type { QuestionType } from './quiz';
 
 export type ExamKey = ModuleId | 'final';
 
@@ -39,6 +40,16 @@ export interface DayActivity {
   goalMet: boolean;
 }
 
+/** One answer of an attempt: the learner model reads these (docs/04-features/learner-model.md, section 3). */
+export interface AttemptAnswer {
+  /** Question id. */
+  q: string;
+  ok: boolean;
+  tags: string[];
+  type?: QuestionType;
+  sec?: number;
+}
+
 export interface QuizAttempt {
   quizId: string;
   at: number;
@@ -47,6 +58,8 @@ export interface QuizAttempt {
   /** tag → [correct, total] */
   tags: Record<string, [number, number]>;
   durationSec?: number;
+  /** Per-question answers (absent in attempts recorded before stage 19). */
+  answers?: AttemptAnswer[];
 }
 
 export interface Streak {

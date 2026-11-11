@@ -154,11 +154,11 @@ describe('gradeQuiz pass threshold (80%)', () => {
     expect(gradeQuiz('x', [], {}, 0.8)).toMatchObject({ total: 0, ratio: 0, passed: false });
   });
 
-  it('reports per-question results with tags', () => {
-    const r = gradeQuiz('x', [single, tf], { s: 'b' }, 0.8);
+  it('reports per-question results with type, tags and measured seconds', () => {
+    const r = gradeQuiz('x', [single, tf], { s: 'b' }, 0.8, { s: 14 });
     expect(r.perQuestion).toEqual([
-      { id: 's', correct: true, tags: ['t'] },
-      { id: 'tf', correct: false, tags: ['t'] },
+      { id: 's', type: 'single', correct: true, tags: ['t'], sec: 14 },
+      { id: 'tf', type: 'truefalse', correct: false, tags: ['t'] },
     ]);
   });
 });
