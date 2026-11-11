@@ -27,7 +27,7 @@ describe('Tour', () => {
 
   it('can be skipped', () => {
     render(<Tour id="simulator" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Пропустить знакомство' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Закрыть знакомство' }));
     expect(useSettings.getState().toursSeen).toEqual(['simulator']);
   });
 });

@@ -49,7 +49,7 @@ export function Tour({ id }: { id: TourId }) {
         </Button>
         {!last && (
           <Button size="sm" variant="ghost" onClick={finish}>
-            Пропустить знакомство
+            Закрыть знакомство
           </Button>
         )}
       </div>
