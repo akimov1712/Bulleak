@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import type { PreparedQuestion, PreparedQuiz } from '@/lib/quiz/prepare';
 import { nextHintLevel, nudgeHiddenOptions, type HintLevel } from '@/lib/hints/ladder';
 import { HintPanel } from './HintPanel';
+import { useSettings } from '@/store/settingsStore';
 import type { Confidence, QuizResult } from '@/types/quiz';
 import { CONFIDENCE_LEVELS } from '@/lib/learner/calibration';
 import { Pill } from '@/components/ui/Badge';
@@ -45,6 +46,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const [seconds, setSeconds] = useState<Record<string, number>>({});
   const [confidence, setConfidence] = useState<Record<string, Confidence>>({});
   const [hints, setHints] = useState<Record<string, HintLevel>>({});
+  const hintsOn = useSettings((s) => s.hints !== 'off');
 
   const question = questions[index];
   if (!question) return null;
@@ -161,7 +163,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
           state={!checked || mode === 'exam' ? 'answering' : verdict ? 'correct' : 'wrong'}
         />
 
-        {!checked && mode === 'lesson' && (
+        {!checked && mode === 'lesson' && hintsOn && (
           <HintPanel
             question={question}
             level={hint}

@@ -112,6 +112,19 @@ export function SettingsPage() {
           checked={settings.freeMode}
           onCheckedChange={(freeMode) => settings.update({ freeMode })}
         />
+        <Segmented
+          label="Подсказки"
+          value={settings.hints}
+          options={[
+            { value: 'all', label: 'Все' },
+            { value: 'less', label: 'Меньше' },
+            { value: 'off', label: 'Выключены' },
+          ]}
+          onChange={(hints) => settings.update({ hints })}
+        />
+        <p className="-mt-2 text-sm text-text-muted">
+          «Меньше» — без туров и советов, подсказки в тестах остаются. «Выключены» — и без них.
+        </p>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-semibold">Знакомство с сайтом</p>

@@ -19,6 +19,7 @@ export function sanitizeSettings(raw: unknown): Partial<Settings> {
   if (typeof r.freeMode === 'boolean') out.freeMode = r.freeMode;
   if (r.reducedMotion === 'system' || r.reducedMotion === 'on' || r.reducedMotion === 'off')
     out.reducedMotion = r.reducedMotion;
+  if (r.hints === 'all' || r.hints === 'less' || r.hints === 'off') out.hints = r.hints;
   if (Array.isArray(r.toursSeen)) out.toursSeen = [...new Set(r.toursSeen.filter(isTourId))];
   return out;
 }

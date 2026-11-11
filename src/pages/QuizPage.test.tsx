@@ -35,6 +35,14 @@ async function runQuiz(correctCount: number) {
 }
 
 describe('QuizPage', () => {
+  it('has no hint ladder when hints are switched off', async () => {
+    useSettings.setState({ hints: 'off' });
+    renderAt('/lesson/m00-l01/quiz');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Начать' }));
+    expect(screen.queryByRole('button', { name: /^Подсказка:/ })).not.toBeInTheDocument();
+  });
+
   it('the hint ladder opens step by step and is recorded; no perfect bonus after it', async () => {
     renderAt('/lesson/m00-l01/quiz');
     const user = userEvent.setup();

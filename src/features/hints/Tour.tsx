@@ -13,7 +13,7 @@ const HIGHLIGHT = ['ring-2', 'ring-primary', 'ring-offset-2', 'ring-offset-bg'];
  * until finished or skipped; restarted from the settings.
  */
 export function Tour({ id }: { id: TourId }) {
-  const seen = useSettings((s) => s.toursSeen.includes(id));
+  const seen = useSettings((s) => s.toursSeen.includes(id) || s.hints !== 'all');
   const update = useSettings((s) => s.update);
   const [step, setStep] = useState(0);
   const steps = TOURS[id];

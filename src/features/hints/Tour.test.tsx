@@ -31,3 +31,11 @@ describe('Tour', () => {
     expect(useSettings.getState().toursSeen).toEqual(['simulator']);
   });
 });
+
+describe('Tour with fewer hints', () => {
+  it('is not shown when hints are «less» or off', () => {
+    useSettings.setState({ hints: 'less' });
+    render(<Tour id="home" />);
+    expect(screen.queryByLabelText('Знакомство')).not.toBeInTheDocument();
+  });
+});

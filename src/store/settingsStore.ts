@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyGoalXp: 50,
   freeMode: false,
   reducedMotion: 'system',
+  hints: 'all',
   toursSeen: [],
 };
 
@@ -31,12 +32,13 @@ export const useSettings = create<SettingsStore>()(
       name: 'tc-settings',
       version: 1,
       storage: createJSONStorage(() => safeStorage),
-      partialize: ({ theme, sound, dailyGoalXp, freeMode, reducedMotion, toursSeen }) => ({
+      partialize: ({ theme, sound, dailyGoalXp, freeMode, reducedMotion, hints, toursSeen }) => ({
         theme,
         sound,
         dailyGoalXp,
         freeMode,
         reducedMotion,
+        hints,
         toursSeen,
       }),
       // Unknown or corrupted fields fall back to defaults.

@@ -10,6 +10,7 @@ import { misconceptions } from '@/lib/learner/calibration';
 import { contextTips, pickTip, TIP_SNOOZE_MS, type Tip } from '@/lib/hints/tips';
 import { formatNumber } from '@/lib/format';
 import { useProgress } from '@/store/progressStore';
+import { useSettings } from '@/store/settingsStore';
 import { paths } from '@/app/paths';
 import type { SimTrade } from '@/types/trading';
 
@@ -78,11 +79,12 @@ export function TipCard({ trades }: { trades: readonly SimTrade[] }) {
   const attempts = useProgress((s) => s.quizAttempts);
   const [snoozed, setSnoozed] = useState(readSnoozed);
   const [now] = useState(() => Date.now());
+  const enabled = useSettings((s) => s.hints === 'all');
   const tip = useMemo(() => {
     const open = [...misconceptions(answerEvents(attempts, skillIndex.skillsOfTags))];
     return pickTip(contextTips(trades, open), snoozed, now);
   }, [attempts, trades, snoozed, now]);
-  if (!tip) return null;
+  if (!tip || !enabled) return null;
   return (
     <Card className="flex items-start gap-3" aria-label="Совет">
       <Lightbulb className="mt-0.5 size-5 shrink-0 text-xp" aria-hidden="true" />

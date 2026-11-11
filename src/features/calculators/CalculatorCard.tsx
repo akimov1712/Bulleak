@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react';
+import { useSettings } from '@/store/settingsStore';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { NumberInput } from '@/components/ui/NumberInput';
@@ -25,6 +26,7 @@ export interface CalculatorCardProps {
 export function CalculatorCard(props: CalculatorCardProps) {
   const id = useId();
   const Icon = props.icon;
+  const hintsOn = useSettings((s) => s.hints !== 'off');
   return (
     <Card className="flex flex-col gap-4" role="group" aria-labelledby={`${id}-title`}>
       <div className="flex items-center gap-2">
@@ -42,7 +44,7 @@ export function CalculatorCard(props: CalculatorCardProps) {
         ) : (
           <>
             {props.result}
-            {props.advice && (
+            {props.advice && hintsOn && (
               <p className="mt-3 rounded-xl bg-surface-2 p-3 text-sm" data-calc-advice="">
                 <b>Что это значит. </b>
                 {props.advice}
