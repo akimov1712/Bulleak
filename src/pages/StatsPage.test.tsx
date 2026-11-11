@@ -22,6 +22,30 @@ beforeEach(async () => {
 });
 
 describe('StatsPage', () => {
+  it('tests tab: repeated mistakes link to their lesson', async () => {
+    const answers = [
+      { q: 'm03-l01-q2', ok: false, tags: ['candlestick'], type: 'numeric' as const, sec: 2 },
+    ];
+    useProgress.setState({
+      quizAttempts: [1, 2].map((i) => ({
+        quizId: 'm03-l01',
+        at: Date.now() - i * 1000,
+        ratio: 0,
+        passed: false,
+        tags: {},
+        answers,
+      })),
+    });
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: 'Тесты' }));
+    const card = await screen.findByLabelText('Частые ошибки');
+    expect(card).toHaveTextContent('Японские свечи, вопрос 2');
+    expect(card).toHaveTextContent('ошибок 2 из 2');
+    expect(screen.getByLabelText('Время на вопрос')).toHaveTextContent(
+      'Ошибок быстрее 3 секунд: 2',
+    );
+  });
+
   it('simulator tab: R curve and breakdowns by instrument, timeframe and side', async () => {
     const t = (i: number, dataset: string, side: 'long' | 'short', r: number) => ({
       at: Date.UTC(2026, 10, 1 + i, 12),

@@ -3,13 +3,15 @@ import { PageHeader } from '@/app/layout/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LearningStats } from '@/features/stats/LearningStats';
 import { DisciplineStats } from '@/features/stats/DisciplineStats';
+import { QuizStats } from '@/features/stats/QuizStats';
 import { JournalStats, SimulatorStats } from '@/features/stats/TradingStats';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
-type Tab = 'learning' | 'discipline' | 'simulator' | 'journal';
+type Tab = 'learning' | 'quizzes' | 'discipline' | 'simulator' | 'journal';
 
 const TABS = [
   { id: 'learning', label: 'Обучение' },
+  { id: 'quizzes', label: 'Тесты' },
   { id: 'discipline', label: 'Дисциплина' },
   { id: 'simulator', label: 'Тренажёр' },
   { id: 'journal', label: 'Журнал' },
@@ -25,6 +27,7 @@ export function StatsPage() {
       <Tabs items={TABS} value={tab} onChange={setTab} label="Разделы статистики" />
       <div role="tabpanel" aria-label={TABS.find((t) => t.id === tab)?.label}>
         {tab === 'learning' && <LearningStats />}
+        {tab === 'quizzes' && <QuizStats />}
         {tab === 'discipline' && <DisciplineStats />}
         {tab === 'simulator' && <SimulatorStats />}
         {tab === 'journal' && <JournalStats />}
