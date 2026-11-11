@@ -21,6 +21,7 @@ import { mdxComponents } from '@/features/lesson/mdxComponents';
 import { MOODS } from '@/components/mascot/moods';
 import { skillGroups, skillIndex, skills } from './skills';
 import { skillGraphProblems } from '@/lib/learner/skills';
+import { BEHAVIOUR_RULES } from '@/lib/learner/behaviour';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -212,6 +213,11 @@ describe('skill graph', () => {
     ]);
     expect(problems).toEqual([]);
     expect(skills.length).toBeGreaterThanOrEqual(25);
+  });
+
+  it('every behaviour rule measures a skill of the graph', () => {
+    const unknown = BEHAVIOUR_RULES.filter((r) => !skillIndex.getSkill(r.skill)).map((r) => r.id);
+    expect(unknown).toEqual([]);
   });
 
   it('every question maps to a skill, every skill has questions, its lessons test it', async () => {
