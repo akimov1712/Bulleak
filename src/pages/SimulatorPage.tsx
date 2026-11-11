@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { RotateCcw, Shuffle, Wallet } from 'lucide-react';
 import { PageHeader } from '@/app/layout/PageHeader';
+import { Tour } from '@/features/hints/Tour';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Segmented } from '@/components/ui/Segmented';
@@ -152,6 +153,7 @@ export function SimulatorPage() {
           </div>
         }
       />
+      <Tour id="simulator" />
       {scenario ? (
         <Link
           to={paths.simulator()}

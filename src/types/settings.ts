@@ -11,4 +11,8 @@ export interface Settings {
   /** Unlock every lesson regardless of progress. */
   freeMode: boolean;
   reducedMotion: MotionSetting;
+  /** First-visit tours already shown (hints.md, section 5). */
+  toursSeen: TourId[];
 }
+
+export type TourId = 'home' | 'simulator';

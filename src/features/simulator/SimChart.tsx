@@ -276,6 +276,7 @@ export function SimChart(props: SimChartProps) {
       <div
         ref={containerRef}
         data-testid="sim-chart"
+        data-tour="sim-chart"
         role="group"
         aria-label="График тренажёра: видны только свечи до текущего момента"
         className="overflow-hidden rounded-2xl border border-border bg-surface"

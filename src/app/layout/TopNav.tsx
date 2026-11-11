@@ -28,6 +28,7 @@ function Tab({ item, active }: { item: NavItem; active: boolean }) {
   return (
     <Link
       to={item.to}
+      data-tour={item.tour}
       aria-label={item.short ? item.label : undefined}
       aria-current={active ? 'page' : undefined}
       className={cn(

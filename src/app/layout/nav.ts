@@ -31,6 +31,8 @@ export interface NavItem {
   match?: string[];
   /** Not shown as a tab in the top bar (reachable from the profile menu). */
   hideInTabs?: boolean;
+  /** Target of a first-visit tour step (data-tour). */
+  tour?: string;
 }
 
 export type NavSectionId = 'learn' | 'practice' | 'reference' | 'progress';
@@ -52,6 +54,7 @@ const coursePath: NavItem = {
   to: paths.path(),
   label: 'Карта курса',
   short: 'Курс',
+  tour: 'nav-path',
   icon: Map,
   description: '13 модулей: от основ до реальной торговли',
   match: ['/module', '/lesson', '/exam'],
@@ -59,6 +62,7 @@ const coursePath: NavItem = {
 const simulator: NavItem = {
   to: paths.simulator(),
   label: 'Тренажёр',
+  tour: 'nav-simulator',
   icon: CandlestickChart,
   description: 'Сделки на реальной истории Bybit',
 };
@@ -120,6 +124,7 @@ export const NAV_SECTIONS: NavSection[] = [
         to: paths.skills(),
         label: 'Мои навыки',
         short: 'Навыки',
+        tour: 'nav-skills',
         icon: Brain,
         description: 'Что знаю, что применяю, что повторить',
       },

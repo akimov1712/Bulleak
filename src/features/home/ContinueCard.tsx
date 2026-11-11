@@ -80,7 +80,7 @@ export function ContinueCard({
     const fresh = step.lesson.id === 'm00-l01' && step.status === 'available';
     const read = step.status === 'read';
     return (
-      <section aria-label="Продолжить обучение" className={box}>
+      <section aria-label="Продолжить обучение" className={box} data-tour="continue">
         <Candles />
         <div className="flex flex-col gap-2 md:max-w-[calc(100%-15rem)]">
           <p className="text-xs font-medium tracking-[0.14em] text-text-muted uppercase">
@@ -136,7 +136,7 @@ export function ContinueCard({
           };
 
   return (
-    <section aria-label="Продолжить обучение" className={box}>
+    <section aria-label="Продолжить обучение" className={box} data-tour="continue">
       <Candles />
       <div className="flex flex-col gap-2 md:max-w-[calc(100%-15rem)]">
         <p className="flex items-center gap-2 text-xs font-medium tracking-[0.14em] text-text-muted uppercase">

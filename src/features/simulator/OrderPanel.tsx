@@ -73,7 +73,12 @@ export function OrderPanel(props: OrderPanelProps) {
 
   return (
     <Card className="flex flex-col gap-4" aria-label="Панель сделки">
-      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Направление">
+      <div
+        className="grid grid-cols-2 gap-2"
+        role="radiogroup"
+        aria-label="Направление"
+        data-tour="sim-side"
+      >
         {(['long', 'short'] as const).map((side) => {
           const active = draft.side === side;
           const Icon = side === 'long' ? ArrowUpRight : ArrowDownRight;
@@ -135,12 +140,14 @@ export function OrderPanel(props: OrderPanelProps) {
         </>
       )}
 
-      <Segmented
-        label="Риск на сделку"
-        value={String(draft.riskPct)}
-        options={RISK_OPTIONS.map((r) => ({ value: String(r), label: `${formatNumber(r, 1)}%` }))}
-        onChange={(v) => props.onDraft({ riskPct: Number(v) })}
-      />
+      <div data-tour="sim-risk">
+        <Segmented
+          label="Риск на сделку"
+          value={String(draft.riskPct)}
+          options={RISK_OPTIONS.map((r) => ({ value: String(r), label: `${formatNumber(r, 1)}%` }))}
+          onChange={(v) => props.onDraft({ riskPct: Number(v) })}
+        />
+      </div>
       <Segmented
         label="Плечо"
         value={String(draft.leverage)}

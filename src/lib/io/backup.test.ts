@@ -11,6 +11,7 @@ const settings: Settings = {
   dailyGoalXp: 50,
   freeMode: false,
   reducedMotion: 'system',
+  toursSeen: ['home'],
 };
 const sim: SimTrade = {
   id: 3,

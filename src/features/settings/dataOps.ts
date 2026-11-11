@@ -32,6 +32,7 @@ function currentSettings(): Settings {
     dailyGoalXp: s.dailyGoalXp,
     freeMode: s.freeMode,
     reducedMotion: s.reducedMotion,
+    toursSeen: s.toursSeen,
   };
 }
 

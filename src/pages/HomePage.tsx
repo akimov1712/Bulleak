@@ -6,6 +6,7 @@ import { ContinueCard } from '@/features/home/ContinueCard';
 import { TodayCard } from '@/features/home/TodayCard';
 import { ReviewCard } from '@/features/learner/ReviewCard';
 import { AdviceCard } from '@/features/learner/AdviceCard';
+import { Tour } from '@/features/hints/Tour';
 import { ModulesCard } from '@/features/home/ModulesCard';
 import { courseCompletion, currentLesson } from '@/lib/progress/unlock';
 import { BackupReminder, QuickLinks, RecentAchievements } from '@/features/home/HomeExtras';
@@ -60,6 +61,7 @@ export function HomePage() {
         </h1>
         <p className="text-text-muted">Шаг за шагом к своей стратегии.</p>
       </div>
+      <Tour id="home" />
       {shouldRemindBackup(profile, xp, now, snoozedUntil) && (
         <BackupReminder
           onSnooze={() => {

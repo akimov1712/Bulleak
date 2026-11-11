@@ -112,6 +112,20 @@ export function SettingsPage() {
           checked={settings.freeMode}
           onCheckedChange={(freeMode) => settings.update({ freeMode })}
         />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold">Знакомство с сайтом</p>
+            <p className="text-sm text-text-muted">Короткие туры на главной и в тренажёре.</p>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={settings.toursSeen.length === 0}
+            onClick={() => settings.update({ toursSeen: [] })}
+          >
+            Показать снова
+          </Button>
+        </div>
       </Section>
 
       <DataSection />
