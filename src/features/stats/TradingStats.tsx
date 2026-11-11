@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/Skeleton';
 import { journalRepo } from '@/db/journalRepo';
 import { simRepo } from '@/db/simRepo';
 import { formatNumber, formatPct, formatR, formatUsd } from '@/lib/format';
-import { journalMetrics } from '@/lib/journal/metrics';
+import { byCloseTime, journalMetrics } from '@/lib/journal/metrics';
 import { rHistogram, simStats } from '@/lib/stats/simulator';
 import { getStrategy } from '@/content/strategies';
 import {
@@ -25,6 +25,7 @@ import { JournalBreakdowns, JournalKpis } from '../journal/JournalOverview';
 import { ACCOUNT_LABEL, ACCOUNTS } from '../journal/labels';
 import { BacktestVsForward } from './BacktestVsForward';
 import { Bars } from './charts';
+import { ExpectancyCard } from './ExpectancyCard';
 
 const toError = (e: unknown) => (e instanceof Error ? e : new Error(String(e)));
 
@@ -91,6 +92,7 @@ export function SimulatorStats() {
               </Card>
             ))}
           </dl>
+          <ExpectancyCard rs={trades.map((t) => t.r)} />
           {kind === 'backtest' &&
             tags.map((tag) => (
               <BacktestReportCard
@@ -212,6 +214,7 @@ export function JournalStats() {
       />
       <BacktestVsForward />
       <JournalKpis metrics={journalMetrics(trades)} />
+      <ExpectancyCard rs={byCloseTime(trades).map((t) => t.r)} />
       <JournalBreakdowns trades={trades} />
     </div>
   );
