@@ -43,19 +43,6 @@ const mdxSources = Object.fromEntries(
   }),
 ) as Record<LessonId, string>;
 
-/** Modules whose lesson tests follow the 2026-11-11 rules (no obvious questions). */
-const QUIZ_V2_MODULES = new Set<string>([
-  'm00',
-  'm01',
-  'm02',
-  'm03',
-  'm04',
-  'm05',
-  'm06',
-  'm07',
-  'm08',
-]);
-
 /** Problems with one question (empty list = valid). */
 export function questionProblems(q: Question): string[] {
   const p: string[] = [];
@@ -115,11 +102,7 @@ function quizProblems(quiz: Quiz, expectedId: string, kind: Quiz['kind']): strin
     if (quiz.questions.length < 5 || quiz.questions.length > 12)
       p.push('lesson quiz needs 5–12 questions');
     // Content guidelines (2026-11-11): true/false only for one common misconception per test.
-    // Enforced per module as tests are reworked; the list goes away when all 13 are done.
-    if (
-      QUIZ_V2_MODULES.has(expectedId.slice(0, 3)) &&
-      quiz.questions.filter((q) => q.type === 'truefalse').length > 1
-    )
+    if (quiz.questions.filter((q) => q.type === 'truefalse').length > 1)
       p.push('at most one true/false question per lesson test');
     if (quiz.passRatio !== 0.8) p.push('lesson pass ratio must be 0.8');
   } else {
