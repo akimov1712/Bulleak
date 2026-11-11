@@ -44,7 +44,7 @@ const mdxSources = Object.fromEntries(
 ) as Record<LessonId, string>;
 
 /** Modules whose lesson tests follow the 2026-11-11 rules (no obvious questions). */
-const QUIZ_V2_MODULES = new Set<string>(['m00']);
+const QUIZ_V2_MODULES = new Set<string>(['m00', 'm01']);
 
 /** Problems with one question (empty list = valid). */
 export function questionProblems(q: Question): string[] {
