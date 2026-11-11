@@ -34,6 +34,7 @@ export function AdviceCard({ className }: { className?: string }) {
     ordered,
     due.map((d) => d.skill),
     (id) => skillIndex.getSkill(id)?.requires ?? [],
+    model.misconceptions,
   );
 
   let advice: Advice | null = null;
@@ -54,7 +55,9 @@ export function AdviceCard({ className }: { className?: string }) {
     case 'theory': {
       const lesson = lessonOf(step.skill);
       advice = {
-        text: `Навык «${titleOf(step.skill)}» пока даётся тяжело. Стоит перечитать урок и пересдать тест.`,
+        text: step.misconception
+          ? `В навыке «${titleOf(step.skill)}» был уверенный, но неверный ответ — похоже на заблуждение. Перечитай урок и разбор ошибки.`
+          : `Навык «${titleOf(step.skill)}» пока даётся тяжело. Стоит перечитать урок и пересдать тест.`,
         action: lesson
           ? { to: paths.lesson(lesson.id), label: 'Открыть урок' }
           : { to: paths.skills(), label: 'Мои навыки' },

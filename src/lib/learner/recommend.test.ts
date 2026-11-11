@@ -33,7 +33,11 @@ describe('recommendStep', () => {
       kind: 'review',
       skills: ['candles'],
     });
-    expect(recommendStep(states, [], requires)).toEqual({ kind: 'theory', skill: 'levels' });
+    expect(recommendStep(states, [], requires)).toEqual({
+      kind: 'theory',
+      skill: 'levels',
+      misconception: false,
+    });
     expect(recommendStep([state('risk', 'practice')], [], requires)).toEqual({
       kind: 'practice',
       skill: 'risk',
@@ -42,11 +46,38 @@ describe('recommendStep', () => {
 
   it('offers a weak prerequisite before the skill built on it', () => {
     const states = [state('structure', 'knowledge'), state('levels', 'knowledge')];
-    expect(recommendStep(states, [], requires)).toEqual({ kind: 'theory', skill: 'structure' });
-    // Order of the list does not matter for prerequisites.
-    expect(recommendStep([...states].reverse(), [], requires)).toEqual({
+    expect(recommendStep(states, [], requires)).toEqual({
       kind: 'theory',
       skill: 'structure',
+      misconception: false,
     });
+    // Order of the list does not matter for prerequisites.
+    expect(recommendStep([...states].reverse(), [], requires)).toMatchObject({
+      skill: 'structure',
+    });
+  });
+
+  it('a confident mistake makes a skill weak and puts it first', () => {
+    const known = { ...state('candles', 'learning'), knowledge: undefined };
+    const withK = {
+      ...state('risk', 'mastered'),
+      knowledge: {
+        skill: 'risk',
+        p: 0.9,
+        pAtLast: 0.9,
+        answers: 5,
+        correct: 4,
+        lastAt: 0,
+        mastered: true,
+      },
+    };
+    const states = [state('levels', 'knowledge'), known, withK];
+    expect(recommendStep(states, [], requires, new Set(['risk']))).toEqual({
+      kind: 'theory',
+      skill: 'risk',
+      misconception: true,
+    });
+    // A skill without answers cannot hold a misconception.
+    expect(recommendStep([known], [], requires, new Set(['candles']))).toEqual({ kind: 'course' });
   });
 });

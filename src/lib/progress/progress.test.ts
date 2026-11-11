@@ -157,8 +157,8 @@ describe('migrateProgress', () => {
             passed: false,
             tags: {},
             answers: [
-              { q: 'a', ok: true, tags: ['risk', 7], type: 'single', sec: 5 },
-              { q: 'b', ok: false, tags: [], type: 'essay', sec: -1 },
+              { q: 'a', ok: true, tags: ['risk', 7], type: 'single', sec: 5, conf: 'sure' },
+              { q: 'b', ok: false, tags: [], type: 'essay', sec: -1, conf: 'maybe' },
               { q: 'c' },
               'junk',
             ],
@@ -170,7 +170,7 @@ describe('migrateProgress', () => {
       T0,
     );
     expect(s.quizAttempts[0]?.answers).toEqual([
-      { q: 'a', ok: true, tags: ['risk'], type: 'single', sec: 5 },
+      { q: 'a', ok: true, tags: ['risk'], type: 'single', sec: 5, conf: 'sure' },
       { q: 'b', ok: false, tags: [] },
     ]);
     expect(s.quizAttempts[1]).not.toHaveProperty('answers');

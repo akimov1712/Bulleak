@@ -3,7 +3,7 @@
  * Not stored separately — derived from quiz attempts (progress) and simulator trades.
  */
 import type { QuizAttempt } from '@/types/progress';
-import type { QuestionType } from '@/types/quiz';
+import type { Confidence, QuestionType } from '@/types/quiz';
 import type { SimTrade } from '@/types/trading';
 
 export interface AnswerEvent {
@@ -16,6 +16,7 @@ export interface AnswerEvent {
   skills: string[];
   type?: QuestionType;
   sec?: number;
+  conf?: Confidence;
 }
 
 export interface TradeEvent {
@@ -75,6 +76,7 @@ export function answerEvents(
           skills: skillsOfTags(a.tags),
           ...(a.type !== undefined && { type: a.type }),
           ...(a.sec !== undefined && { sec: a.sec }),
+          ...(a.conf !== undefined && { conf: a.conf }),
         }))
       : fromSummary(attempt, skillsOfTags),
   );

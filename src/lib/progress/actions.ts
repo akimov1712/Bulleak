@@ -37,6 +37,7 @@ function attemptAnswers(result: QuizResult): QuizAttempt['answers'] {
     tags: p.tags,
     ...(p.type !== undefined && { type: p.type }),
     ...(p.sec !== undefined && { sec: p.sec }),
+    ...(p.conf !== undefined && { conf: p.conf }),
   }));
 }
 

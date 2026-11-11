@@ -109,6 +109,9 @@ export interface AnswerByType {
 
 export type AnswerValue = AnswerByType[QuestionType];
 
+/** How sure the learner was, marked before checking (lesson tests, optional). */
+export type Confidence = 'sure' | 'unsure' | 'guess';
+
 export interface QuestionResult {
   id: string;
   /** Set by gradeQuiz; guessing odds depend on it. */
@@ -117,6 +120,7 @@ export interface QuestionResult {
   tags: string[];
   /** Seconds from showing the question to checking the answer. */
   sec?: number;
+  conf?: Confidence;
 }
 
 export interface QuizResult {

@@ -35,6 +35,31 @@ async function runQuiz(correctCount: number) {
 }
 
 describe('QuizPage', () => {
+  it('stores the optional confidence mark with each answer', async () => {
+    renderAt('/lesson/m00-l01/quiz');
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Начать' }));
+    for (let i = 0; i < quiz.questions.length; i++) {
+      if (i === 0) await user.click(screen.getByRole('button', { name: 'Уверен' }));
+      if (i === 1) await user.click(screen.getByRole('button', { name: 'Угадываю' }));
+      await answer(currentQuestion(quiz.questions), i !== 0);
+      await user.click(screen.getByRole('button', { name: 'Проверить' }));
+      // The marks are asked before checking only.
+      expect(screen.queryByRole('button', { name: 'Уверен' })).not.toBeInTheDocument();
+      await user.click(
+        screen.getByRole('button', {
+          name: i === quiz.questions.length - 1 ? 'Результат' : 'Дальше',
+        }),
+      );
+    }
+    const answers = useProgress.getState().quizAttempts.at(-1)?.answers ?? [];
+    const marked = answers.filter((a) => a.conf).map((a) => [a.ok, a.conf]);
+    expect(marked).toEqual([
+      [false, 'sure'],
+      [true, 'guess'],
+    ]);
+  }, 30_000);
+
   it('shows the intro with question count and threshold', async () => {
     renderAt('/lesson/m00-l01/quiz');
     expect(await screen.findByRole('heading', { name: 'Тест по уроку' })).toBeInTheDocument();

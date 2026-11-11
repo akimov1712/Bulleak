@@ -69,6 +69,29 @@ describe('SkillsPage', () => {
     expect(within(row).getByText('часто нарушается')).toBeInTheDocument();
     expect(within(row).getByRole('link', { name: 'В тренажёр' })).toBeInTheDocument();
     expect(screen.getByLabelText('Сводка')).toHaveTextContent('Знаю, но нарушаю1');
+    // No confidence marks yet: no calibration card.
+    expect(
+      screen.queryByRole('heading', { name: 'Уверенность в ответах' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows how often answers marked «Уверен» were right', async () => {
+    const answers = [
+      { q: 'a', ok: true, tags: ['candlestick'], type: 'single' as const, conf: 'sure' as const },
+      { q: 'b', ok: true, tags: ['candlestick'], type: 'single' as const, conf: 'sure' as const },
+      { q: 'c', ok: true, tags: ['candlestick'], type: 'single' as const },
+      { q: 'd', ok: false, tags: ['candlestick'], type: 'single' as const, conf: 'sure' as const },
+    ];
+    useProgress.setState({
+      quizAttempts: [
+        { quizId: 'm03-l01', at: Date.now() - 1000, ratio: 0.75, passed: false, tags: {}, answers },
+      ],
+      profile: { ...useProgress.getState().profile, name: 'Тестер' },
+    });
+    renderAt('/skills');
+    const card = await screen.findByLabelText('Уверенность в ответах');
+    expect(card).toHaveTextContent('Уверен');
+    expect(card).toHaveTextContent(/верно 67\s?% · 3 ответа/);
   });
 });
 

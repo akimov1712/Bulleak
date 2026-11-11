@@ -60,6 +60,7 @@ function attemptAnswers(raw: unknown[]): AttemptAnswer[] {
       tags: strArray(a.tags),
       ...(isQuestionType(a.type) && { type: a.type }),
       ...(sec !== undefined && sec >= 0 && { sec }),
+      ...((a.conf === 'sure' || a.conf === 'unsure' || a.conf === 'guess') && { conf: a.conf }),
     });
   }
   return out;

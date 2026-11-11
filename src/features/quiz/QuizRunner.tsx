@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { X } from 'lucide-react';
 import type { PreparedQuiz } from '@/lib/quiz/prepare';
-import type { QuizResult } from '@/types/quiz';
+import type { Confidence, QuizResult } from '@/types/quiz';
+import { CONFIDENCE_LEVELS } from '@/lib/learner/calibration';
+import { Pill } from '@/components/ui/Badge';
 import { gradeQuestion, gradeQuiz } from '@/lib/quiz/grade';
 import { correctAnswerText, initialAnswer, isAnswered, questionHint } from '@/lib/quiz/describe';
 import { cn } from '@/lib/cn';
@@ -39,6 +41,7 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const [startedAt] = useState(() => performance.now());
   const [shownAt, setShownAt] = useState(startedAt);
   const [seconds, setSeconds] = useState<Record<string, number>>({});
+  const [confidence, setConfidence] = useState<Record<string, Confidence>>({});
 
   const question = questions[index];
   if (!question) return null;
@@ -48,14 +51,21 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
   const isLast = index === questions.length - 1;
 
   function finish(finalAnswers: Record<string, unknown>, finalSeconds: Record<string, number>) {
+    const result = gradeQuiz(
+      prepared.quiz.id,
+      questions,
+      finalAnswers,
+      prepared.quiz.passRatio,
+      finalSeconds,
+    );
     onFinish({
-      result: gradeQuiz(
-        prepared.quiz.id,
-        questions,
-        finalAnswers,
-        prepared.quiz.passRatio,
-        finalSeconds,
-      ),
+      result: {
+        ...result,
+        perQuestion: result.perQuestion.map((p) => {
+          const conf = confidence[p.id];
+          return conf ? { ...p, conf } : p;
+        }),
+      },
       answers: finalAnswers,
       durationSec: Math.round((performance.now() - startedAt) / 1000),
     });
@@ -137,6 +147,30 @@ export function QuizRunner({ prepared, mode, title, onFinish, onExit }: QuizRunn
           onChange={(v) => setAnswers({ ...answers, [question.id]: v })}
           state={!checked || mode === 'exam' ? 'answering' : verdict ? 'correct' : 'wrong'}
         />
+
+        {!checked && mode === 'lesson' && (
+          <div
+            className="flex flex-wrap items-center gap-2"
+            role="group"
+            aria-label="Насколько ты уверен в ответе?"
+          >
+            <span className="text-sm text-text-muted">Насколько уверен?</span>
+            {CONFIDENCE_LEVELS.map((c) => (
+              <Pill
+                key={c.id}
+                selected={confidence[question.id] === c.id}
+                onClick={() => {
+                  const { [question.id]: _old, ...rest } = confidence;
+                  setConfidence(
+                    confidence[question.id] === c.id ? rest : { ...rest, [question.id]: c.id },
+                  );
+                }}
+              >
+                {c.label}
+              </Pill>
+            ))}
+          </div>
+        )}
 
         {!checked && (
           <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] mt-auto pt-4 lg:bottom-4">

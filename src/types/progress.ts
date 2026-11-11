@@ -1,7 +1,7 @@
 /** Learning progress persisted in localStorage (key "tc-progress"). See data-model.md. */
 import type { DateKey } from '@/lib/date';
 import type { LessonId, ModuleId } from './course';
-import type { QuestionType } from './quiz';
+import type { Confidence, QuestionType } from './quiz';
 
 export type ExamKey = ModuleId | 'final';
 
@@ -48,6 +48,7 @@ export interface AttemptAnswer {
   tags: string[];
   type?: QuestionType;
   sec?: number;
+  conf?: Confidence;
 }
 
 export interface QuizAttempt {

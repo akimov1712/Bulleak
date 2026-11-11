@@ -11,6 +11,7 @@ import { skillGroups, skillIndex } from '@/content/skills';
 import { useLearnerModel } from '@/features/learner/useLearnerModel';
 import { useDueReviews } from '@/features/learner/useDueReviews';
 import { BEHAVIOUR_RULES } from '@/lib/learner/behaviour';
+import { CONFIDENCE_LEVELS, type Calibration } from '@/lib/learner/calibration';
 import { DEFICIT_TEXT, knowledgeLevel, practiceLevel, summarize } from '@/lib/learner/describe';
 import type { SkillState } from '@/lib/learner/gap';
 import { formatPct, plural } from '@/lib/format';
@@ -83,6 +84,31 @@ function SkillRow({ state }: { state: SkillState }) {
   );
 }
 
+function CalibrationCard({ data }: { data: Calibration }) {
+  const rows = CONFIDENCE_LEVELS.filter((c) => data[c.id].answers > 0);
+  if (rows.length === 0) return null;
+  return (
+    <Card className="flex flex-col gap-2" aria-label="Уверенность в ответах">
+      <h2 className="text-lg font-semibold">Уверенность в ответах</h2>
+      <p className="text-sm text-text-muted">
+        Когда ты отмечаешь «Уверен», ответ должен быть верным почти всегда. Уверенные ошибки —
+        признак заблуждения: такие темы сайт предложит повторить первыми.
+      </p>
+      <ul className="flex flex-col gap-1">
+        {rows.map((c) => (
+          <li key={c.id} className="flex justify-between gap-3">
+            <span>{c.label}</span>
+            <span className="font-mono tabular-nums">
+              верно {formatPct(data[c.id].correct / data[c.id].answers, 0)} · {data[c.id].answers}{' '}
+              {plural(data[c.id].answers, ['ответ', 'ответа', 'ответов'])}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 /** /skills — what the learner knows, applies, and where the two part (learner model). */
 export function SkillsPage() {
   usePageTitle('Мои навыки');
@@ -149,6 +175,7 @@ export function SkillsPage() {
           </p>
         </div>
       </Card>
+      <CalibrationCard data={model.calibration} />
       {model.tradesMissing && (
         <Card role="status">
           Сделки тренажёра не прочитались (браузер без IndexedDB), поэтому практика не оценена.
