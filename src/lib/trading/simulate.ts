@@ -77,20 +77,43 @@ export interface SimResult {
   gap: boolean;
 }
 
-/** Books the exit: P&L, fees and R for leaving at `exitPrice` on candle `exitIndex`. */
+/** A part of the position already closed (T-2002): its result before fees and its fees. */
+export interface BookedPart {
+  qty: number;
+  grossPnl: number;
+  fees: number;
+}
+
+/** Result of closing `qty` of the order at `exitPrice`: before fees and fees (entry + exit). */
+export function bookPart(order: SimOrder, qty: number, exitPrice: number): BookedPart {
+  const feePct = order.feePct ?? BYBIT_BASE_FEES.perpetual.taker;
+  const grossPnl =
+    order.side === 'long' ? (exitPrice - order.entry) * qty : (order.entry - exitPrice) * qty;
+  return {
+    qty,
+    grossPnl,
+    fees: feeFor(order.entry * qty, feePct) + feeFor(exitPrice * qty, feePct),
+  };
+}
+
+/**
+ * Books the exit: P&L, fees and R for leaving at `exitPrice` on candle `exitIndex`. `extra`
+ * adds a part closed earlier and fixes R to the risk planned at entry (the stop or the size
+ * may have changed since).
+ */
 export function closeTrade(
   order: SimOrder,
   exitIndex: number,
   exitPrice: number,
   outcome: SimOutcome,
   flags: { ambiguous?: boolean; gap?: boolean } = {},
+  extra: { plannedRisk?: number; partial?: BookedPart } = {},
 ): SimResult {
-  const { side, entry, sl, qty } = order;
-  const feePct = order.feePct ?? BYBIT_BASE_FEES.perpetual.taker;
-  const grossPnl = side === 'long' ? (exitPrice - entry) * qty : (entry - exitPrice) * qty;
-  const fees = feeFor(entry * qty, feePct) + feeFor(exitPrice * qty, feePct);
+  const rest = bookPart(order, order.qty, exitPrice);
+  const grossPnl = rest.grossPnl + (extra.partial?.grossPnl ?? 0);
+  const fees = rest.fees + (extra.partial?.fees ?? 0);
   const pnl = grossPnl - fees;
-  const risk = Math.abs(entry - sl) * qty;
+  const risk = extra.plannedRisk ?? Math.abs(order.entry - order.sl) * order.qty;
   return {
     exitIndex,
     exitPrice,
@@ -108,9 +131,22 @@ export interface TradeState {
   /** Last candle already checked (starts at the entry candle). */
   index: number;
   result: SimResult | null;
+  /** Risk at entry (qty × |entry − sl|): R stays measured against it. */
+  plannedRisk?: number;
+  /** Part closed during the trade. */
+  partial?: BookedPart;
 }
 
-export const startTrade = (startIndex: number): TradeState => ({ index: startIndex, result: null });
+export const startTrade = (startIndex: number, plannedRisk?: number): TradeState => ({
+  index: startIndex,
+  result: null,
+  ...(plannedRisk !== undefined && { plannedRisk }),
+});
+
+const extraOf = (state: TradeState) => ({
+  ...(state.plannedRisk !== undefined && { plannedRisk: state.plannedRisk }),
+  ...(state.partial !== undefined && { partial: state.partial }),
+});
 
 /**
  * Checks the next candle. Closes by SL/TP, or by `timeout` at the close once `maxBars`
@@ -130,20 +166,32 @@ export function stepTrade(
     // No more data: close where we are.
     const last = candles[state.index];
     if (!last) return state;
-    return { index: state.index, result: closeTrade(order, state.index, last.c, 'timeout') };
+    return {
+      ...state,
+      result: closeTrade(order, state.index, last.c, 'timeout', {}, extraOf(state)),
+    };
   }
   const hit = checkCandle(order, candle);
   if (hit) {
     return {
+      ...state,
       index,
-      result: closeTrade(order, index, hit.price, hit.outcome, {
-        ambiguous: hit.ambiguous,
-        gap: hit.gap,
-      }),
+      result: closeTrade(
+        order,
+        index,
+        hit.price,
+        hit.outcome,
+        { ambiguous: hit.ambiguous, gap: hit.gap },
+        extraOf(state),
+      ),
     };
   }
   const timedOut = index - startIndex >= maxBars || index === candles.length - 1;
-  return { index, result: timedOut ? closeTrade(order, index, candle.c, 'timeout') : null };
+  return {
+    ...state,
+    index,
+    result: timedOut ? closeTrade(order, index, candle.c, 'timeout', {}, extraOf(state)) : null,
+  };
 }
 
 /** Manual exit at the close of the last replayed candle. */
@@ -154,7 +202,10 @@ export function closeManually(
 ): TradeState {
   const candle = candles[state.index];
   if (state.result || !candle) return state;
-  return { index: state.index, result: closeTrade(order, state.index, candle.c, 'manual') };
+  return {
+    ...state,
+    result: closeTrade(order, state.index, candle.c, 'manual', {}, extraOf(state)),
+  };
 }
 
 /**

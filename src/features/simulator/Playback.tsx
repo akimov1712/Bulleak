@@ -19,6 +19,11 @@ export interface PlaybackProps {
   onPause: (paused: boolean) => void;
   onInstant: () => void;
   onCloseManually: () => void;
+  /** Half of the position is already closed. */
+  partClosed?: boolean;
+  onClosePart?: () => void;
+  /** The stop was moved away from the price: the rule is broken (shown, not blocked). */
+  stopMovedAway?: boolean;
 }
 
 /** Controls while a trade plays out candle by candle. */
@@ -74,6 +79,25 @@ export function Playback(props: PlaybackProps) {
           Мгновенно
         </Button>
       </div>
+      <p className="text-sm text-text-muted">
+        Стоп и тейк можно перетаскивать на графике и во время сделки.
+      </p>
+      {props.stopMovedAway && (
+        <p role="status" className="text-sm font-semibold text-warn">
+          Стоп отодвинут от цены — риск вырос. Это нарушение правила курса, оно попадёт в статистику
+          дисциплины.
+        </p>
+      )}
+      {props.onClosePart && (
+        <Button
+          variant="secondary"
+          fullWidth
+          disabled={props.partClosed}
+          onClick={props.onClosePart}
+        >
+          {props.partClosed ? 'Половина закрыта' : 'Закрыть 50 %'}
+        </Button>
+      )}
       <Button
         variant="danger"
         fullWidth

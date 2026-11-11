@@ -5,6 +5,7 @@
 import type { SimTrade } from '@/types/trading';
 import type { ClosedTrade } from '@/lib/journal/metrics';
 import { toDateKey } from '@/lib/date';
+import { stopMovedAway } from '@/lib/trading/manage';
 
 export type RuleId = 'risk' | 'rr' | 'daily-loss' | 'revenge' | 'stop-moved' | 'plan';
 
@@ -64,7 +65,8 @@ export interface DisciplineTrade {
   stopMovedAway?: boolean;
 }
 
-export function fromSim(t: SimTrade & { stopMovedAway?: boolean }): DisciplineTrade {
+export function fromSim(t: SimTrade): DisciplineTrade {
+  const moved = stopMovedAway(t);
   return {
     at: t.at,
     closedAt: t.at,
@@ -76,7 +78,7 @@ export function fromSim(t: SimTrade & { stopMovedAway?: boolean }): DisciplineTr
     r: t.r,
     loss: t.pnl < 0,
     lossPct: t.pnl < 0 && t.balanceBefore > 0 ? (-t.pnl / t.balanceBefore) * 100 : 0,
-    ...(t.stopMovedAway !== undefined && { stopMovedAway: t.stopMovedAway }),
+    ...(moved !== undefined && { stopMovedAway: moved }),
   };
 }
 

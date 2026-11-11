@@ -14,6 +14,15 @@ export interface Candle {
 
 export type SimOutcome = 'tp' | 'sl' | 'timeout' | 'manual';
 
+/** Something the learner did in an open simulator trade (T-2002). */
+export interface TradeAction {
+  /** Candle index when it happened. */
+  index: number;
+  kind: 'move-sl' | 'move-tp' | 'partial';
+  /** New level, or the exit price of the closed part. */
+  price: number;
+}
+
 /** Fields that let a record sync between devices (set by the repositories). */
 export interface SyncFields {
   /** Stable id across devices (the numeric `id` is local to this browser). */
@@ -45,6 +54,8 @@ export interface SimTrade extends SyncFields {
   r: number;
   fees: number;
   notes?: string;
+  /** In-trade actions; sl, tp and qty above are the levels and size planned at entry. */
+  actions?: TradeAction[];
 }
 
 export type JournalAccount = 'demo' | 'testnet' | 'real';

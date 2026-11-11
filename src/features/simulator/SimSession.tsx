@@ -27,6 +27,7 @@ import {
   type TradeState,
 } from '@/lib/trading/simulate';
 import type { Side } from '@/lib/trading/pnl';
+import { closePart, moveLevel, stopMovedAway } from '@/lib/trading/manage';
 import { simRepo } from '@/db/simRepo';
 import { toast } from '@/store/uiStore';
 import { useProgress } from '@/store/progressStore';
@@ -47,7 +48,7 @@ import { ScenarioBrief, ScenarioDebrief } from './ScenarioBrief';
 import { BacktestPanel } from './BacktestPanel';
 import type { StrategyRules } from '@/content/strategies';
 import { isDecisionCorrect } from '@/content/scenarios';
-import type { SimDecision, SimScenario } from '@/types/trading';
+import type { SimDecision, SimScenario, TradeAction } from '@/types/trading';
 
 export interface SimSessionProps {
   dataset: DatasetName;
@@ -72,7 +73,11 @@ export interface SimSessionProps {
 }
 
 interface ActiveTrade {
+  /** Current levels and size (they change with in-trade actions). */
   order: SimOrder;
+  /** As opened: the trade is recorded with these levels and size. */
+  planned: SimOrder;
+  actions: TradeAction[];
   start: number;
   riskPct: number;
   balanceBefore: number;
@@ -80,6 +85,17 @@ interface ActiveTrade {
 }
 
 const EMPTY_DRAFT: Omit<OrderDraft, 'riskPct' | 'leverage'> = { side: null, sl: null, tp: null };
+
+/** Appends an action; a drag on the same candle replaces its previous step (one action per gesture). */
+function withAction(actions: TradeAction[], action: TradeAction): TradeAction[] {
+  const last = actions[actions.length - 1];
+  return last &&
+    last.kind === action.kind &&
+    last.index === action.index &&
+    action.kind !== 'partial'
+    ? [...actions.slice(0, -1), action]
+    : [...actions, action];
+}
 
 /** One blind-trading session on a dataset from a seeded random start. */
 export function SimSession(props: SimSessionProps) {
@@ -154,13 +170,14 @@ export function SimSession(props: SimSessionProps) {
         ...(strategy ? { strategyTag: strategy.tag } : {}),
         dataset,
         startIndex: trade.start,
-        side: trade.order.side,
-        entry: trade.order.entry,
-        sl: trade.order.sl,
-        tp: trade.order.tp,
+        side: trade.planned.side,
+        entry: trade.planned.entry,
+        sl: trade.planned.sl,
+        tp: trade.planned.tp,
         riskPct: trade.riskPct,
         balanceBefore: trade.balanceBefore,
-        qty: trade.order.qty,
+        qty: trade.planned.qty,
+        actions: trade.actions,
         exitPrice: result.exitPrice,
         exitIndex: result.exitIndex,
         outcome: result.outcome,
@@ -221,12 +238,15 @@ export function SimSession(props: SimSessionProps) {
     const { side, sl, tp } = draft;
     if (!side || sl === null || tp === null || !plan || plan.error || plan.qty === null) return;
     setPaused(false);
+    const order: SimOrder = { side, entry: entryPrice, sl, tp, qty: plan.qty };
     setTrade({
-      order: { side, entry: entryPrice, sl, tp, qty: plan.qty },
+      order,
+      planned: order,
+      actions: [],
       start: anchor,
       riskPct: draft.riskPct,
       balanceBefore: balance,
-      state: startTrade(anchor),
+      state: startTrade(anchor, Math.abs(entryPrice - sl) * plan.qty),
     });
   };
 
@@ -251,10 +271,22 @@ export function SimSession(props: SimSessionProps) {
       dashed: true,
     });
     if (shownOrder.sl !== null) {
-      levels.push({ id: 'sl', price: shownOrder.sl, tone: 'bear', label: 'SL', draggable: !trade });
+      levels.push({
+        id: 'sl',
+        price: shownOrder.sl,
+        tone: 'bear',
+        label: 'SL',
+        draggable: !result,
+      });
     }
     if (shownOrder.tp !== null) {
-      levels.push({ id: 'tp', price: shownOrder.tp, tone: 'bull', label: 'TP', draggable: !trade });
+      levels.push({
+        id: 'tp',
+        price: shownOrder.tp,
+        tone: 'bull',
+        label: 'TP',
+        draggable: !result,
+      });
     }
   }
   if (scenario?.ideal && decision) {
@@ -284,12 +316,18 @@ export function SimSession(props: SimSessionProps) {
   }
 
   const lastClose = candles[cursor]?.c ?? entryPrice;
+  // Open part at the last close plus a half already closed; R against the risk at entry.
   const openPnl = trade
     ? (trade.order.side === 'long'
         ? lastClose - trade.order.entry
-        : trade.order.entry - lastClose) * trade.order.qty
+        : trade.order.entry - lastClose) *
+        trade.order.qty +
+      (trade.state.partial?.grossPnl ?? 0)
     : 0;
-  const openRisk = trade ? Math.abs(trade.order.entry - trade.order.sl) * trade.order.qty : 1;
+  const openRisk = trade
+    ? (trade.state.plannedRisk ??
+      Math.abs(trade.planned.entry - trade.planned.sl) * trade.planned.qty)
+    : 1;
   const nextAfterTrade =
     !scenario && result && result.exitIndex <= candles.length - 1 - SIM_FUTURE
       ? result.exitIndex
@@ -316,11 +354,32 @@ export function SimSession(props: SimSessionProps) {
           levels={levels}
           markers={markers}
           onLevelDrag={
-            trade
+            result
               ? undefined
               : (id, price) => {
                   if (id !== 'sl' && id !== 'tp') return;
-                  setDraft((d) => ({ ...d, [id]: roundToTick(price, steps.tick) }));
+                  const rounded = roundToTick(price, steps.tick);
+                  if (!trade) {
+                    setDraft((d) => ({ ...d, [id]: rounded }));
+                    return;
+                  }
+                  // An open trade: move the level (on its side of the price) and record it.
+                  setTrade((t) => {
+                    if (!t || t.state.result) return t;
+                    const close = candles[t.state.index]?.c ?? t.order.entry;
+                    const order = moveLevel(t.order, id, rounded, close);
+                    if (!order) return t;
+                    const kind = id === 'sl' ? 'move-sl' : 'move-tp';
+                    return {
+                      ...t,
+                      order,
+                      actions: withAction(t.actions, {
+                        index: t.state.index,
+                        kind,
+                        price: rounded,
+                      }),
+                    };
+                  });
                 }
           }
           onPriceClick={
@@ -368,6 +427,24 @@ export function SimSession(props: SimSessionProps) {
               onCloseManually={() =>
                 setTrade((t) => (t ? { ...t, state: closeManually(candles, t.order, t.state) } : t))
               }
+              partClosed={trade.state.partial !== undefined}
+              onClosePart={() =>
+                setTrade((t) => {
+                  const part = t && closePart(candles, t.order, t.state);
+                  if (!t || !part) return t;
+                  const price = candles[t.state.index]?.c ?? t.order.entry;
+                  return {
+                    ...t,
+                    ...part,
+                    actions: withAction(t.actions, {
+                      index: t.state.index,
+                      kind: 'partial',
+                      price,
+                    }),
+                  };
+                })
+              }
+              stopMovedAway={stopMovedAway({ ...trade.planned, actions: trade.actions }) === true}
             />
           ) : (
             <OrderPanel

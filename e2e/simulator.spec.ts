@@ -100,4 +100,33 @@ test.describe('simulator (T-511)', () => {
       '#/lesson/m03-l04',
     );
   });
+
+  test('closing half during the trade is recorded with the trade (T-2002)', async ({ page }) => {
+    // Frozen timers: the replay does not advance, so the trade stays open for the actions.
+    await page.clock.install();
+    await page.goto(`./#/simulator?seed=${SEED}`);
+    await expect(page.getByTestId('sim-chart')).toBeVisible();
+    await page.getByRole('radio', { name: 'Long' }).click();
+    await page.getByRole('button', { name: 'Открыть сделку' }).click();
+
+    await page.getByRole('button', { name: 'Закрыть 50 %' }).click();
+    await expect(page.getByRole('button', { name: 'Половина закрыта' })).toBeDisabled();
+    await page.getByRole('button', { name: 'Закрыть вручную' }).click();
+    await expect(page.locator('[aria-label="Результат сделки"]')).toBeVisible();
+
+    const actions = await page.evaluate(
+      () =>
+        new Promise<unknown>((resolve, reject) => {
+          const open = indexedDB.open('tc-db');
+          open.onerror = () => reject(open.error);
+          open.onsuccess = () => {
+            const req = open.result.transaction('simTrades').objectStore('simTrades').getAll();
+            req.onsuccess = () =>
+              resolve((req.result as { actions?: { kind: string }[] }[]).map((t) => t.actions));
+            req.onerror = () => reject(req.error);
+          };
+        }),
+    );
+    expect(actions).toEqual([[expect.objectContaining({ kind: 'partial' })]]);
+  });
 });

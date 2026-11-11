@@ -99,7 +99,9 @@ describe('journal trades', () => {
 
 describe('simulator trades', () => {
   it('check risk, R:R and, once recorded, a stop moved away', () => {
-    const [c] = disciplineChecks([fromSim({ ...sim({ riskPct: 2 }), stopMovedAway: true })]);
+    const [c] = disciplineChecks([
+      fromSim(sim({ riskPct: 2, actions: [{ index: 3, kind: 'move-sl', price: 90 }] })),
+    ]);
     expect(rules(c ?? [])).toEqual(['risk:broken', 'rr:ok', 'stop-moved:broken']);
     const [plain] = disciplineChecks([fromSim(sim({}))]);
     expect(rules(plain ?? [])).toEqual(['risk:ok', 'rr:ok']);
