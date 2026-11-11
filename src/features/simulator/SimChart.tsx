@@ -35,7 +35,8 @@ export interface SimIndicators {
   volume: boolean;
 }
 
-export type LevelId = 'entry' | 'sl' | 'tp' | 'ideal-sl' | 'ideal-tp' | `line-${number}`;
+export type LevelId =
+  'entry' | 'sl' | 'tp' | 'ideal-sl' | 'ideal-tp' | `line-${number}` | `hint-${number}`;
 
 export interface SimLevel {
   id: LevelId;

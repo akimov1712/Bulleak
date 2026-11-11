@@ -1,4 +1,4 @@
-import { Eraser, PenLine } from 'lucide-react';
+import { Eraser, PenLine, Sparkles } from 'lucide-react';
 import { chipClass } from '@/components/ui/styles';
 import type { SimIndicators } from './SimChart';
 
@@ -19,6 +19,11 @@ export interface SimToolbarProps {
   onDrawing: (on: boolean) => void;
   lineCount: number;
   onClearLines: () => void;
+  /** Chart markup hints (levels, trend, stop zone). */
+  markup?: boolean;
+  onMarkup?: (on: boolean) => void;
+  /** Lesson scenario before the decision: the markup would give the answer away. */
+  markupLocked?: boolean;
 }
 
 /** Indicator switches and the horizontal-level drawing tool. */
@@ -58,6 +63,19 @@ export function SimToolbar(props: SimToolbarProps) {
         <Eraser className="size-4" aria-hidden="true" />
         Стереть линии
       </button>
+      {props.onMarkup && (
+        <button
+          type="button"
+          aria-pressed={props.markup === true}
+          disabled={props.markupLocked}
+          title={props.markupLocked ? 'Разметка откроется после решения в сценарии' : undefined}
+          onClick={() => props.onMarkup?.(!props.markup)}
+          className={chip(props.markup === true)}
+        >
+          <Sparkles className="size-4" aria-hidden="true" />
+          Разметка
+        </button>
+      )}
     </div>
   );
 }

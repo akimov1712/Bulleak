@@ -28,6 +28,8 @@ import {
 } from '@/lib/trading/simulate';
 import type { Side } from '@/lib/trading/pnl';
 import { closePart, moveLevel, stopMovedAway } from '@/lib/trading/manage';
+import { chartHints } from '@/lib/hints/chart';
+import { MarkupNote } from './MarkupNote';
 import { simRepo } from '@/db/simRepo';
 import { toast } from '@/store/uiStore';
 import { useProgress } from '@/store/progressStore';
@@ -129,6 +131,7 @@ export function SimSession(props: SimSessionProps) {
   const [anchor, setAnchor] = useState(start ?? 0);
   const [lines, setLines] = useState<number[]>([]);
   const [drawing, setDrawing] = useState(false);
+  const [markup, setMarkup] = useState(false);
   const [draft, setDraft] = useState<OrderDraft>({ ...EMPTY_DRAFT, riskPct: 1, leverage: 1 });
   const [trade, setTrade] = useState<ActiveTrade | null>(null);
   const [speed, setSpeed] = useState<PlaybackSpeed>('1');
@@ -250,13 +253,25 @@ export function SimSession(props: SimSessionProps) {
     });
   };
 
-  const levels: SimLevel[] = lines.map((p, i) => ({
-    id: `line-${i}` as LevelId,
-    price: p,
+  // Markup on the candles seen so far; locked in a scenario until the decision is made.
+  const markupLocked = scenario !== undefined && decision === null;
+  const hints = markup && !markupLocked ? chartHints(candles, cursor) : null;
+  const levels: SimLevel[] = (hints?.levels ?? []).map((l, i) => ({
+    id: `hint-${i}` as LevelId,
+    price: l.price,
     tone: 'muted',
-    label: '',
+    label: l.kind === 'support' ? 'S' : 'R',
     dashed: true,
   }));
+  levels.push(
+    ...lines.map((p, i): SimLevel => ({
+      id: `line-${i}` as LevelId,
+      price: p,
+      tone: 'muted',
+      label: '',
+      dashed: true,
+    })),
+  );
   const shownOrder = trade
     ? trade.order
     : draft.side
@@ -343,7 +358,11 @@ export function SimSession(props: SimSessionProps) {
         onDrawing={setDrawing}
         lineCount={lines.length}
         onClearLines={() => setLines([])}
+        markup={markup}
+        onMarkup={setMarkup}
+        markupLocked={markupLocked}
       />
+      {hints && <MarkupNote hints={hints} tick={steps.tick} />}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <SimChart
           candles={candles}
