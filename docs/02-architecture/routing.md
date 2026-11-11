@@ -20,7 +20,8 @@
 | `/cheatsheets` | CheatsheetsPage | Шпаргалки и чек-лист перед сделкой |
 | `/skills` | SkillsPage | Мои навыки: знание, практика, разрыв по каждому навыку (T-1908) |
 | `/review` | ReviewPage | Повторение навыков: 5 вопросов по навыкам, которым подошёл срок (T-1907) |
-| `/stats` | StatsPage | Статистика |
+| `/stats` | StatsPage | Статистика: обучение, тесты, дисциплина, тренажёр, журнал |
+| `/stats/week` | WeeklyReportPage | Отчёт за неделю, печать в PDF, экспорт CSV (T-2009) |
 | `/achievements` | AchievementsPage | Все достижения |
 | `/settings` | SettingsPage | Тема, цель дня, экспорт/импорт, сброс |
 | `/certificate` | CertificatePage | Сертификат (доступен после финального экзамена) |

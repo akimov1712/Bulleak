@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
+import { buttonClass } from '@/components/ui/styles';
+import { paths } from '@/app/paths';
 import { PageHeader } from '@/app/layout/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { LearningStats } from '@/features/stats/LearningStats';
@@ -23,7 +26,15 @@ export function StatsPage() {
   const [tab, setTab] = useState<Tab>('learning');
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title="Статистика" subtitle="Как идёт обучение и торговля" />
+      <PageHeader
+        title="Статистика"
+        subtitle="Как идёт обучение и торговля"
+        actions={
+          <Link to={paths.weeklyReport()} className={buttonClass({ variant: 'secondary' })}>
+            Отчёт за неделю
+          </Link>
+        }
+      />
       <Tabs items={TABS} value={tab} onChange={setTab} label="Разделы статистики" />
       <div role="tabpanel" aria-label={TABS.find((t) => t.id === tab)?.label}>
         {tab === 'learning' && <LearningStats />}

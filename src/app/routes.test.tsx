@@ -30,6 +30,7 @@ describe('routes', () => {
     [paths.cheatsheets(), 'Шпаргалки'],
     [paths.stats(), 'Статистика'],
     [paths.skills(), 'Мои навыки'],
+    [paths.weeklyReport(), 'Отчёт за неделю'],
     [paths.achievements(), 'Достижения'],
     [paths.settings(), 'Настройки'],
     [paths.certificate(), 'Сертификат пока не получен'],

@@ -27,6 +27,7 @@ const PAGES = [
   '/cheatsheets',
   '/stats',
   '/skills',
+  '/stats/week',
   '/review',
   '/achievements',
   '/settings',
