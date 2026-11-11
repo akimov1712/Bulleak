@@ -19,6 +19,8 @@ import { getScenario } from './scenarios';
 import { finalExam } from './final-exam';
 import { mdxComponents } from '@/features/lesson/mdxComponents';
 import { MOODS } from '@/components/mascot/moods';
+import { skillGroups, skills } from './skills';
+import { skillGraphProblems } from '@/lib/learner/skills';
 
 const datasetLengths = new Map<DatasetName, number>();
 function datasetLength(name: DatasetName): number {
@@ -194,6 +196,22 @@ describe('question tags', () => {
       quiz.questions.flatMap((q) => q.tags.filter((t) => !getTerm(t)).map((t) => `${q.id}: ${t}`)),
     );
     expect(unknown).toEqual([]);
+  });
+});
+
+describe('skill graph', () => {
+  it('is valid: no cycles, known prerequisites, known groups and lessons, terms as tags', () => {
+    expect(skillGraphProblems(skills)).toEqual([]);
+    const groups = new Set(skillGroups.map((g) => g.id));
+    const problems = skills.flatMap((s) => [
+      ...(groups.has(s.group) ? [] : [`${s.id}: unknown group ${s.group}`]),
+      ...s.lessons
+        .filter((l) => !courseIndex.getLesson(l))
+        .map((l) => `${s.id}: unknown lesson ${l}`),
+      ...s.tags.filter((t) => !getTerm(t)).map((t) => `${s.id}: tag ${t} is not a term`),
+    ]);
+    expect(problems).toEqual([]);
+    expect(skills.length).toBeGreaterThanOrEqual(25);
   });
 });
 
