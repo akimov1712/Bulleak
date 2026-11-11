@@ -42,6 +42,8 @@ export interface SkillState {
   behaviour?: SkillBehaviour;
   /** The skill has a behaviour rule (B can be measured). */
   hasRule: boolean;
+  /** The learner has own simulator trades (a conditional rule may still have had no case). */
+  traded?: boolean;
   /** K − B, when both exist. */
   gap?: number;
   /** P(K − B > δ), when both exist. */
@@ -55,8 +57,9 @@ export function skillState(
   knowledge: SkillKnowledge | undefined,
   behaviour: SkillBehaviour | undefined,
   hasRule: boolean,
+  traded = behaviour !== undefined,
 ): SkillState {
-  const base = { skill, knowledge, behaviour, hasRule };
+  const base = { skill, knowledge, behaviour, hasRule, traded };
   if (!knowledge) return { ...base, significantGap: false, deficit: 'new' };
   const k = knowledge.p;
   const gap = behaviour ? k - behaviour.b : undefined;
@@ -73,6 +76,7 @@ export function skillState(
   };
   if (k < KNOWS_P) return { ...withGap, deficit: 'knowledge' };
   if (significantGap) return { ...withGap, deficit: 'behaviour' };
-  if (hasRule && !behaviour) return { ...withGap, deficit: 'practice' };
+  // Daily-loss and revenge rules apply only after a loss: trading without one is not «no practice».
+  if (hasRule && !behaviour && !traded) return { ...withGap, deficit: 'practice' };
   return { ...withGap, deficit: knowledge.mastered && k >= MASTERED_P ? 'mastered' : 'learning' };
 }

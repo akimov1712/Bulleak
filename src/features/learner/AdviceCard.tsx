@@ -8,7 +8,6 @@ import { BEHAVIOUR_RULES } from '@/lib/learner/behaviour';
 import { recommendStep } from '@/lib/learner/recommend';
 import { paths } from '@/app/paths';
 import { useLearnerModel } from './useLearnerModel';
-import { useDueReviews } from './useDueReviews';
 
 const titleOf = (id: string) => skillIndex.getSkill(id)?.title ?? id;
 const lessonOf = (id: string) => courseIndex.getLesson(skillIndex.getSkill(id)?.lessons[0] ?? '');
@@ -25,14 +24,11 @@ interface Advice {
  */
 export function AdviceCard({ className }: { className?: string }) {
   const model = useLearnerModel();
-  const due = useDueReviews();
   if (!model) return null;
-  const ordered = skillIndex.order
-    .map((id) => model.states.find((s) => s.skill === id))
-    .filter((s) => s !== undefined);
+  // Due reviews have their own card, so the advice is the best step besides them.
   const step = recommendStep(
-    ordered,
-    due.map((d) => d.skill),
+    model.states,
+    [],
     (id) => skillIndex.getSkill(id)?.requires ?? [],
     model.misconceptions,
   );
@@ -47,7 +43,7 @@ export function AdviceCard({ className }: { className?: string }) {
       };
       break;
     }
-    // Review: the «Сегодня повторить» card already offers it; course: the «Продолжить» card.
+    // Reviews are not passed in; the course is the «Продолжить» card.
     case 'review':
     case 'course':
       advice = null;

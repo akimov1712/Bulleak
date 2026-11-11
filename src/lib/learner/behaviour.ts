@@ -57,17 +57,26 @@ export function checkTrade(
   before: readonly SimTrade[],
   limits: Limits = COURSE_LIMITS,
 ): RuleCheck[] {
-  const checks: RuleCheck[] = [
-    { rule: 'risk', ok: trade.riskPct <= limits.maxRiskPct + EPS },
-    { rule: 'rr', ok: plannedRr(trade) + EPS >= limits.minRr },
-  ];
   const day = toDateKey(trade.at);
   const lostToday = before
     .filter((t) => toDateKey(t.at) === day)
     .reduce((sum, t) => sum + lossPct(t), 0);
+  return checkWith(trade, lostToday, before[before.length - 1], limits);
+}
+
+/** checkTrade with the context precomputed: loss % earlier today and the previous trade. */
+function checkWith(
+  trade: SimTrade,
+  lostToday: number,
+  previous: SimTrade | undefined,
+  limits: Limits,
+): RuleCheck[] {
+  const checks: RuleCheck[] = [
+    { rule: 'risk', ok: trade.riskPct <= limits.maxRiskPct + EPS },
+    { rule: 'rr', ok: plannedRr(trade) + EPS >= limits.minRr },
+  ];
   if (lostToday > 0) checks.push({ rule: 'daily-loss', ok: lostToday + EPS < limits.dailyLossPct });
 
-  const previous = before[before.length - 1];
   if (previous && previous.pnl < 0 && trade.at - previous.at <= limits.revengeWindowMs) {
     checks.push({ rule: 'revenge', ok: trade.riskPct <= previous.riskPct + EPS });
   }
@@ -102,9 +111,18 @@ export function behaviourBySkill(
     RuleId,
     { kept: number; broken: number; trades: number; ok: number; lastAt: number }
   >();
-  trades.forEach((trade, i) => {
+  // One pass: the day's running loss and the previous trade (same result as checkTrade).
+  let day = '';
+  let lostToday = 0;
+  let previous: SimTrade | undefined;
+  for (const trade of trades) {
+    const key = toDateKey(trade.at);
+    if (key !== day) {
+      day = key;
+      lostToday = 0;
+    }
     const w = 0.5 ** (Math.max(0, now - trade.at) / DAY_MS / BEHAVIOUR_HALF_LIFE_DAYS);
-    for (const c of checkTrade(trade, trades.slice(0, i), limits)) {
+    for (const c of checkWith(trade, lostToday, previous, limits)) {
       const a = acc.get(c.rule) ?? { kept: 0, broken: 0, trades: 0, ok: 0, lastAt: 0 };
       acc.set(c.rule, {
         kept: a.kept + (c.ok ? w : 0),
@@ -114,7 +132,9 @@ export function behaviourBySkill(
         lastAt: trade.at,
       });
     }
-  });
+    lostToday += lossPct(trade);
+    previous = trade;
+  }
   const out = new Map<string, SkillBehaviour>();
   for (const [rule, a] of acc) {
     const skill = skillOf.get(rule);

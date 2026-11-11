@@ -45,10 +45,12 @@ export function knowledgeLevel(state: Pick<SkillState, 'knowledge'>): string {
 }
 
 /** Practice in words: how often the rule was kept. */
-export function practiceLevel(state: Pick<SkillState, 'behaviour' | 'hasRule'>): string | null {
+export function practiceLevel(
+  state: Pick<SkillState, 'behaviour' | 'hasRule' | 'traded'>,
+): string | null {
   if (!state.hasRule) return null;
   const b = state.behaviour;
-  if (!b) return 'нет сделок';
+  if (!b) return state.traded ? 'случая ещё не было' : 'нет сделок';
   if (b.kept === b.trades) return 'соблюдается';
   if (b.kept / b.trades >= 0.7) return 'чаще соблюдается';
   return 'часто нарушается';

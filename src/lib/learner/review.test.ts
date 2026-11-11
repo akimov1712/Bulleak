@@ -3,7 +3,13 @@ import { mulberry32 } from '@/lib/random';
 import type { Question } from '@/types/quiz';
 import type { AnswerEvent } from './events';
 import type { SkillKnowledge } from './knowledge';
-import { answerHistory, dueReviews, pickReviewQuestions, reviewSchedule } from './review';
+import {
+  answerHistory,
+  dueReviews,
+  pickReviewQuestions,
+  reviewLessons,
+  reviewSchedule,
+} from './review';
 
 const DAY = 86_400_000;
 const session = (
@@ -60,7 +66,7 @@ const k = (skill: string, p: number, pAtLast = p): SkillKnowledge => ({
 });
 
 describe('dueReviews', () => {
-  it('lists overdue skills and forgotten mastered ones, most urgent first, at most three', () => {
+  it('lists overdue skills only, most urgent first, at most three', () => {
     const schedule = reviewSchedule([
       ...session(0, 'a', 5, 5),
       ...session(0, 'b', 5, 5),
@@ -87,9 +93,18 @@ describe('dueReviews', () => {
       'd',
       'b',
       'a',
-      'forgot',
     ]);
     expect(dueReviews(schedule, new Map(), -1)).toEqual([]);
+  });
+});
+
+describe('reviewLessons', () => {
+  it('keeps only studied lessons of the skills, without repeats', () => {
+    const lessonsOf = (s: string) =>
+      ({ risk: ['m09-l01', 'm09-l05'], size: ['m09-l02', 'm09-l01'] })[s] ?? [];
+    const studied = (l: string) => l !== 'm09-l05';
+    expect(reviewLessons(['risk', 'size'], lessonsOf, studied)).toEqual(['m09-l01', 'm09-l02']);
+    expect(reviewLessons(['risk'], lessonsOf, () => false)).toEqual([]);
   });
 });
 

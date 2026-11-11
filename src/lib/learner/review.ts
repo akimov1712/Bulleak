@@ -5,13 +5,11 @@
 import type { Question } from '@/types/quiz';
 import { shuffle, type Rng } from '@/lib/random';
 import type { AnswerEvent } from './events';
-import { MASTERED_P, type SkillKnowledge } from './knowledge';
+import type { SkillKnowledge } from './knowledge';
 
 export const REVIEW_INTERVALS_DAYS = [1, 3, 7, 14, 30, 60] as const;
 /** A session with at least this share of right answers moves the skill to the next interval. */
 export const REVIEW_PASS = 0.8;
-/** A once-mastered skill below this K is due regardless of the interval. */
-export const REVIEW_FORGOT_P = 0.7;
 export const REVIEW_SKILLS_PER_DAY = 3;
 export const REVIEW_QUESTIONS = 5;
 /** quizId of review attempts. */
@@ -63,8 +61,9 @@ export function reviewSchedule(events: readonly AnswerEvent[]): Map<string, Revi
 }
 
 /**
- * Skills to review now, most urgent first, at most `limit`: overdue by the schedule, or a
- * mastered skill that forgetting pulled below REVIEW_FORGOT_P. Lower K goes first on a tie.
+ * Skills to review now, most urgent first, at most `limit`: overdue by the schedule. Lower K
+ * goes first on a tie. (No separate «forgot» trigger: with a 30-day half-life it fired after
+ * ~15 days and made the 30- and 60-day intervals meaningless.)
  */
 export function dueReviews(
   schedule: ReadonlyMap<string, ReviewItem>,
@@ -72,11 +71,7 @@ export function dueReviews(
   now: number,
   limit = REVIEW_SKILLS_PER_DAY,
 ): ReviewItem[] {
-  const due = [...schedule.values()].filter((item) => {
-    const k = knowledge.get(item.skill);
-    const forgot = k !== undefined && k.pAtLast >= MASTERED_P && k.p < REVIEW_FORGOT_P;
-    return now >= item.dueAt || forgot;
-  });
+  const due = [...schedule.values()].filter((item) => now >= item.dueAt);
   const p = (id: string) => knowledge.get(id)?.p ?? 0;
   return due
     .sort((a, b) => a.dueAt - b.dueAt || p(a.skill) - p(b.skill) || (a.skill < b.skill ? -1 : 1))
@@ -121,6 +116,18 @@ export function pickReviewQuestions(
     }
   }
   return picked;
+}
+
+/**
+ * Lessons to draw review questions from: the skills' lessons the learner has studied (`studied`),
+ * so a review never asks about a lesson not read yet.
+ */
+export function reviewLessons<L extends string>(
+  skills: readonly string[],
+  lessonsOf: (skill: string) => readonly L[],
+  studied: (lesson: L) => boolean,
+): L[] {
+  return [...new Set(skills.flatMap((s) => lessonsOf(s).filter(studied)))];
 }
 
 /** Latest answer per question id. */

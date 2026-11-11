@@ -28,11 +28,11 @@ export function useLearnerModel(): LearnerModelView | undefined {
     return {
       calibration: calibration(events),
       misconceptions: misconceptions(events),
+      // Prerequisite order: the recommendation relies on it, the skills page groups by id.
       states: learnerModel({
-        attempts,
+        answers: events,
         trades: loaded ?? [],
-        skills: skillIndex.skills.map((s) => s.id),
-        skillsOfTags: skillIndex.skillsOfTags,
+        skills: skillIndex.order,
         now,
       }),
       tradesMissing: loaded === null,

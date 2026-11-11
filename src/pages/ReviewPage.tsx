@@ -11,7 +11,12 @@ import { QuizRunner, type QuizFinish } from '@/features/quiz/QuizRunner';
 import { QuizResultView } from '@/features/quiz/QuizResultView';
 import { useDueReviews, type DueReview } from '@/features/learner/useDueReviews';
 import { answerEvents } from '@/lib/learner/events';
-import { answerHistory, pickReviewQuestions, REVIEW_QUIZ_ID } from '@/lib/learner/review';
+import {
+  answerHistory,
+  pickReviewQuestions,
+  REVIEW_QUIZ_ID,
+  reviewLessons,
+} from '@/lib/learner/review';
 import { prepareQuiz, type PreparedQuiz } from '@/lib/quiz/prepare';
 import { mulberry32 } from '@/lib/random';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -26,11 +31,13 @@ const REVIEW_PASS_RATIO = 0.6;
 function reviewQuizPromise(
   due: readonly DueReview[],
   attempts: Parameters<typeof answerEvents>[0],
+  studied: (lesson: LessonId) => boolean,
 ) {
   const skills = due.map((d) => d.skill);
-  const lessons = [
-    ...new Set(skills.flatMap((s) => skillIndex.getSkill(s)?.lessons ?? [])),
-  ] as LessonId[];
+  const lessonsOf = (s: string) => skillIndex.getSkill(s)?.lessons ?? [];
+  const read = reviewLessons(skills, lessonsOf, studied);
+  // Answers can come from an exam of lessons skipped in free mode: then any lesson of the skill.
+  const lessons = read.length > 0 ? read : reviewLessons(skills, lessonsOf, () => true);
   return Promise.all(lessons.map((l) => lessonQuizPromise(l))).then((quizzes): Quiz => {
     const pool = quizzes.flatMap((q) => q.questions);
     const history = answerHistory(answerEvents(attempts, skillIndex.skillsOfTags));
@@ -93,10 +100,17 @@ export function ReviewPage() {
   usePageTitle('Повторение');
   const due = useDueReviews();
   const attempts = useProgress((s) => s.quizAttempts);
+  const lessons = useProgress((s) => s.lessons);
   // Fixed for the visit: the session must not change while answers are recorded.
   const [session] = useState(() =>
     due.length > 0
-      ? { promise: reviewQuizPromise(due, attempts), titles: due.map((d) => d.title).join(', ') }
+      ? {
+          promise: reviewQuizPromise(due, attempts, (id) => {
+            const l = lessons[id];
+            return l !== undefined && (l.readAt !== undefined || l.quizAttempts > 0);
+          }),
+          titles: due.map((d) => d.title).join(', '),
+        }
       : null,
   );
 

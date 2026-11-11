@@ -105,3 +105,23 @@ describe('behaviourBySkill', () => {
     expect(b1).toBeGreaterThan(b2);
   });
 });
+
+describe('behaviourBySkill one pass', () => {
+  it('matches checkTrade on every trade of a mixed history', () => {
+    const DAYS = [0, 0, 0, 1, 1, 2];
+    const trades = DAYS.map((d, i) =>
+      (i % 2 === 0 ? loss : trade)({ at: T0 + d * DAY + i * 5 * MIN, riskPct: 1 + (i % 3) }),
+    );
+    const counts = new Map<string, number>();
+    trades.forEach((t, i) => {
+      for (const c of checkTrade(t, trades.slice(0, i))) {
+        counts.set(c.rule, (counts.get(c.rule) ?? 0) + (c.ok ? 1 : 0) * 1000 + 1);
+      }
+    });
+    const b = behaviourBySkill(trades, T0 + 3 * DAY);
+    for (const r of b.values()) {
+      expect(r.kept * 1000 + r.trades, r.rule).toBe(counts.get(r.rule));
+    }
+    expect(b.size).toBe(counts.size);
+  });
+});

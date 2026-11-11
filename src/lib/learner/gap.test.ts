@@ -6,6 +6,7 @@ import { gapProbability, skillState } from './gap';
 import type { SkillKnowledge } from './knowledge';
 import type { SkillBehaviour } from './behaviour';
 import { learnerModel } from './model';
+import { answerEvents } from './events';
 
 describe('betaCdf', () => {
   it('matches closed forms', () => {
@@ -76,6 +77,8 @@ describe('skillState', () => {
       significantGap: false,
     });
     expect(skillState('s', k(0.9, true), undefined, true).deficit).toBe('practice');
+    // Trades exist, but a conditional rule (after a loss) never applied: not «no practice».
+    expect(skillState('s', k(0.9, true), undefined, true, true).deficit).toBe('mastered');
     expect(skillState('s', k(0.7), undefined, false).deficit).toBe('learning');
     expect(skillState('s', k(0.9, true), undefined, false).deficit).toBe('mastered');
     const s = skillState('s', k(0.9, true), b(8, 0), true);
@@ -115,10 +118,9 @@ describe('learnerModel', () => {
       fees: 0,
     });
     const model = learnerModel({
-      attempts,
+      answers: answerEvents(attempts, (tags) => tags.filter((t) => t === 'risk-per-trade')),
       trades: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => trade(10 + i)),
       skills: ['risk-per-trade', 'expectancy', 'candles'],
-      skillsOfTags: (tags) => tags.filter((t) => t === 'risk-per-trade'),
       now: 100,
     });
     expect(model.map((s) => [s.skill, s.deficit])).toEqual([
