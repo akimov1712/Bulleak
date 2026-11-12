@@ -16,15 +16,18 @@
       // useApplyTheme / useApplyMotion) to avoid a light/dark flash or unwanted animation.
       (function () {
         var state = {};
+        var version = 0;
         try {
           var saved = JSON.parse(localStorage.getItem('tc-settings') || '{}');
           if (saved && saved.state) state = saved.state;
+          if (saved && typeof saved.version === 'number') version = saved.version;
         } catch (e) {}
         var theme = state.theme || 'dark';
         if (theme === 'system') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
-        var motion = state.reducedMotion || 'system';
+        // Animations are on by default; saves before v2 held the old «system» default.
+        var motion = (version >= 2 && state.reducedMotion) || 'on';
         var reduce =
           motion === 'off' ||
           (motion === 'system' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);

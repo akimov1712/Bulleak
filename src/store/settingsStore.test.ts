@@ -14,6 +14,34 @@ describe('settingsStore', () => {
     const s = useSettings.getState();
     expect(s.theme).toBe('dark');
     expect(s.dailyGoalXp).toBe(50);
+    expect(s.sound).toBe(true);
+    expect(s.reducedMotion).toBe('on');
+  });
+
+  it('turns sound and animations on for v1 saves, keeping other choices', async () => {
+    localStorage.setItem(
+      'tc-settings',
+      JSON.stringify({
+        state: { theme: 'light', sound: false, reducedMotion: 'system', dailyGoalXp: 100 },
+        version: 1,
+      }),
+    );
+    await useSettings.persist.rehydrate();
+    expect(useSettings.getState()).toMatchObject({
+      theme: 'light',
+      dailyGoalXp: 100,
+      sound: true,
+      reducedMotion: 'on',
+    });
+  });
+
+  it('keeps a v2 choice to turn sound off', async () => {
+    localStorage.setItem(
+      'tc-settings',
+      JSON.stringify({ state: { sound: false, reducedMotion: 'off' }, version: 2 }),
+    );
+    await useSettings.persist.rehydrate();
+    expect(useSettings.getState()).toMatchObject({ sound: false, reducedMotion: 'off' });
   });
 
   it('persists updates to localStorage', () => {

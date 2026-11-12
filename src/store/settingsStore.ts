@@ -6,10 +6,10 @@ import { sanitizeSettings } from '@/lib/settings';
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'dark',
-  sound: false,
+  sound: true,
   dailyGoalXp: 50,
   freeMode: false,
-  reducedMotion: 'system',
+  reducedMotion: 'on',
   hints: 'all',
   toursSeen: [],
 };
@@ -30,8 +30,13 @@ export const useSettings = create<SettingsStore>()(
     }),
     {
       name: 'tc-settings',
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => safeStorage),
+      // v2 turned sound and animations on by default; v1 saves held the old defaults.
+      migrate: (persisted, version) =>
+        version < 2 && persisted && typeof persisted === 'object'
+          ? { ...persisted, sound: true, reducedMotion: 'on' }
+          : persisted,
       partialize: ({ theme, sound, dailyGoalXp, freeMode, reducedMotion, hints, toursSeen }) => ({
         theme,
         sound,
