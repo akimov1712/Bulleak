@@ -66,6 +66,18 @@ describe('PracticePage', () => {
     ]);
     expect(screen.getByRole('heading', { name: 'Калибровка' })).toBeInTheDocument();
   });
+
+  it('walks a situation and judges the choices by the plan', async () => {
+    renderAt('/practice?tab=situations');
+    await userEvent.click(
+      (await screen.findAllByRole('button', { name: 'Начать' }))[0] as HTMLElement,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /Беру с риском 2 %/ }));
+    expect(screen.getByText('Нарушение')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /Закрываю терминал/ }));
+    expect(screen.getByText('По плану')).toBeInTheDocument();
+    expect(screen.getByText(/Решений по плану: 50 %/)).toBeInTheDocument();
+  });
 });
 
 describe('sanitizePractice', () => {

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Candle } from '@/types/trading';
 import { mulberry32 } from '@/lib/random';
+import { SITUATIONS } from '@/content/practice/situations';
 import { checkDrill, DRILL_KINDS, EMPTY_DRILL_STATS, generateDrill, recordDrill } from './drills';
+import { disciplineScore, situationProblems } from './situations';
 import {
   brier,
   FORECAST_HISTORY,
@@ -103,5 +105,43 @@ describe('forecast', () => {
     expect(s.overconfident).toBe(true);
     expect(s.brier).toBeGreaterThan(s.baseline ?? 0);
     expect(summarizeForecasts([])).toMatchObject({ count: 0, hitRate: null, brier: null });
+  });
+});
+
+describe('situations', () => {
+  it.each(SITUATIONS)(
+    '$id has no dead ends, unreachable steps or steps without a good choice',
+    (s) => {
+      expect(situationProblems(s)).toEqual([]);
+    },
+  );
+
+  it('scores discipline: by the plan 1, debatable 0.5, a broken rule 0', () => {
+    expect(disciplineScore([])).toBeNull();
+    expect(disciplineScore(['good', 'risky', 'bad', 'good'])).toBeCloseTo(0.625);
+  });
+
+  it('finds broken content', () => {
+    expect(
+      situationProblems({
+        id: 'x',
+        title: 't',
+        skill: 's',
+        steps: [
+          {
+            id: 'a',
+            text: 'start',
+            choices: [{ id: '1', text: 'go', verdict: 'bad', feedback: 'short', next: 'zz' }],
+          },
+          { id: 'b', text: 'lost', choices: [] },
+        ],
+      }),
+    ).toEqual([
+      'a: needs ≥2 choices',
+      'a: no good choice',
+      'a/1: feedback too short',
+      'a/1: unknown next zz',
+      'b: unreachable',
+    ]);
   });
 });
