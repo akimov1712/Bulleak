@@ -19,7 +19,7 @@ try {
   # Both halves must be what git has: the API is taken from HEAD, so the site is too.
   $dirty = git status --porcelain --untracked-files=no
   if ($dirty -and -not $env:BULLEAK_ALLOW_DIRTY) {
-    throw "Uncommitted changes — commit or stash them first (BULLEAK_ALLOW_DIRTY=1 to override):`n$($dirty -join "`n")"
+    throw "Uncommitted changes - commit or stash them first (BULLEAK_ALLOW_DIRTY=1 to override):`n$($dirty -join "`n")"
   }
   if ($only -ne 'site') {
     # Committed sources only: the API release must match what is in git.
