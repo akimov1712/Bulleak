@@ -23,3 +23,22 @@ export function sanitizeSettings(raw: unknown): Partial<Settings> {
   if (Array.isArray(r.toursSeen)) out.toursSeen = [...new Set(r.toursSeen.filter(isTourId))];
   return out;
 }
+
+/**
+ * Version of the settings document on the server. 2 — sound and animations on by default
+ * (2026-11-12); documents without it were written by older clients with the old defaults.
+ */
+export const SYNCED_SETTINGS_SCHEMA = 2;
+
+/** Settings as sent to the server: valid fields plus the document version. */
+export function settingsForSync(settings: unknown): Record<string, unknown> {
+  return { ...sanitizeSettings(settings), schema: SYNCED_SETTINGS_SCHEMA };
+}
+
+/** Settings from the server; an old document gets the same upgrade as the local v1 → v2 one. */
+export function settingsFromSync(raw: unknown): Partial<Settings> {
+  const out = sanitizeSettings(raw);
+  const schema = typeof raw === 'object' && raw !== null ? (raw as { schema?: unknown }).schema : 0;
+  if (typeof schema === 'number' && schema >= SYNCED_SETTINGS_SCHEMA) return out;
+  return { ...out, sound: true, reducedMotion: 'on' };
+}

@@ -214,9 +214,24 @@ describe('syncOnce', () => {
     await syncOnce(server.api, USER);
     expect(useSettings.getState().theme).toBe('light');
 
-    useSettings.getState().update({ sound: true });
+    useSettings.getState().update({ sound: false });
     await syncOnce(server.api, USER);
-    expect(server.settings.state).toMatchObject({ theme: 'light', sound: true });
+    expect(server.settings.state).toMatchObject({ theme: 'light', sound: false, schema: 2 });
+  });
+
+  it('upgrades settings an older client saved on the server to the new defaults', async () => {
+    const server = fakeServer();
+    server.setSettings({
+      state: { theme: 'light', sound: false, reducedMotion: 'system', dailyGoalXp: 100 },
+      rev: 3,
+    });
+    await syncOnce(server.api, USER);
+    expect(useSettings.getState()).toMatchObject({
+      theme: 'light',
+      dailyGoalXp: 100,
+      sound: true,
+      reducedMotion: 'on',
+    });
   });
 
   it('passes deletions both ways and forgets synced tombstones', async () => {

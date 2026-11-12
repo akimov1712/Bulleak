@@ -12,7 +12,7 @@ import { onLocalRecordChange } from '@/db/syncedTable';
 import { isJournalTrade, isSimTrade } from '@/lib/io/backup';
 import { migrateProgress } from '@/lib/progress/migrate';
 import { PROGRESS_VERSION } from '@/lib/progress/initial';
-import { sanitizeSettings } from '@/lib/settings';
+import { sanitizeSettings, settingsForSync, settingsFromSync } from '@/lib/settings';
 import { canonical, sameData } from '@/lib/sync/canonical';
 import { mergeProgress } from '@/lib/sync/mergeProgress';
 import { planRemoteChange, toChange } from '@/lib/sync/records';
@@ -126,19 +126,19 @@ async function syncSettings(api: SyncApi, meta: SyncMeta) {
     if (meta.settingsSynced === null) {
       const remote = await api.getSettings();
       if (remote.state) {
-        const theirs = sanitizeSettings(remote.state);
+        const theirs = settingsFromSync(remote.state);
         applyRemote(() => useSettings.setState(theirs));
         meta.settingsSynced = canonical(localSettings());
         return;
       }
     }
-    await api.putSettings(localSettings());
+    await api.putSettings(settingsForSync(localSettings()));
     meta.settingsSynced = local;
     return;
   }
   const remote = await api.getSettings();
   if (!remote.state) return;
-  const theirs = sanitizeSettings(remote.state);
+  const theirs = settingsFromSync(remote.state);
   if (canonical(theirs) !== local) {
     applyRemote(() => useSettings.setState(theirs));
     meta.settingsSynced = canonical(localSettings());

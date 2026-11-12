@@ -8,7 +8,9 @@ dir="$base/releases/$id"
 mkdir -p "$dir"
 tar -xzf /root/api.tar.gz -C "$dir"
 cd "$dir"
-npm ci --omit=dev --no-fund --no-audit --ignore-scripts --loglevel=error
+# Only the API and what it imports: the root dependencies belong to the site.
+npm ci --omit=dev --no-fund --no-audit --ignore-scripts --loglevel=error \
+  -w @bulleak/server --include-workspace-root=false
 chown -R root:bulleak "$dir"
 previous=$(readlink -f "$base/current" 2>/dev/null || true)
 ln -sfn "$dir" "$base/current.tmp"

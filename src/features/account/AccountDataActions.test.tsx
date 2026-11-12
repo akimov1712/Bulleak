@@ -108,8 +108,8 @@ describe('AccountDataActions', () => {
     await vi.waitFor(() => expect(useAuth.getState().user).toBeNull());
     expect(session()).toBeNull();
     expect(deletes).toEqual([
-      { password: 'wrong-pass', confirm: 'УДАЛИТЬ' },
-      { password: 'right-pass', confirm: 'УДАЛИТЬ' },
+      { password: 'wrong-pass', confirm: 'удалить' },
+      { password: 'right-pass', confirm: 'удалить' },
     ]);
   });
 });

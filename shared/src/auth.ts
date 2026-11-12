@@ -60,9 +60,14 @@ export const DELETE_CONFIRM_WORD = 'УДАЛИТЬ';
 
 export const deleteAccountBodySchema = z.object({
   password: z.string({ error: 'Укажи пароль' }).min(1, 'Укажи пароль').max(PASSWORD_MAX),
-  confirm: z.literal(DELETE_CONFIRM_WORD, {
-    error: `Напиши слово ${DELETE_CONFIRM_WORD}, чтобы подтвердить`,
-  }),
+  /** What the user typed; case and surrounding spaces do not matter. */
+  confirm: z
+    .string({ error: `Напиши слово ${DELETE_CONFIRM_WORD}, чтобы подтвердить` })
+    .max(50)
+    .refine(
+      (v) => v.trim().toUpperCase() === DELETE_CONFIRM_WORD,
+      `Напиши слово ${DELETE_CONFIRM_WORD}, чтобы подтвердить`,
+    ),
 });
 export type DeleteAccountBody = z.infer<typeof deleteAccountBodySchema>;
 

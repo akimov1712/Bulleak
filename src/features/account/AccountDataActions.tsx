@@ -92,7 +92,7 @@ export function AccountDataActions({ api }: { api: ApiClient }) {
               onClick={() => {
                 setPending(true);
                 setError(null);
-                api.deleteAccount({ password, confirm: DELETE_CONFIRM_WORD }).then(
+                api.deleteAccount({ password, confirm: word }).then(
                   () => {
                     setPending(false);
                     close();

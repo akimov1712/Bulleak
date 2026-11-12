@@ -618,7 +618,7 @@ describe('account export and deletion', () => {
     await call(app, 'PUT', '/sync/progress', session.accessToken, { state: { xp: 1 }, baseRev: 0 });
     const res = await call(app, 'DELETE', '/me', session.accessToken, {
       password: account.password,
-      confirm: 'УДАЛИТЬ',
+      confirm: ' удалить ',
     });
     expect(res.status).toBe(204);
     expect(await database.db.select().from(users)).toHaveLength(0);

@@ -12,3 +12,7 @@ New-Item -ItemType Directory -Force $Dest | Out-Null
 scp -q -i $key -o BatchMode=yes "${target}:$latest" $Dest
 if ($LASTEXITCODE -ne 0) { throw 'download failed' }
 Write-Output "saved $(Join-Path $Dest (Split-Path -Leaf $latest))"
+# Same retention as on the server (the privacy policy promises it): copies older than 14 days go.
+Get-ChildItem $Dest -Filter 'bulleak-*.dump' |
+  Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-14) } |
+  ForEach-Object { Remove-Item $_.FullName; Write-Output "removed old $($_.Name)" }

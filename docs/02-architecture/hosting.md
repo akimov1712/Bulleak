@@ -34,6 +34,12 @@ $env:BULLEAK_HOST = 'root@<ip>'
 Проверить прод после выкладки: `npm run check:prod` (страницы, переадресации, заголовки, кэш, API без входа, CORS, срок сертификата; ничего не меняет).
 Откатить версию: на сервере переключить ссылку `current` на предыдущую папку в `releases` (для API — затем `systemctl restart bulleak-api`).
 
+## Доступ к базе (TablePlus)
+- PostgreSQL слушает только `127.0.0.1`; подключение — через SSH-туннель (в TablePlus «Over SSH», ключ `bulleak_deploy`, пользователь `root`).
+- Для этого заведена отдельная роль `tableplus` (2026-11-12, вручную): член роли `bulleak`, при входе переключается на неё (`ALTER ROLE tableplus SET role = 'bulleak'`), права те же, что у API. Пароль генерировался на сервере и передан владельцу; в скрипты и репозиторий не попадает.
+- Отключить доступ, не трогая сайт: `sudo -u postgres psql -c 'DROP ROLE tableplus'`. Сменить пароль: `sudo -u postgres psql -c "ALTER ROLE tableplus PASSWORD '<новый>'"`.
+- После пересборки сервера роль нужно создать заново (скрипты её не создают).
+
 ## Резервные копии
 - Каждую ночь (01:30 UTC) таймер `bulleak-backup` делает `pg_dump -Fc` в `/var/backups/bulleak`, хранятся 14 последних (скрипт `deploy/server/backup.sh`).
 - Копия вне сервера: `./scripts/pull-backup.ps1` скачивает свежий дамп в `Документы\bulleak-backups` (нужен `$env:BULLEAK_HOST`). Запускать хотя бы раз в неделю или повесить на планировщик Windows.

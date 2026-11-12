@@ -41,6 +41,12 @@ location /api/ {
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_read_timeout 30s;
     client_max_body_size 3m;
+    # nginx sets the security headers for the whole site; drop the API's own copies so each
+    # header is sent once and they never disagree (X-Frame-Options DENY vs SAMEORIGIN).
+    proxy_hide_header Strict-Transport-Security;
+    proxy_hide_header X-Frame-Options;
+    proxy_hide_header X-Content-Type-Options;
+    proxy_hide_header Referrer-Policy;
 }
 
 # Hashed build files never change: cache for a year.
@@ -113,7 +119,7 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_session_cache shared:bulleak:10m;
     ssl_session_timeout 1d;
-    add_header Strict-Transport-Security "max-age=31536000" always;
+    # HSTS comes from bulleak-headers.conf (added below), like the other security headers.
     include snippets/bulleak-site.conf;
 }
 EOF

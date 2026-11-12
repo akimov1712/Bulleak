@@ -12,6 +12,8 @@ const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().min(1).max(65535).default(8787),
+    /** Listen address: loopback by default (nginx is the public entry point in production). */
+    HOST: z.string().min(1).default('127.0.0.1'),
     APP_ORIGIN: z.url().optional(),
     JWT_SECRET: z.string().optional(),
     /** postgres://… ; without it (outside production) a local PGlite database is used. */
@@ -65,6 +67,7 @@ const envSchema = z
     return {
       env: env.NODE_ENV,
       port: env.PORT,
+      host: env.HOST,
       appOrigin,
       appUrl: `${(env.APP_URL ?? appOrigin).replace(/\/+$/, '')}/`,
       mail:
