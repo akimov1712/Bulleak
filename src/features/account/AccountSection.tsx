@@ -8,6 +8,7 @@ import { buttonClass } from '@/components/ui/styles';
 import { paths } from '@/app/paths';
 import { useAuth } from '@/store/authStore';
 import { toast } from '@/store/uiStore';
+import { AccountDataActions } from './AccountDataActions';
 
 const errorText = (error: unknown) => (error instanceof Error ? error.message : undefined);
 
@@ -103,6 +104,7 @@ export function AccountSection() {
           <p className="text-xs text-text-muted">
             Прогресс на этом устройстве останется и после выхода.
           </p>
+          <AccountDataActions api={api} />
         </>
       )}
 

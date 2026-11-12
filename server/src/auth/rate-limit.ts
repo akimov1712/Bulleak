@@ -14,6 +14,8 @@ export const RATE_LIMITS = {
   forgot: { limit: 3, windowMs: 60 * MINUTE },
   forgotPerAddress: { limit: 20, windowMs: 60 * MINUTE },
   resendVerification: { limit: 3, windowMs: 60 * MINUTE },
+  /** Per account: a stolen access token must not brute-force the password. */
+  deleteAccount: { limit: 5, windowMs: 15 * MINUTE },
 } satisfies Record<string, RateLimit>;
 
 /** Counts attempts per key. Replaceable: one process keeps them in memory, several need a store. */

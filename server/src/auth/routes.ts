@@ -1,8 +1,9 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, asc, eq, sql } from 'drizzle-orm';
 import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono, type Context, type MiddlewareHandler } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import {
+  deleteAccountBodySchema,
   emailTokenBodySchema,
   forgotBodySchema,
   isWeakPassword,
@@ -10,13 +11,14 @@ import {
   refreshBodySchema,
   registerBodySchema,
   resetBodySchema,
+  type AccountExport,
   type AuthResponse,
   type PublicUser,
 } from '@bulleak/shared';
 import type { Config } from '../config';
 import { parseBody, type AuthedEnv } from '../http';
 import type { Db } from '../db';
-import { users, type User } from '../db/schema';
+import { progress, settings, syncRecords, users, type User } from '../db/schema';
 import type { Logger } from '../log';
 import { resetPasswordMail, verifyEmailMail, type Mailer } from '../mail';
 import {
@@ -27,6 +29,7 @@ import {
   tokenInvalid,
   unauthorized,
   weakPassword,
+  wrongPassword,
 } from '../errors';
 import { consumeEmailToken, issueEmailToken, peekEmailToken } from './email-tokens';
 import { hashPassword, verifyPassword } from './password';
@@ -271,6 +274,47 @@ export function authRoutes({ config, db, logger, mailer, limiter, apiPrefix }: A
     if (!user) throw unauthorized();
     c.header('Cache-Control', 'no-store');
     return c.json({ user: publicUser(user) });
+  });
+
+  /** Everything the server keeps about the user, as one JSON file (U9). */
+  app.get('/me/export', requireAuth(config.jwtSecret), async (c) => {
+    const userId = c.get('userId');
+    const user = await findUserById(userId);
+    if (!user) throw unauthorized();
+    const [doc] = await db.select().from(progress).where(eq(progress.userId, userId));
+    const [prefs] = await db.select().from(settings).where(eq(settings.userId, userId));
+    const rows = await db
+      .select({ kind: syncRecords.kind, data: syncRecords.data })
+      .from(syncRecords)
+      .where(and(eq(syncRecords.userId, userId), eq(syncRecords.deleted, false)))
+      .orderBy(asc(syncRecords.changedAt));
+    const pick = (kind: 'sim' | 'journal') =>
+      rows.flatMap((r) => (r.kind === kind && r.data ? [r.data] : []));
+    const body: AccountExport = {
+      format: 'bulleak-account-export',
+      exportedAt: new Date().toISOString(),
+      user: publicUser(user),
+      progress: doc?.state ?? null,
+      settings: prefs?.state ?? null,
+      records: { sim: pick('sim'), journal: pick('journal') },
+    };
+    c.header('Cache-Control', 'no-store');
+    return c.json(body);
+  });
+
+  /** Deletes the account and all its data at once (U8); local data stays on the devices. */
+  app.delete('/me', requireAuth(config.jwtSecret), async (c) => {
+    const userId = c.get('userId');
+    enforceLimit(`delete:${userId}`, RATE_LIMITS.deleteAccount);
+    const body = await parseBody(c, deleteAccountBodySchema);
+    const user = await findUserById(userId);
+    if (!user) throw unauthorized();
+    if (!(await verifyPassword(user.passwordHash, body.password))) throw wrongPassword();
+    // Sessions, e-mail tokens, progress, settings and records go by ON DELETE CASCADE.
+    await db.delete(users).where(eq(users.id, userId));
+    clearRefreshCookie(c);
+    logger.info('account deleted');
+    return c.body(null, 204);
   });
 
   return app;

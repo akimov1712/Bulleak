@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { publicUserSchema } from './auth';
 
 /** Limits from docs/04-features/accounts-backend.md, section 5. */
 export const PROGRESS_MAX_BYTES = 1_000_000;
@@ -61,3 +62,14 @@ export type RecordsPage = z.infer<typeof recordsPageSchema>;
 
 /** Bytes of a value as JSON text (what the limits are about). */
 export const jsonBytes = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).length;
+
+/** «Скачать мои данные»: everything the server keeps about the user (deleted records excluded). */
+export const accountExportSchema = z.object({
+  format: z.literal('bulleak-account-export'),
+  exportedAt: z.iso.datetime(),
+  user: publicUserSchema,
+  progress: jsonObject.nullable(),
+  settings: jsonObject.nullable(),
+  records: z.object({ sim: z.array(jsonObject), journal: z.array(jsonObject) }),
+});
+export type AccountExport = z.infer<typeof accountExportSchema>;

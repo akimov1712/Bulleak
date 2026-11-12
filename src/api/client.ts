@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  accountExportSchema,
   apiErrorSchema,
   authResponseSchema,
   progressDocSchema,
@@ -10,7 +11,9 @@ import {
   type ProgressDoc,
   type RecordChange,
   type RecordKindName,
+  type AccountExport,
   type AuthResponse,
+  type DeleteAccountBody,
   type ErrorCode,
   type LoginBody,
   type PublicUser,
@@ -85,7 +88,7 @@ const meSchema = z.object({ user: publicUserSchema });
 const revSchema = z.object({ rev: z.number().int().min(0) });
 
 interface SendOptions {
-  method?: 'GET' | 'POST' | 'PUT';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
   token?: string;
 }
@@ -295,6 +298,16 @@ export function createApiClient({
 
     pushRecords: (kind: RecordKindName, changes: RecordChange[]) =>
       authed('/sync/records', recordsPushResultSchema, { body: { kind, changes } }),
+
+    /** Everything the server keeps about the user («Скачать мои данные»). */
+    exportAccount: (): Promise<AccountExport> =>
+      authed('/me/export', accountExportSchema, { method: 'GET' }),
+
+    /** Deletes the account on the server; this device keeps its data as a guest. */
+    async deleteAccount(body: DeleteAccountBody) {
+      await authed('/me', nothing, { method: 'DELETE', body });
+      endSession();
+    },
 
     async resetPassword(token: string, password: string) {
       await parse(await send('/auth/reset', { body: { token, password } }), nothing);

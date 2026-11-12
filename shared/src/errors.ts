@@ -14,6 +14,8 @@ export const ERROR_CODES = [
   'invalid_credentials',
   'weak_password',
   'token_invalid',
+  /** The current password did not match (account deletion); not a sign-out. */
+  'wrong_password',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

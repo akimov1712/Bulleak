@@ -55,6 +55,17 @@ export const resetBodySchema = z.object({
 });
 export type ResetBody = z.infer<typeof resetBodySchema>;
 
+/** The word the user types to confirm deleting the account. */
+export const DELETE_CONFIRM_WORD = 'УДАЛИТЬ';
+
+export const deleteAccountBodySchema = z.object({
+  password: z.string({ error: 'Укажи пароль' }).min(1, 'Укажи пароль').max(PASSWORD_MAX),
+  confirm: z.literal(DELETE_CONFIRM_WORD, {
+    error: `Напиши слово ${DELETE_CONFIRM_WORD}, чтобы подтвердить`,
+  }),
+});
+export type DeleteAccountBody = z.infer<typeof deleteAccountBodySchema>;
+
 /** What the API tells the client about the signed-in user. */
 export const publicUserSchema = z.object({
   id: z.uuid(),

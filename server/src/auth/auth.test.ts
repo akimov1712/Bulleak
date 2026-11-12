@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { apiErrorSchema, authResponseSchema } from '@bulleak/shared';
+import { accountExportSchema, apiErrorSchema, authResponseSchema } from '@bulleak/shared';
 import { API_PREFIX, createApp } from '../app';
 import { loadConfig } from '../config';
 import { openTestDatabase, type Database } from '../db';
-import { emailTokens, sessions, users } from '../db/schema';
+import { emailTokens, progress, sessions, users } from '../db/schema';
 import { memoryLogger } from '../log';
 import { memoryMailer } from '../mail';
 import { memoryRateLimiter, type RateLimiter } from './rate-limit';
@@ -550,5 +550,82 @@ describe('GET /me', () => {
     const session = await registered(app);
     await database.db.delete(users);
     expect((await me(app, `Bearer ${session.accessToken}`)).status).toBe(401);
+  });
+});
+
+describe('account export and deletion', () => {
+  async function registered(app: App) {
+    return authResponseSchema.parse(await (await post(app, '/auth/register', account)).json());
+  }
+
+  const call = (app: App, method: string, path: string, token: string, body?: unknown) =>
+    app.request(`${API_PREFIX}${path}`, {
+      method,
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+
+  it('exports the user, progress, settings and live records only', async () => {
+    const app = setup();
+    const { accessToken, user } = await registered(app);
+    await call(app, 'PUT', '/sync/progress', accessToken, { state: { xp: 120 }, baseRev: 0 });
+    await call(app, 'PUT', '/sync/settings', accessToken, { state: { theme: 'light' } });
+    const uid = '7c1c3b2a-1d4e-4f5a-9b6c-0d1e2f3a4b5c';
+    const gone = '8d2d4c3b-2e5f-4a6b-8c7d-1e2f3a4b5c6d';
+    await call(app, 'POST', '/sync/records', accessToken, {
+      kind: 'journal',
+      changes: [
+        { uid, updatedAt: 1, data: { note: 'kept' } },
+        { uid: gone, updatedAt: 1, data: { note: 'gone' } },
+      ],
+    });
+    await call(app, 'POST', '/sync/records', accessToken, {
+      kind: 'journal',
+      changes: [{ uid: gone, updatedAt: 2, data: null }],
+    });
+
+    const res = await call(app, 'GET', '/me/export', accessToken);
+    expect(res.status).toBe(200);
+    const body = accountExportSchema.parse(await res.json());
+    expect(body).toMatchObject({
+      user,
+      progress: { xp: 120 },
+      settings: { theme: 'light' },
+      records: { sim: [], journal: [{ note: 'kept' }] },
+    });
+  });
+
+  it('refuses a wrong password or a missing confirmation word and keeps the account', async () => {
+    const app = setup();
+    const { accessToken } = await registered(app);
+    const wrong = await call(app, 'DELETE', '/me', accessToken, {
+      password: 'not-it-at-all',
+      confirm: 'УДАЛИТЬ',
+    });
+    expect(wrong.status).toBe(403);
+    expect((await errorOf(wrong)).code).toBe('wrong_password');
+    const unconfirmed = await call(app, 'DELETE', '/me', accessToken, {
+      password: account.password,
+      confirm: 'да',
+    });
+    expect(unconfirmed.status).toBe(400);
+    expect(await database.db.select().from(users)).toHaveLength(1);
+  });
+
+  it('deletes the account with all its data and ends every session', async () => {
+    const app = setup();
+    const session = await registered(app);
+    await call(app, 'PUT', '/sync/progress', session.accessToken, { state: { xp: 1 }, baseRev: 0 });
+    const res = await call(app, 'DELETE', '/me', session.accessToken, {
+      password: account.password,
+      confirm: 'УДАЛИТЬ',
+    });
+    expect(res.status).toBe(204);
+    expect(await database.db.select().from(users)).toHaveLength(0);
+    expect(await database.db.select().from(sessions)).toHaveLength(0);
+    expect(await database.db.select().from(progress)).toHaveLength(0);
+    expect((await me(app, `Bearer ${session.accessToken}`)).status).toBe(401);
+    // The same e-mail can sign up again from scratch.
+    expect((await post(app, '/auth/register', account)).status).toBe(201);
   });
 });
