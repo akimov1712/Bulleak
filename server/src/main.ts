@@ -13,7 +13,8 @@ const applied = await database.migrate();
 if (applied.length > 0) logger.info('migrations applied', { applied });
 const app = createApp({ config, logger, db: database.db, mailer: createMailer(config, logger) });
 
-serve({ fetch: app.fetch, port: config.port }, (info) => {
+// Loopback only: in production nginx is the public entry point.
+serve({ fetch: app.fetch, port: config.port, hostname: '127.0.0.1' }, (info) => {
   logger.info('server started', {
     url: `http://localhost:${info.port}${API_PREFIX}`,
     env: config.env,
