@@ -72,6 +72,9 @@ location /.well-known/acme-challenge/ {
 EOF
 
 cert=/etc/letsencrypt/live/$DOMAIN
+# www may have its own certificate (when the apex one was obtained by a DNS challenge).
+www_cert=/etc/letsencrypt/live/www.$DOMAIN
+[[ -f $www_cert/fullchain.pem ]] || www_cert=$cert
 http_only() {
   cat > /etc/nginx/sites-available/bulleak <<EOF
 server {
@@ -94,18 +97,16 @@ server {
     location / { return 301 https://$DOMAIN\$request_uri; }
 }
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name www.$DOMAIN;
-    ssl_certificate $cert/fullchain.pem;
-    ssl_certificate_key $cert/privkey.pem;
+    ssl_certificate $www_cert/fullchain.pem;
+    ssl_certificate_key $www_cert/privkey.pem;
     return 301 https://$DOMAIN\$request_uri;
 }
 server {
-    listen 443 ssl default_server;
-    listen [::]:443 ssl default_server;
-    http2 on;
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
     server_name $DOMAIN;
     ssl_certificate $cert/fullchain.pem;
     ssl_certificate_key $cert/privkey.pem;
@@ -123,7 +124,7 @@ EOF
 
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/bulleak /etc/nginx/sites-enabled/bulleak
-[[ -f $cert/fullchain.pem ]] || http_only
+if [[ -f $cert/fullchain.pem ]]; then https; else http_only; fi
 nginx -t
 systemctl enable --now nginx
 systemctl reload nginx
