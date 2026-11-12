@@ -33,6 +33,11 @@ $env:BULLEAK_HOST = 'root@<ip>'
 `$env:BULLEAK_ONLY = 'site'` или `'api'` — выложить что-то одно.
 Откатить версию: на сервере переключить ссылку `current` на предыдущую папку в `releases` (для API — затем `systemctl restart bulleak-api`).
 
+## Резервные копии
+- Каждую ночь (01:30 UTC) таймер `bulleak-backup` делает `pg_dump -Fc` в `/var/backups/bulleak`, хранятся 14 последних (скрипт `deploy/server/backup.sh`).
+- Копия вне сервера: `./scripts/pull-backup.ps1` скачивает свежий дамп в `Документы\bulleak-backups` (нужен `$env:BULLEAK_HOST`). Запускать хотя бы раз в неделю или повесить на планировщик Windows.
+- Восстановление на сервере: `systemctl stop bulleak-api`, затем `sudo -u postgres pg_restore --clean --if-exists -d bulleak <файл>.dump`, затем `systemctl start bulleak-api`.
+
 ## Сертификаты
 - `www.bulleak.ru` — свой сертификат, проверка через сайт (webroot), продлевается сам.
 - `bulleak.ru` — первый раз выпущен через TXT-запись `_acme-challenge` (2026-11-12): Timeweb отдаёт для домена скрытую AAAA-запись своей заглушки `2a03:6f00:1::5c35:60df`, которой нет в редакторе DNS, и Let's Encrypt по IPv6 попадал на неё. Продление настроено на webroot и заработает, когда поддержка Timeweb уберёт эту запись (до 2027-02-10, иначе выпустить снова через TXT). Пока она есть, посетители с IPv6 тоже попадают на заглушку.
@@ -40,4 +45,4 @@ $env:BULLEAK_HOST = 'root@<ip>'
 
 ## Дальше
 1. Автоматическая выкладка из GitHub Actions.
-2. Резервные копии базы — вне этого сервера.
+2. Автоматическая копия дампов вне сервера (сейчас — вручную скриптом).
