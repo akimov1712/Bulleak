@@ -39,6 +39,7 @@ const pages: [string, string][] = [
   ['#/achievements', 'Достижения'],
   ['#/settings', 'Настройки'],
   ['#/about', 'О курсе'],
+  ['#/privacy', 'Политика конфиденциальности'],
   ['#/definitely-missing', 'Такой страницы нет'],
 ];
 

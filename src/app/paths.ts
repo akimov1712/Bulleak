@@ -23,6 +23,7 @@ export const paths = {
   certificate: () => '/certificate',
   plan: () => '/plan',
   about: () => '/about',
+  privacy: () => '/privacy',
   login: () => '/login',
   register: () => '/register',
   forgot: () => '/forgot',

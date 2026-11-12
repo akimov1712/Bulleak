@@ -10,6 +10,13 @@ export function Footer() {
         <Link to={paths.about()} className="font-bold text-info underline-offset-2 hover:underline">
           О курсе
         </Link>
+        {' · '}
+        <Link
+          to={paths.privacy()}
+          className="font-bold text-info underline-offset-2 hover:underline"
+        >
+          Конфиденциальность
+        </Link>
       </p>
     </footer>
   );
