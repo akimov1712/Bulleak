@@ -108,6 +108,9 @@ function quizProblems(quiz: Quiz, expectedId: string, kind: Quiz['kind']): strin
   } else {
     if (!quiz.sample) p.push('exam needs sample');
     else if (quiz.questions.length < quiz.sample) p.push('pool smaller than sample');
+    // Module pools only: the final exam pools every module and may hold more.
+    if (expectedId !== 'final' && quiz.questions.filter((q) => q.type === 'truefalse').length > 2)
+      p.push('at most two true/false questions per exam pool');
   }
   if (new Set(quiz.questions.map((q) => q.type)).size < 2) p.push('needs ≥2 question types');
   for (const q of quiz.questions) {

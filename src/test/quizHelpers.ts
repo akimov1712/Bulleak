@@ -3,9 +3,12 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Question } from '@/types/quiz';
 
-/** Option text as a literal regex prefix (texts may contain brackets, dots, etc.). */
+/**
+ * The whole option text as a literal regex, anchored at the end (the accessible name may start
+ * with a key hint). Options of one question may share a long beginning, so a prefix is not enough.
+ */
 const textStart = (text = '') =>
-  new RegExp(text.slice(0, 20).replace(/[.*+?^${}()|[\]\\]/g, (ch) => `\\${ch}`));
+  new RegExp(`${text.replace(/[.*+?^${}()|[\]\\]/g, (ch) => `\\${ch}`)}$`);
 
 export function currentQuestion(questions: readonly Question[]): Question {
   const prompt = screen.getByRole('heading', { level: 1 }).textContent;
