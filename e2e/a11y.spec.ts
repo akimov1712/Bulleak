@@ -35,6 +35,7 @@ const PAGES = [
   '/certificate',
   '/about',
   '/privacy',
+  '/practice',
 ];
 
 for (const scheme of ['light', 'dark'] as const) {

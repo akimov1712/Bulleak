@@ -13,6 +13,7 @@ import {
   NotebookPen,
   ScrollText,
   Settings,
+  Target,
   type LucideIcon,
 } from 'lucide-react';
 import { paths } from '../paths';
@@ -66,6 +67,12 @@ const simulator: NavItem = {
   icon: CandlestickChart,
   description: 'Сделки на реальной истории Bybit',
 };
+const practice: NavItem = {
+  to: paths.practice(),
+  label: 'Тренировки',
+  icon: Target,
+  description: 'Расчёты до автоматизма и прогнозы «Что дальше?»',
+};
 const journal: NavItem = {
   to: paths.journal(),
   label: 'Журнал',
@@ -96,7 +103,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     id: 'practice',
     label: 'Практика',
-    items: [simulator, journal, tools, plan],
+    items: [simulator, practice, journal, tools, plan],
   },
   {
     id: 'reference',

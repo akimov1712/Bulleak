@@ -7,6 +7,7 @@ export const paths = {
   lessonQuiz: (lessonId: string) => `/lesson/${lessonId}/quiz`,
   exam: (moduleId: string) => `/exam/${moduleId}`,
   finalExam: () => '/exam/final',
+  practice: () => '/practice',
   simulator: (scenarioId?: string) => (scenarioId ? `/simulator/${scenarioId}` : '/simulator'),
   tools: (calcId?: string) => (calcId ? `/tools/${calcId}` : '/tools'),
   journal: () => '/journal',

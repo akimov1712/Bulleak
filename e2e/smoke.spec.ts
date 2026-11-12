@@ -40,6 +40,7 @@ const pages: [string, string][] = [
   ['#/settings', 'Настройки'],
   ['#/about', 'О курсе'],
   ['#/privacy', 'Политика конфиденциальности'],
+  ['#/practice', 'Практика'],
   ['#/definitely-missing', 'Такой страницы нет'],
 ];
 
