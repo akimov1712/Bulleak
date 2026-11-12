@@ -14,6 +14,7 @@ import { buttonClass } from '@/components/ui/styles';
 import { journalRepo } from '@/db/journalRepo';
 import { JournalBreakdowns, JournalKpis } from '@/features/journal/JournalOverview';
 import { ACCOUNT_LABEL, ACCOUNTS } from '@/features/journal/labels';
+import { PlanVsFactCard } from '@/features/journal/PlanVsFactCard';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { cn } from '@/lib/cn';
 import { formatR, formatUsd } from '@/lib/format';
@@ -131,6 +132,7 @@ function JournalContent({ trades }: { trades: JournalTrade[] }) {
       ) : (
         <TradeList trades={shown} onOpen={(id) => navigate(paths.journalEntry(id))} />
       )}
+      <PlanVsFactCard trades={shown} />
       <JournalBreakdowns trades={shown} />
     </>
   );
