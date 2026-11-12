@@ -31,6 +31,7 @@ $env:BULLEAK_HOST = 'root@<ip>'
 ./scripts/deploy-vps.ps1
 ```
 `$env:BULLEAK_ONLY = 'site'` или `'api'` — выложить что-то одно.
+Проверить прод после выкладки: `npm run check:prod` (страницы, переадресации, заголовки, кэш, API без входа, CORS, срок сертификата; ничего не меняет).
 Откатить версию: на сервере переключить ссылку `current` на предыдущую папку в `releases` (для API — затем `systemctl restart bulleak-api`).
 
 ## Резервные копии

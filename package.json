@@ -25,7 +25,8 @@
     "data:fetch": "tsx scripts/fetch-klines.ts",
     "audit:responsive": "node scripts/audit-responsive.mjs",
     "dev:server": "npm run dev -w server",
-    "db:migrate": "npm run db:migrate -w server"
+    "db:migrate": "npm run db:migrate -w server",
+    "check:prod": "tsx scripts/check-prod.ts"
   },
   "dependencies": {
     "@bulleak/shared": "^0.1.0",
