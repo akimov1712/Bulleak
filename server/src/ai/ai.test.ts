@@ -4,6 +4,7 @@ import {
   aiStatusSchema,
   apiErrorSchema,
   authResponseSchema,
+  type CourseChunk,
 } from '@bulleak/shared';
 import { API_PREFIX, createApp } from '../app';
 import { loadConfig } from '../config';
@@ -11,7 +12,15 @@ import { openTestDatabase, type Database } from '../db';
 import { aiUsage, users } from '../db/schema';
 import { memoryLogger } from '../log';
 import { memoryMailer } from '../mail';
-import { systemPrompt } from './prompt';
+import { pickExcerpts, systemPrompt } from './prompt';
+import {
+  createCourseSearch,
+  loadCourseSearch,
+  stem,
+  tokenize,
+  type CourseSearch,
+} from './retrieval';
+import { searchQuery, sourcesOf } from './routes';
 import { deepseekProvider, mockProvider, ProviderError, type ChatProvider } from './provider';
 import { decideQuota } from './quota';
 
@@ -100,7 +109,11 @@ describe('/ai routes', () => {
     await database.db.delete(users);
   });
 
-  function setup(provider: ChatProvider | null, env: Record<string, string> = {}) {
+  function setup(
+    provider: ChatProvider | null,
+    env: Record<string, string> = {},
+    course?: CourseSearch,
+  ) {
     const config = loadConfig({
       NODE_ENV: 'test',
       APP_ORIGIN: 'https://bulleak.test',
@@ -114,6 +127,7 @@ describe('/ai routes', () => {
       db: database.db,
       mailer: memoryMailer(),
       ai: provider,
+      ...(course ? { course } : {}),
     });
   }
 
@@ -144,6 +158,7 @@ describe('/ai routes', () => {
     expect(aiChatResponseSchema.parse(await res.json())).toEqual({
       text: 'Это тестовый ответ.',
       remaining: 1,
+      sources: [],
     });
     const sent = provider.requests[0];
     expect(sent?.model).toBe('deepseek-flash');
@@ -189,11 +204,89 @@ describe('/ai routes', () => {
     expect(error.message).not.toContain('402');
   });
 
+  it('puts the course excerpts into the instructions and links them', async () => {
+    const provider = mockProvider();
+    const course = createCourseSearch([
+      {
+        id: 'm06-l01#2',
+        kind: 'lesson',
+        ref: 'm06-l01',
+        title: 'Фандинг — как считается',
+        text: 'Фандинг платят каждые 8 часов.',
+      },
+    ]);
+    const app = setup(provider, {}, course);
+    const res = await chat(app, await token(app), {
+      messages: [{ role: 'user', content: 'Как часто платят фандинг?' }],
+    });
+    expect(aiChatResponseSchema.parse(await res.json()).sources).toEqual([
+      { kind: 'lesson', ref: 'm06-l01', title: 'Фандинг' },
+    ]);
+    expect(provider.requests[0]?.system).toContain('Фандинг платят каждые 8 часов.');
+  });
+
   it('rejects a conversation that does not end with a question, and guests', async () => {
     const app = setup(mockProvider());
     const t = await token(app);
     const res = await chat(app, t, { messages: [{ role: 'assistant', content: 'x' }] });
     expect(res.status).toBe(400);
     expect((await chat(app, 'nope', ask)).status).toBe(401);
+  });
+});
+
+describe('course search', () => {
+  const chunk = (id: string, title: string, text: string): CourseChunk => ({
+    id,
+    kind: 'lesson',
+    ref: id.split('#')[0] ?? id,
+    title,
+    text,
+  });
+  const course = createCourseSearch([
+    chunk('m06-l01#1', 'Стоп-лосс — где ставить стоп', 'Стоп ставят за уровень, а не по проценту.'),
+    chunk(
+      'm03-l02#1',
+      'Таймфреймы',
+      'Таймфрейм — период одной свечи. Дневная свеча — 6 свечей 4H.',
+    ),
+    chunk('m07-l03#1', 'Фандинг', 'Funding — выплата между лонгами и шортами каждые 8 часов.'),
+  ]);
+
+  it('stems Russian word forms and ignores stop words', () => {
+    expect(stem('стопа')).toBe(stem('стопы'));
+    expect(stem('таймфреймах')).toBe(stem('таймфрейм'));
+    expect(tokenize('Что такое ФАНДИНГ?')).toEqual([stem('фандинг')]);
+    expect(tokenize('Какой R:R нужен, и r / r?')).toEqual(['rr', stem('нужен'), 'rr']);
+  });
+
+  it('finds the excerpt for a question, title first', () => {
+    expect(course.search('куда ставить стопы?')[0]?.chunk.id).toBe('m06-l01#1');
+    expect(course.search('что такое funding')[0]?.chunk.id).toBe('m07-l03#1');
+    expect(course.search('сколько свечей 4H в дневной')[0]?.chunk.id).toBe('m03-l02#1');
+    expect(course.search('погода в москве')).toEqual([]);
+  });
+
+  it('fits excerpts into the budget and links each lesson once', () => {
+    const all = course.search('стоп таймфрейм funding', 6).map((h) => h.chunk);
+    expect(pickExcerpts(all, 70)).toHaveLength(1);
+    expect(sourcesOf([...all, ...all]).map((s) => s.ref)).toHaveLength(3);
+    expect(sourcesOf(all.slice(0, 1))[0]?.title).not.toContain('—');
+    expect(
+      searchQuery([
+        { role: 'user', content: 'старый' },
+        { role: 'user', content: 'про стоп' },
+        { role: 'assistant', content: 'ответ' },
+        { role: 'user', content: 'а почему?' },
+      ]),
+    ).toBe('про стоп\nа почему?');
+  });
+
+  it('loads the committed index of the whole course', () => {
+    const loaded = loadCourseSearch();
+    expect(loaded.error).toBeUndefined();
+    expect(loaded.search.size).toBeGreaterThan(300);
+    const hit = loaded.search.search('что такое ликвидация позиции')[0];
+    expect(hit?.chunk.text.toLowerCase()).toContain('ликвид');
+    expect(loadCourseSearch(new URL('file:///nope.json')).search.size).toBe(0);
   });
 });

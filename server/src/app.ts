@@ -6,6 +6,7 @@ import { memoryRateLimiter, type RateLimiter } from './auth/rate-limit';
 import { authRoutes } from './auth/routes';
 import { syncRoutes } from './sync/routes';
 import { aiRoutes } from './ai/routes';
+import type { CourseSearch } from './ai/retrieval';
 import { deepseekProvider, type ChatProvider } from './ai/provider';
 import type { Config } from './config';
 import type { Db } from './db';
@@ -22,6 +23,8 @@ export interface AppDeps {
   limiter?: RateLimiter;
   /** AI provider; by default DeepSeek when a key is configured, otherwise AI is off. */
   ai?: ChatProvider | null;
+  /** Course excerpts for the assistant (main.ts loads server/data/course-index.json). */
+  course?: CourseSearch;
 }
 
 export const API_PREFIX = '/api/v1';
@@ -35,6 +38,7 @@ export function createApp({
   mailer,
   limiter = memoryRateLimiter(),
   ai = config.ai.apiKey ? deepseekProvider({ apiKey: config.ai.apiKey }) : null,
+  course,
 }: AppDeps) {
   const app = new Hono();
 
@@ -82,7 +86,10 @@ export function createApp({
 
   app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, limiter, apiPrefix: API_PREFIX }));
   app.route(API_PREFIX, syncRoutes({ config, db }));
-  app.route(API_PREFIX, aiRoutes({ config, db, logger, provider: ai }));
+  app.route(
+    API_PREFIX,
+    aiRoutes({ config, db, logger, provider: ai, ...(course ? { course } : {}) }),
+  );
 
   app.notFound((c) => {
     const error = notFound();

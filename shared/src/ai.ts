@@ -28,15 +28,40 @@ export const aiChatBodySchema = z.object({
 });
 export type AiChatBody = z.input<typeof aiChatBodySchema>;
 
-export const aiChatResponseSchema = z.object({
-  text: z.string(),
-  /** Requests left today for this learner. */
-  remaining: z.number().int().min(0),
-});
-export type AiChatResponse = z.infer<typeof aiChatResponseSchema>;
-
 export const aiStatusSchema = z.object({
   enabled: z.boolean(),
   remaining: z.number().int().min(0),
 });
 export type AiStatus = z.infer<typeof aiStatusSchema>;
+
+/** A course excerpt the assistant may quote (T-2105). Built by src/lib/ai/courseChunks.ts. */
+export const COURSE_CHUNK_KINDS = ['lesson', 'term', 'cheatsheet'] as const;
+export const courseChunkSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(COURSE_CHUNK_KINDS),
+  /** Lesson id, glossary term id or cheat sheet id — what the site links to. */
+  ref: z.string().min(1),
+  title: z.string().min(1),
+  text: z.string().min(1),
+});
+export type CourseChunk = z.infer<typeof courseChunkSchema>;
+
+export const COURSE_INDEX_VERSION = 1;
+export const courseIndexFileSchema = z.object({
+  version: z.literal(COURSE_INDEX_VERSION),
+  chunks: z.array(courseChunkSchema),
+});
+export type CourseIndexFile = z.infer<typeof courseIndexFileSchema>;
+
+/** Where an answer came from: shown under it as links. */
+export const aiSourceSchema = courseChunkSchema.pick({ kind: true, ref: true, title: true });
+export type AiSource = z.infer<typeof aiSourceSchema>;
+
+export const aiChatResponseSchema = z.object({
+  text: z.string(),
+  /** Requests left today for this learner. */
+  remaining: z.number().int().min(0),
+  /** Course excerpts the answer was based on. */
+  sources: z.array(aiSourceSchema).default([]),
+});
+export type AiChatResponse = z.infer<typeof aiChatResponseSchema>;

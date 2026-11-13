@@ -1,15 +1,23 @@
 /** /ai/* — the AI gateway for signed-in learners (docs/04-features/ai-platform.md). */
 import { Hono } from 'hono';
-import { aiChatBodySchema, type AiChatResponse, type AiStatus } from '@bulleak/shared';
+import {
+  aiChatBodySchema,
+  type AiChatBody,
+  type AiChatResponse,
+  type AiSource,
+  type AiStatus,
+  type CourseChunk,
+} from '@bulleak/shared';
 import type { Config } from '../config';
 import type { Db } from '../db';
 import { HttpError } from '../errors';
 import { parseBody, type AuthedEnv } from '../http';
 import type { Logger } from '../log';
 import { requireAuth } from '../auth/routes';
-import { systemPrompt } from './prompt';
+import { pickExcerpts, systemPrompt } from './prompt';
 import { ProviderError, type ChatProvider } from './provider';
 import { decideQuota, readQuotaState, recordUsage } from './quota';
+import { createCourseSearch, type CourseSearch } from './retrieval';
 
 export interface AiDeps {
   config: Config;
@@ -17,13 +25,44 @@ export interface AiDeps {
   logger: Logger;
   /** Null — AI is off (no key configured). */
   provider: ChatProvider | null;
+  /** Course index for excerpts; empty by default. */
+  course?: CourseSearch;
   now?: () => Date;
 }
 
 const unavailable = () =>
   new HttpError(503, 'ai_unavailable', 'Помощник сейчас недоступен. Попробуй позже.');
 
-export function aiRoutes({ config, db, logger, provider, now = () => new Date() }: AiDeps) {
+/** Search text: the question and the one before it, so follow-ups like «а почему?» still find the topic. */
+export function searchQuery(messages: AiChatBody['messages']): string {
+  return messages
+    .filter((m) => m.role === 'user')
+    .slice(-2)
+    .map((m) => m.content)
+    .join('\n');
+}
+
+/** One link per lesson, term or cheat sheet, in the order of the excerpts. */
+export function sourcesOf(excerpts: readonly CourseChunk[]): AiSource[] {
+  const seen = new Set<string>();
+  const out: AiSource[] = [];
+  for (const c of excerpts) {
+    const key = `${c.kind}:${c.ref}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ kind: c.kind, ref: c.ref, title: c.title.split(' — ')[0] ?? c.title });
+  }
+  return out;
+}
+
+export function aiRoutes({
+  config,
+  db,
+  logger,
+  provider,
+  course = createCourseSearch([]),
+  now = () => new Date(),
+}: AiDeps) {
   const app = new Hono<AuthedEnv>();
   const limits = config.ai.limits;
   app.use('/ai/*', requireAuth(config.jwtSecret));
@@ -54,15 +93,20 @@ export function aiRoutes({ config, db, logger, provider, now = () => new Date() 
           : 'Помощник в этом месяце исчерпал лимит. Он снова заработает с 1-го числа.',
       );
     }
+    const excerpts = pickExcerpts(course.search(searchQuery(body.messages), 6).map((h) => h.chunk));
     try {
       const result = await provider.complete({
         model: body.purpose === 'review' ? config.ai.models.review : config.ai.models.chat,
-        system: systemPrompt(body.purpose),
+        system: systemPrompt(body.purpose, excerpts),
         messages: body.messages,
-        maxTokens: body.purpose === 'review' ? 900 : 500,
+        maxTokens: body.purpose === 'review' ? 900 : 600,
       });
       await recordUsage(db, userId, at, result.usage);
-      const answer: AiChatResponse = { text: result.text, remaining: decision.remaining };
+      const answer: AiChatResponse = {
+        text: result.text,
+        remaining: decision.remaining,
+        sources: sourcesOf(excerpts),
+      };
       c.header('Cache-Control', 'no-store');
       return c.json(answer);
     } catch (error) {
