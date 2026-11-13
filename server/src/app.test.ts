@@ -102,6 +102,22 @@ describe('loadConfig', () => {
     ).toThrow(/MAIL_OUTBOX: запрещён в production/);
   });
 
+  it('allows the canned assistant only outside production', () => {
+    expect(loadConfig({ AI_MOCK: '1' }).ai.mock).toBe(true);
+    expect(loadConfig({}).ai.mock).toBe(false);
+    expect(() =>
+      loadConfig({
+        NODE_ENV: 'production',
+        APP_ORIGIN: 'https://x.test',
+        JWT_SECRET: 'k'.repeat(48),
+        DATABASE_URL: 'postgres://u:p@db.test:5432/bulleak',
+        RESEND_API_KEY: 'test-key',
+        MAIL_FROM: 'Bulleak <mail@bulleak.test>',
+        AI_MOCK: '1',
+      }),
+    ).toThrow(/AI_MOCK: запрещён в production/);
+  });
+
   it('treats empty variables as not set', () => {
     expect(loadConfig({ APP_URL: '', APP_ORIGIN: '', DATABASE_URL: '' })).toMatchObject({
       appUrl: 'http://localhost:5173/',

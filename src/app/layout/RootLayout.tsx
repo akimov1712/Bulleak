@@ -7,6 +7,7 @@ import { revalidateSession, subscribeAuthToOtherTabs } from '@/store/authStore';
 import { useSyncEngine } from '@/features/sync/useSyncEngine';
 import { Toaster } from '@/components/ui/Toaster';
 import { RewardsPresenter } from '@/features/gamification/RewardsPresenter';
+import { AssistantLauncher } from '@/features/assistant/AssistantLauncher';
 import { ScrollToTop } from './ScrollToTop';
 import { TopNav } from './TopNav';
 import { BottomNav } from './BottomNav';
@@ -78,6 +79,7 @@ export function RootLayout() {
       <Toaster />
       <UpdatePrompt />
       <RewardsPresenter />
+      <AssistantLauncher />
     </div>
   );
 }

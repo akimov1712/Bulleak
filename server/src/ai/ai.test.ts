@@ -21,7 +21,7 @@ import {
   tokenize,
   type CourseSearch,
 } from './retrieval';
-import { estimateUsage, searchQuery, sourcesOf } from './routes';
+import { estimateUsage, linkTitle, searchQuery, sourcesOf } from './routes';
 import {
   deepseekProvider,
   mockProvider,
@@ -341,6 +341,12 @@ describe('course search', () => {
         { role: 'user', content: 'а почему?' },
       ]),
     ).toBe('про стоп\nа почему?');
+  });
+
+  it('makes short link texts', () => {
+    expect(linkTitle('Таймфреймы — Шум')).toBe('Таймфреймы');
+    expect(linkTitle('Термин: Таймфрейм (timeframe, ТФ)')).toBe('Таймфрейм');
+    expect(linkTitle('Шпаргалка «Типы ордеров Bybit» — Основные')).toBe('«Типы ордеров Bybit»');
   });
 
   it('loads the committed index of the whole course', () => {

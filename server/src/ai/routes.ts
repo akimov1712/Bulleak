@@ -53,9 +53,21 @@ export function sourcesOf(excerpts: readonly CourseChunk[]): AiSource[] {
     const key = `${c.kind}:${c.ref}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ kind: c.kind, ref: c.ref, title: c.title.split(' — ')[0] ?? c.title });
+    out.push({ kind: c.kind, ref: c.ref, title: linkTitle(c.title) });
   }
   return out;
+}
+
+/**
+ * Short link text: the lesson without its section, the term without «Термин:» and aliases,
+ * the cheat sheet without its section. Section titles contain « — ».
+ */
+export function linkTitle(title: string): string {
+  const head = title.split(' — ')[0] ?? title;
+  return head
+    .replace(/^Термин:\s*/, '')
+    .replace(/\s*\([^)]*\)$/, '')
+    .replace(/^Шпаргалка\s+/, '');
 }
 
 /** Rough token count of a cut-off answer (no usage from the model): ~3 characters a token. */

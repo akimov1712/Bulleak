@@ -31,6 +31,8 @@ const envSchema = z
     TRUST_PROXY: z.stringbool().default(false),
     /** DeepSeek key; without it the AI gateway is off. */
     DEEPSEEK_API_KEY: z.string().optional(),
+    /** "1" — a canned assistant without a key (local runs, e2e); forbidden in production. */
+    AI_MOCK: z.enum(['0', '1']).default('0'),
     /** AI requests per learner per UTC day. */
     AI_DAILY_REQUESTS: z.coerce.number().int().min(0).default(30),
     /** Input + output tokens for the whole site per calendar month. */
@@ -61,6 +63,9 @@ const envSchema = z
     if (production && !env.APP_ORIGIN) {
       ctx.addIssue({ code: 'custom', path: ['APP_ORIGIN'], message: 'обязателен в production' });
     }
+    if (production && env.AI_MOCK === '1') {
+      ctx.addIssue({ code: 'custom', path: ['AI_MOCK'], message: 'запрещён в production' });
+    }
     if (production && env.MAIL_OUTBOX) {
       ctx.addIssue({ code: 'custom', path: ['MAIL_OUTBOX'], message: 'запрещён в production' });
     }
@@ -89,6 +94,7 @@ const envSchema = z
       bodyLimit: env.BODY_LIMIT,
       ai: {
         apiKey: env.DEEPSEEK_API_KEY ?? null,
+        mock: env.AI_MOCK === '1',
         limits: { dailyRequests: env.AI_DAILY_REQUESTS, monthlyTokens: env.AI_MONTHLY_TOKENS },
         models: { chat: env.AI_MODEL_CHAT, review: env.AI_MODEL_REVIEW },
       },

@@ -7,7 +7,7 @@ import { authRoutes } from './auth/routes';
 import { syncRoutes } from './sync/routes';
 import { aiRoutes } from './ai/routes';
 import type { CourseSearch } from './ai/retrieval';
-import { deepseekProvider, type ChatProvider } from './ai/provider';
+import { deepseekProvider, mockProvider, type ChatProvider } from './ai/provider';
 import type { Config } from './config';
 import type { Db } from './db';
 import { HttpError, internal, notFound, payloadTooLarge } from './errors';
@@ -27,6 +27,17 @@ export interface AppDeps {
   course?: CourseSearch;
 }
 
+/** DeepSeek with a key; the canned mock when AI_MOCK=1 (never in production); otherwise off. */
+function defaultProvider(config: Config): ChatProvider | null {
+  if (config.ai.apiKey) return deepseekProvider({ apiKey: config.ai.apiKey });
+  if (config.ai.mock)
+    return mockProvider(
+      () =>
+        'Это тестовый ответ помощника: на этом компьютере модель не подключена. Стоп ставят за уровень, риск — не больше 1 % депозита.',
+    );
+  return null;
+}
+
 export const API_PREFIX = '/api/v1';
 export const VERSION = '0.1.0';
 
@@ -37,7 +48,7 @@ export function createApp({
   db,
   mailer,
   limiter = memoryRateLimiter(),
-  ai = config.ai.apiKey ? deepseekProvider({ apiKey: config.ai.apiKey }) : null,
+  ai = defaultProvider(config),
   course,
 }: AppDeps) {
   const app = new Hono();
