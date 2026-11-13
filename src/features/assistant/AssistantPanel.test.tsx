@@ -91,6 +91,11 @@ describe('AssistantPanel', () => {
       '/glossary/stop-loss',
     );
     expect(screen.getByText(/Вопросов на сегодня: 4/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Объясни проще' }));
+    await waitFor(() => expect(bodies).toHaveLength(2));
+    const followUp = bodies[1] as { messages: { content: string }[] };
+    expect(followUp.messages).toHaveLength(3);
+    expect(followUp.messages.at(-1)?.content).toContain('Объясни проще');
     const sent = bodies[0] as { messages: { content: string }[] };
     expect(sent.messages.at(-1)?.content).toMatch(
       /^\(Я сейчас в уроке «.+»\.\) Где ставить стоп\?$/,

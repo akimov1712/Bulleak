@@ -20,6 +20,9 @@ const sourceLink = (s: AiSource) =>
       ? paths.glossary(s.ref)
       : paths.cheatsheets();
 
+/** One-tap follow-ups under the last answer (T-2305). */
+const FOLLOW_UPS = ['Объясни проще', 'Приведи пример с числами', 'Подробнее'] as const;
+
 function Bubble({ message, onNavigate }: { message: ChatMessage; onNavigate: () => void }) {
   const mine = message.role === 'user';
   return (
@@ -152,6 +155,20 @@ export function AssistantPanel() {
               {messages.map((m) => (
                 <Bubble key={m.id} message={m} onNavigate={close} />
               ))}
+              {last?.role === 'assistant' && last.status === 'done' && canAsk && !busy && (
+                <li className="flex flex-wrap gap-1.5" aria-label="Уточнить ответ">
+                  {FOLLOW_UPS.map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => send(q)}
+                      className="rounded-full border border-border px-3 py-1 text-sm hover:bg-surface-2"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </li>
+              )}
             </ul>
           )}
 
