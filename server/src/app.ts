@@ -5,6 +5,8 @@ import { secureHeaders } from 'hono/secure-headers';
 import { memoryRateLimiter, type RateLimiter } from './auth/rate-limit';
 import { authRoutes } from './auth/routes';
 import { syncRoutes } from './sync/routes';
+import { aiRoutes } from './ai/routes';
+import { deepseekProvider, type ChatProvider } from './ai/provider';
 import type { Config } from './config';
 import type { Db } from './db';
 import { HttpError, internal, notFound, payloadTooLarge } from './errors';
@@ -18,13 +20,22 @@ export interface AppDeps {
   mailer: Mailer;
   /** In-memory by default (one server process). */
   limiter?: RateLimiter;
+  /** AI provider; by default DeepSeek when a key is configured, otherwise AI is off. */
+  ai?: ChatProvider | null;
 }
 
 export const API_PREFIX = '/api/v1';
 export const VERSION = '0.1.0';
 
 /** The API as a Hono app (no network listener): main.ts serves it, tests call `app.request`. */
-export function createApp({ config, logger, db, mailer, limiter = memoryRateLimiter() }: AppDeps) {
+export function createApp({
+  config,
+  logger,
+  db,
+  mailer,
+  limiter = memoryRateLimiter(),
+  ai = config.ai.apiKey ? deepseekProvider({ apiKey: config.ai.apiKey }) : null,
+}: AppDeps) {
   const app = new Hono();
 
   app.use(
@@ -71,6 +82,7 @@ export function createApp({ config, logger, db, mailer, limiter = memoryRateLimi
 
   app.route(API_PREFIX, authRoutes({ config, db, logger, mailer, limiter, apiPrefix: API_PREFIX }));
   app.route(API_PREFIX, syncRoutes({ config, db }));
+  app.route(API_PREFIX, aiRoutes({ config, db, logger, provider: ai }));
 
   app.notFound((c) => {
     const error = notFound();

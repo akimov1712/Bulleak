@@ -1,6 +1,7 @@
 import {
   bigint,
   boolean,
+  date,
   integer,
   jsonb,
   pgTable,
@@ -89,7 +90,20 @@ export const syncRecords = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.kind, t.uid] })],
 );
 
-export const schema = { users, sessions, emailTokens, progress, settings, syncRecords };
+export const aiUsage = pgTable(
+  'ai_usage',
+  {
+    userId: owner(),
+    /** UTC day, 'YYYY-MM-DD'. */
+    day: date('day', { mode: 'string' }).notNull(),
+    requests: integer('requests').notNull().default(0),
+    inputTokens: bigint('input_tokens', { mode: 'number' }).notNull().default(0),
+    outputTokens: bigint('output_tokens', { mode: 'number' }).notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] })],
+);
+
+export const schema = { users, sessions, emailTokens, progress, settings, syncRecords, aiUsage };
 
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;

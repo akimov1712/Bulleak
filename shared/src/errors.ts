@@ -16,6 +16,10 @@ export const ERROR_CODES = [
   'token_invalid',
   /** The current password did not match (account deletion); not a sign-out. */
   'wrong_password',
+  /** A daily or monthly AI limit is reached; the model was not called. */
+  'ai_quota',
+  /** AI is off (no key) or the provider failed. */
+  'ai_unavailable',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

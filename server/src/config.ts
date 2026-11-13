@@ -29,6 +29,14 @@ const envSchema = z
     MAIL_OUTBOX: z.string().optional(),
     /** Behind a reverse proxy: take the client address from X-Forwarded-For. */
     TRUST_PROXY: z.stringbool().default(false),
+    /** DeepSeek key; without it the AI gateway is off. */
+    DEEPSEEK_API_KEY: z.string().optional(),
+    /** AI requests per learner per UTC day. */
+    AI_DAILY_REQUESTS: z.coerce.number().int().min(0).default(30),
+    /** Input + output tokens for the whole site per calendar month. */
+    AI_MONTHLY_TOKENS: z.coerce.number().int().min(0).default(5_000_000),
+    AI_MODEL_CHAT: z.string().min(1).default('deepseek-flash'),
+    AI_MODEL_REVIEW: z.string().min(1).default('deepseek-v4-pro'),
     /** Largest accepted request body, bytes. */
     BODY_LIMIT: z.coerce
       .number()
@@ -79,6 +87,11 @@ const envSchema = z
       refreshTransport: env.REFRESH_TRANSPORT,
       trustProxy: env.TRUST_PROXY,
       bodyLimit: env.BODY_LIMIT,
+      ai: {
+        apiKey: env.DEEPSEEK_API_KEY ?? null,
+        limits: { dailyRequests: env.AI_DAILY_REQUESTS, monthlyTokens: env.AI_MONTHLY_TOKENS },
+        models: { chat: env.AI_MODEL_CHAT, review: env.AI_MODEL_REVIEW },
+      },
       database: databaseTarget(env.NODE_ENV, env.DATABASE_URL),
     };
   });
