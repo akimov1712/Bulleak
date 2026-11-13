@@ -4,6 +4,7 @@ import {
   aiStatusSchema,
   apiErrorSchema,
   authResponseSchema,
+  createSseParser,
   type CourseChunk,
 } from '@bulleak/shared';
 import { API_PREFIX, createApp } from '../app';
@@ -20,8 +21,14 @@ import {
   tokenize,
   type CourseSearch,
 } from './retrieval';
-import { searchQuery, sourcesOf } from './routes';
-import { deepseekProvider, mockProvider, ProviderError, type ChatProvider } from './provider';
+import { estimateUsage, searchQuery, sourcesOf } from './routes';
+import {
+  deepseekProvider,
+  mockProvider,
+  ProviderError,
+  readChatStream,
+  type ChatProvider,
+} from './provider';
 import { decideQuota } from './quota';
 
 describe('decideQuota', () => {
@@ -194,6 +201,7 @@ describe('/ai routes', () => {
 
     await database.db.delete(users);
     const failing = setup({
+      ...mockProvider(),
       name: 'broken',
       complete: () => Promise.reject(new ProviderError('deepseek answered 402')),
     });
@@ -223,6 +231,60 @@ describe('/ai routes', () => {
       { kind: 'lesson', ref: 'm06-l01', title: 'Фандинг' },
     ]);
     expect(provider.requests[0]?.system).toContain('Фандинг платят каждые 8 часов.');
+  });
+
+  const events = async (res: Response) => {
+    const parser = createSseParser();
+    return [...parser.push(await res.text()), ...parser.end()].map((e) => ({
+      event: e.event,
+      data: JSON.parse(e.data) as Record<string, unknown>,
+    }));
+  };
+  const stream = (app: ReturnType<typeof setup>, t: string, body: unknown) =>
+    app.request(`${API_PREFIX}/ai/chat/stream`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+  it('streams the answer in pieces, then the quota, and counts the request', async () => {
+    const app = setup(mockProvider(() => 'Стоп ставят за уровень.'));
+    const t = await token(app);
+    const res = await stream(app, t, ask);
+    expect(res.headers.get('content-type')).toContain('text/event-stream');
+    expect(res.headers.get('x-accel-buffering')).toBe('no');
+    const got = await events(res);
+    const text = got
+      .filter((e) => e.event === 'delta')
+      .map((e) => e.data.text)
+      .join('');
+    expect(text).toBe('Стоп ставят за уровень.');
+    expect(got.filter((e) => e.event === 'delta').length).toBeGreaterThan(1);
+    expect(got.at(-1)).toEqual({ event: 'done', data: { remaining: 1, sources: [] } });
+    await stream(app, t, ask);
+    const over = await stream(app, t, ask);
+    expect(over.status).toBe(429);
+    expect(apiErrorSchema.parse(await over.json()).error.code).toBe('ai_quota');
+  });
+
+  it('ends the stream with a safe error when the model breaks mid-answer', async () => {
+    const app = setup({
+      ...mockProvider(),
+      name: 'broken',
+      stream: (_req, { onDelta }) => {
+        onDelta('Нача');
+        return Promise.reject(new ProviderError('deepseek stream broke: reset'));
+      },
+    });
+    const t = await token(app);
+    const got = await events(await stream(app, t, ask));
+    expect(got.map((e) => e.event)).toEqual(['delta', 'error']);
+    expect(got[1]?.data).toMatchObject({ code: 'ai_unavailable' });
+    expect(JSON.stringify(got)).not.toContain('reset');
+    const status = await app.request(`${API_PREFIX}/ai/status`, {
+      headers: { Authorization: `Bearer ${t}` },
+    });
+    expect(aiStatusSchema.parse(await status.json()).remaining).toBe(1);
   });
 
   it('rejects a conversation that does not end with a question, and guests', async () => {
@@ -288,5 +350,60 @@ describe('course search', () => {
     const hit = loaded.search.search('что такое ликвидация позиции')[0];
     expect(hit?.chunk.text.toLowerCase()).toContain('ликвид');
     expect(loadCourseSearch(new URL('file:///nope.json')).search.size).toBe(0);
+  });
+});
+
+describe('streaming (T-2102)', () => {
+  const sseBody = (parts: string[]) =>
+    new ReadableStream<Uint8Array>({
+      start(controller) {
+        const enc = new TextEncoder();
+        for (const p of parts) controller.enqueue(enc.encode(p));
+        controller.close();
+      },
+    });
+
+  it('reads DeepSeek deltas and the usage chunk', async () => {
+    const pieces: string[] = [];
+    const result = await readChatStream(
+      sseBody([
+        'data: {"choices":[{"delta":{"content":" При"}}]}\n\n',
+        'data: {"choices":[{"delta":{"content":"вет"}}]}\n\ndata: {"choices":[],',
+        '"usage":{"prompt_tokens":40,"completion_tokens":7}}\n\ndata: [DONE]\n\n',
+      ]),
+      (t) => pieces.push(t),
+    );
+    expect(pieces).toEqual(['При', 'вет']);
+    expect(result).toEqual({ text: 'Привет', usage: { inputTokens: 40, outputTokens: 7 } });
+  });
+
+  it('asks DeepSeek for a stream with usage', async () => {
+    const fetchMock = vi.fn((..._args: unknown[]) =>
+      Promise.resolve(
+        new Response(sseBody(['data: {"choices":[{"delta":{"content":"Да"}}]}\n\n'])),
+      ),
+    );
+    const provider = deepseekProvider({ apiKey: 'k', fetch: fetchMock as unknown as typeof fetch });
+    const req = { model: 'm', system: 's', messages: [{ role: 'user' as const, content: 'q' }] };
+    await expect(
+      provider.stream({ ...req, maxTokens: 5 }, { onDelta: () => {} }),
+    ).resolves.toMatchObject({ text: 'Да' });
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      stream: true,
+      stream_options: { include_usage: true },
+    });
+  });
+
+  it('estimates the tokens of a cut-off answer', () => {
+    const req = {
+      model: 'm',
+      system: 'abc',
+      messages: [{ role: 'user' as const, content: 'abc' }],
+    };
+    expect(estimateUsage({ ...req, maxTokens: 1 }, 'abcd')).toEqual({
+      inputTokens: 2,
+      outputTokens: 2,
+    });
   });
 });

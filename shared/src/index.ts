@@ -4,3 +4,4 @@ export * from './auth';
 export * from './password';
 export * from './sync';
 export * from './ai';
+export * from './sse';

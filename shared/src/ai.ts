@@ -65,3 +65,13 @@ export const aiChatResponseSchema = z.object({
   sources: z.array(aiSourceSchema).default([]),
 });
 export type AiChatResponse = z.infer<typeof aiChatResponseSchema>;
+
+/**
+ * POST /ai/chat/stream (T-2102) answers with server-sent events: `delta` — a piece of the text,
+ * then `done` with the quota and sources, or `error` if the model failed mid-answer.
+ */
+export const AI_STREAM_EVENTS = { delta: 'delta', done: 'done', error: 'error' } as const;
+export const aiStreamDeltaSchema = z.object({ text: z.string() });
+export const aiStreamDoneSchema = aiChatResponseSchema.omit({ text: true });
+export type AiStreamDone = z.infer<typeof aiStreamDoneSchema>;
+export const aiStreamErrorSchema = z.object({ code: z.string(), message: z.string() });

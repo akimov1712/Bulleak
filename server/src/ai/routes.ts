@@ -1,11 +1,14 @@
 /** /ai/* — the AI gateway for signed-in learners (docs/04-features/ai-platform.md). */
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
+import { streamSSE } from 'hono/streaming';
 import {
+  AI_STREAM_EVENTS,
   aiChatBodySchema,
   type AiChatBody,
   type AiChatResponse,
   type AiSource,
   type AiStatus,
+  type AiStreamDone,
   type CourseChunk,
 } from '@bulleak/shared';
 import type { Config } from '../config';
@@ -15,7 +18,7 @@ import { parseBody, type AuthedEnv } from '../http';
 import type { Logger } from '../log';
 import { requireAuth } from '../auth/routes';
 import { pickExcerpts, systemPrompt } from './prompt';
-import { ProviderError, type ChatProvider } from './provider';
+import { ProviderError, type ChatProvider, type ChatRequest, type ChatUsage } from './provider';
 import { decideQuota, readQuotaState, recordUsage } from './quota';
 import { createCourseSearch, type CourseSearch } from './retrieval';
 
@@ -55,6 +58,12 @@ export function sourcesOf(excerpts: readonly CourseChunk[]): AiSource[] {
   return out;
 }
 
+/** Rough token count of a cut-off answer (no usage from the model): ~3 characters a token. */
+export function estimateUsage(request: ChatRequest, answer: string): ChatUsage {
+  const input = request.system.length + request.messages.reduce((n, m) => n + m.content.length, 0);
+  return { inputTokens: Math.ceil(input / 3), outputTokens: Math.ceil(answer.length / 3) };
+}
+
 export function aiRoutes({
   config,
   db,
@@ -78,7 +87,8 @@ export function aiRoutes({
     return c.json(body);
   });
 
-  app.post('/ai/chat', async (c) => {
+  /** Everything before the model call: auth, validation, quota, excerpts. Throws HTTP errors. */
+  async function prepare(c: Context<AuthedEnv>) {
     if (!provider) throw unavailable();
     const body = await parseBody(c, aiChatBodySchema);
     const userId = c.get('userId');
@@ -94,28 +104,73 @@ export function aiRoutes({
       );
     }
     const excerpts = pickExcerpts(course.search(searchQuery(body.messages), 6).map((h) => h.chunk));
+    const request: ChatRequest = {
+      model: body.purpose === 'review' ? config.ai.models.review : config.ai.models.chat,
+      system: systemPrompt(body.purpose, excerpts),
+      messages: body.messages,
+      maxTokens: body.purpose === 'review' ? 900 : 600,
+    };
+    return { provider, userId, at, request, remaining: decision.remaining, excerpts };
+  }
+
+  const logFailure = (name: string, error: ProviderError) =>
+    logger.error('ai provider failed', { provider: name, reason: error.message });
+
+  app.post('/ai/chat', async (c) => {
+    const job = await prepare(c);
     try {
-      const result = await provider.complete({
-        model: body.purpose === 'review' ? config.ai.models.review : config.ai.models.chat,
-        system: systemPrompt(body.purpose, excerpts),
-        messages: body.messages,
-        maxTokens: body.purpose === 'review' ? 900 : 600,
-      });
-      await recordUsage(db, userId, at, result.usage);
+      const result = await job.provider.complete(job.request);
+      await recordUsage(db, job.userId, job.at, result.usage);
       const answer: AiChatResponse = {
         text: result.text,
-        remaining: decision.remaining,
-        sources: sourcesOf(excerpts),
+        remaining: job.remaining,
+        sources: sourcesOf(job.excerpts),
       };
       c.header('Cache-Control', 'no-store');
       return c.json(answer);
     } catch (error) {
       if (error instanceof ProviderError) {
-        logger.error('ai provider failed', { provider: provider.name, reason: error.message });
+        logFailure(job.provider.name, error);
         throw unavailable();
       }
       throw error;
     }
+  });
+
+  // T-2102: the same answer as server-sent events. Errors before the first byte are plain JSON.
+  app.post('/ai/chat/stream', async (c) => {
+    const job = await prepare(c);
+    c.header('Cache-Control', 'no-store');
+    // nginx must pass pieces through at once instead of buffering the whole answer.
+    c.header('X-Accel-Buffering', 'no');
+    return streamSSE(c, async (stream) => {
+      const abort = new AbortController();
+      stream.onAbort(() => abort.abort());
+      let sent = '';
+      try {
+        const result = await job.provider.stream(job.request, {
+          signal: abort.signal,
+          onDelta: (text) => {
+            sent += text;
+            void stream.writeSSE({ event: AI_STREAM_EVENTS.delta, data: JSON.stringify({ text }) });
+          },
+        });
+        await recordUsage(db, job.userId, job.at, result.usage);
+        const done: AiStreamDone = { remaining: job.remaining, sources: sourcesOf(job.excerpts) };
+        await stream.writeSSE({ event: AI_STREAM_EVENTS.done, data: JSON.stringify(done) });
+      } catch (error) {
+        if (!(error instanceof ProviderError)) throw error;
+        // A cut-off answer still counts: the model already worked on it.
+        await recordUsage(db, job.userId, job.at, estimateUsage(job.request, sent));
+        if (abort.signal.aborted) return;
+        logFailure(job.provider.name, error);
+        const e = unavailable();
+        await stream.writeSSE({
+          event: AI_STREAM_EVENTS.error,
+          data: JSON.stringify({ code: e.code, message: e.message }),
+        });
+      }
+    });
   });
 
   return app;
