@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import {
+  AI_STREAM_EVENTS,
   accountExportSchema,
+  aiStatusSchema,
+  aiStreamDeltaSchema,
+  aiStreamDoneSchema,
+  aiStreamErrorSchema,
+  createSseParser,
+  type AiChatBody,
+  type AiStatus,
+  type AiStreamDone,
   apiErrorSchema,
   authResponseSchema,
   progressDocSchema,
@@ -91,6 +100,13 @@ interface SendOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
   token?: string;
+  signal?: AbortSignal;
+}
+
+export interface AiStreamHandlers {
+  /** Each new piece of the answer. */
+  onDelta: (text: string) => void;
+  signal?: AbortSignal;
 }
 
 export type ApiClient = ReturnType<typeof createApiClient>;
@@ -107,7 +123,7 @@ export function createApiClient({
   let access: { token: string; expiresAt: number } | null = null;
   let refreshing: Promise<string> | null = null;
 
-  async function send(path: string, { method = 'POST', body, token }: SendOptions = {}) {
+  async function send(path: string, { method = 'POST', body, token, signal }: SendOptions = {}) {
     const headers: Record<string, string> = {};
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (token) headers.Authorization = `Bearer ${token}`;
@@ -118,8 +134,10 @@ export function createApiClient({
         body: body === undefined ? undefined : JSON.stringify(body),
         // The refresh token may be an HttpOnly cookie on the API domain.
         credentials: 'include',
+        ...(signal ? { signal } : {}),
       });
-    } catch {
+    } catch (error) {
+      if (signal?.aborted) throw error;
       throw new ApiError('network', NETWORK_MESSAGE);
     }
   }
@@ -307,6 +325,61 @@ export function createApiClient({
     async deleteAccount(body: DeleteAccountBody) {
       await authed('/me', nothing, { method: 'DELETE', body });
       endSession();
+    },
+
+    /** Is the assistant on, and how many questions are left today. */
+    aiStatus: (): Promise<AiStatus> => authed('/ai/status', aiStatusSchema, { method: 'GET' }),
+
+    /**
+     * Asks the assistant and hands out the answer as it is written (T-2102). Resolves with the
+     * quota and sources; an error event or a cut stream rejects with ApiError.
+     */
+    async aiChatStream(
+      body: AiChatBody,
+      { onDelta, signal }: AiStreamHandlers,
+    ): Promise<AiStreamDone> {
+      const res = await authedResponse('/ai/chat/stream', { body, ...(signal ? { signal } : {}) });
+      if (!res.ok) throw await failure(res);
+      if (!res.body) throw new ApiError('bad_response', BAD_RESPONSE_MESSAGE, res.status);
+      const parser = createSseParser();
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      for (;;) {
+        let chunk: ReadableStreamReadResult<Uint8Array>;
+        try {
+          chunk = await reader.read();
+        } catch (error) {
+          if (signal?.aborted) throw error;
+          throw new ApiError('network', NETWORK_MESSAGE);
+        }
+        const events = chunk.done
+          ? parser.end()
+          : parser.push(decoder.decode(chunk.value, { stream: true }));
+        for (const e of events) {
+          let data: unknown;
+          try {
+            data = JSON.parse(e.data);
+          } catch {
+            continue;
+          }
+          if (e.event === AI_STREAM_EVENTS.delta) {
+            const delta = aiStreamDeltaSchema.safeParse(data);
+            if (delta.success) onDelta(delta.data.text);
+          } else if (e.event === AI_STREAM_EVENTS.done) {
+            const done = aiStreamDoneSchema.safeParse(data);
+            if (!done.success) throw new ApiError('bad_response', BAD_RESPONSE_MESSAGE);
+            return done.data;
+          } else if (e.event === AI_STREAM_EVENTS.error) {
+            const err = aiStreamErrorSchema.safeParse(data);
+            throw new ApiError(
+              'ai_unavailable',
+              err.success ? err.data.message : BAD_RESPONSE_MESSAGE,
+              503,
+            );
+          }
+        }
+        if (chunk.done) throw new ApiError('network', NETWORK_MESSAGE);
+      }
     },
 
     async resetPassword(token: string, password: string) {

@@ -280,3 +280,65 @@ describe('localSessionStore', () => {
     expect(localStorage.getItem(SESSION_KEY)).toBeNull();
   });
 });
+
+describe('aiChatStream', () => {
+  const sse = (text: string) =>
+    new Response(
+      new ReadableStream<Uint8Array>({
+        start(c) {
+          const enc = new TextEncoder();
+          // Split mid-event, as the network does.
+          c.enqueue(enc.encode(text.slice(0, 25)));
+          c.enqueue(enc.encode(text.slice(25)));
+          c.close();
+        },
+      }),
+      { headers: { 'Content-Type': 'text/event-stream' } },
+    );
+
+  async function signedIn(stream: Route) {
+    const api = fakeApi({ '/auth/login': () => session('a1', 'r1'), '/ai/chat/stream': stream });
+    const c = client(api);
+    await c.api.login({ email: user.email, password: 'T7#mVq2!xLong' });
+    return { ...c, calls: api.calls };
+  }
+
+  const ask = { messages: [{ role: 'user' as const, content: 'Что такое стоп?' }] };
+
+  it('hands out the pieces and resolves with the quota and sources', async () => {
+    const { api, calls } = await signedIn(() =>
+      sse(
+        'event: delta\ndata: {"text":"Стоп — "}\n\nevent: delta\ndata: {"text":"выход."}\n\n' +
+          'event: done\ndata: {"remaining":4,"sources":[{"kind":"term","ref":"sl","title":"Стоп"}]}\n\n',
+      ),
+    );
+    const pieces: string[] = [];
+    const done = await api.aiChatStream(ask, { onDelta: (t) => pieces.push(t) });
+    expect(pieces.join('')).toBe('Стоп — выход.');
+    expect(done).toEqual({ remaining: 4, sources: [{ kind: 'term', ref: 'sl', title: 'Стоп' }] });
+    expect(calls[1] && authOf(calls[1].init)).toBe('Bearer a1');
+  });
+
+  it('rejects with the server message on an error event, a quota or a cut stream', async () => {
+    const broken = await signedIn(() =>
+      sse(
+        'event: delta\ndata: {"text":"Нач"}\n\nevent: error\ndata: {"code":"ai_unavailable","message":"Помощник сейчас недоступен."}\n\n',
+      ),
+    );
+    await expect(broken.api.aiChatStream(ask, { onDelta: () => {} })).rejects.toMatchObject({
+      code: 'ai_unavailable',
+      message: 'Помощник сейчас недоступен.',
+    });
+
+    const quota = await signedIn(() =>
+      json(429, { error: { code: 'ai_quota', message: 'На сегодня вопросы закончились' } }),
+    );
+    await expect(quota.api.aiChatStream(ask, { onDelta: () => {} })).rejects.toMatchObject({
+      code: 'ai_quota',
+      status: 429,
+    });
+
+    const cut = await signedIn(() => sse('event: delta\ndata: {"text":"Нач"}\n\n'));
+    await expect(cut.api.aiChatStream(ask, { onDelta: () => {} })).rejects.toBeInstanceOf(ApiError);
+  });
+});
