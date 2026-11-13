@@ -120,3 +120,19 @@ describe('AssistantPanel', () => {
     expect(screen.queryByLabelText('Вопрос помощнику')).not.toBeInTheDocument();
   });
 });
+
+describe('assistant history (T-2306)', () => {
+  it('is saved on this device and wiped on sign-out', async () => {
+    setup(() =>
+      sse(
+        'event: delta\ndata: {"text":"Ответ."}\n\nevent: done\ndata: {"remaining":3,"sources":[]}\n\n',
+      ),
+    );
+    await useAssistant.getState().ask('Вопрос');
+    expect(useAssistant.getState().messages.map((m) => m.text)).toEqual(['Вопрос', 'Ответ.']);
+    expect(localStorage.getItem('tc-assistant')).toContain('Ответ.');
+    useAuth.setState({ user: null });
+    expect(useAssistant.getState().messages).toEqual([]);
+    expect(localStorage.getItem('tc-assistant')).not.toContain('Ответ.');
+  });
+});

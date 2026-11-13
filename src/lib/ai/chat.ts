@@ -83,3 +83,45 @@ export function suggestions(context: ChatContext = {}): string[] {
     'Почему стоп нужен в каждой сделке?',
   ];
 }
+
+/** Messages kept on this device (T-2306): enough to scroll back, small in storage. */
+export const CHAT_KEPT = 40;
+
+const SOURCE_KINDS = new Set(['lesson', 'term', 'cheatsheet']);
+
+function isSource(value: unknown): value is AiSource {
+  if (typeof value !== 'object' || value === null) return false;
+  const s = value as Record<string, unknown>;
+  return (
+    typeof s.kind === 'string' &&
+    SOURCE_KINDS.has(s.kind) &&
+    typeof s.ref === 'string' &&
+    typeof s.title === 'string'
+  );
+}
+
+/**
+ * Saved history → messages: broken entries dropped, the last CHAT_KEPT kept. An answer that was
+ * still streaming when the page closed is kept as cut off (or dropped if it was empty).
+ */
+export function sanitizeHistory(raw: unknown): ChatMessage[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ChatMessage[] = [];
+  for (const item of raw as unknown[]) {
+    if (typeof item !== 'object' || item === null) continue;
+    const m = item as Record<string, unknown>;
+    if (typeof m.id !== 'string' || typeof m.text !== 'string') continue;
+    if (m.role !== 'user' && m.role !== 'assistant') continue;
+    if (m.status !== 'done' && m.status !== 'error' && m.status !== 'streaming') continue;
+    if (m.status === 'streaming' && !m.text) continue;
+    const sources = Array.isArray(m.sources) ? m.sources.filter(isSource) : [];
+    out.push({
+      id: m.id,
+      role: m.role,
+      text: m.status === 'streaming' ? `${m.text} …` : m.text,
+      status: m.status === 'streaming' ? 'done' : m.status,
+      ...(sources.length ? { sources } : {}),
+    });
+  }
+  return out.slice(-CHAT_KEPT);
+}

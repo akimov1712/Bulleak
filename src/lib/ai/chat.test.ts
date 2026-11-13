@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { AI_HISTORY_MAX } from '@bulleak/shared';
 import {
+  CHAT_KEPT,
   chatRequest,
   lessonIdFromPathname,
   plainAnswer,
+  sanitizeHistory,
   suggestions,
   type ChatMessage,
 } from './chat';
@@ -62,5 +64,48 @@ describe('helpers', () => {
   it('suggests questions about the lesson when there is one', () => {
     expect(suggestions({ lessonTitle: 'RSI' })[0]).toContain('урока');
     expect(suggestions()).toHaveLength(3);
+  });
+});
+
+describe('sanitizeHistory', () => {
+  it('keeps valid messages, closes cut-off answers and drops junk', () => {
+    expect(
+      sanitizeHistory([
+        { id: 'a', role: 'user', text: 'Вопрос', status: 'done' },
+        {
+          id: 'b',
+          role: 'assistant',
+          text: 'Отв',
+          status: 'streaming',
+          sources: [{ kind: 'term', ref: 'sl', title: 'Стоп' }, { kind: 'x' }],
+        },
+        { id: 'c', role: 'assistant', text: '', status: 'streaming' },
+        { id: 'd', role: 'system', text: 'x', status: 'done' },
+        null,
+        'junk',
+      ]),
+    ).toEqual([
+      { id: 'a', role: 'user', text: 'Вопрос', status: 'done' },
+      {
+        id: 'b',
+        role: 'assistant',
+        text: 'Отв …',
+        status: 'done',
+        sources: [{ kind: 'term', ref: 'sl', title: 'Стоп' }],
+      },
+    ]);
+    expect(sanitizeHistory({})).toEqual([]);
+  });
+
+  it('keeps only the latest messages', () => {
+    const many = Array.from({ length: CHAT_KEPT + 5 }, (_, i) => ({
+      id: String(i),
+      role: 'user',
+      text: 't',
+      status: 'done',
+    }));
+    const kept = sanitizeHistory(many);
+    expect(kept).toHaveLength(CHAT_KEPT);
+    expect(kept[0]?.id).toBe('5');
   });
 });
